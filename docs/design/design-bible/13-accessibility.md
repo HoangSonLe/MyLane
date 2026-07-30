@@ -10,7 +10,7 @@ Not an optional feature.
 
 ---
 
-# Text
+## Text
 
 Readable.
 
@@ -22,7 +22,7 @@ Avoid tiny fonts.
 
 ---
 
-# Touch Targets
+## Touch Targets
 
 Large enough for thumbs.
 
@@ -30,7 +30,7 @@ Avoid tiny buttons.
 
 ---
 
-# Color
+## Color
 
 Never rely only on color.
 
@@ -46,7 +46,7 @@ Animation
 
 ---
 
-# Motion
+## Motion
 
 Respect Reduced Motion.
 
@@ -54,13 +54,13 @@ Animations should never be required.
 
 ---
 
-# Sound
+## Sound
 
 Every sound should have a visual alternative.
 
 ---
 
-# Haptic
+## Haptic
 
 Optional.
 
@@ -68,25 +68,25 @@ Never mandatory.
 
 ---
 
-# Contrast
+## Contrast
 
 Maintain readable contrast across all themes.
 
 ---
 
-# Keyboard
+## Keyboard
 
 Desktop should support keyboard navigation.
 
 ---
 
-# Screen Reader
+## Screen Reader
 
 Interactive components require labels.
 
 ---
 
-# Focus
+## Focus
 
 Visible.
 
@@ -96,7 +96,7 @@ Predictable.
 
 ---
 
-# Error Messages
+## Error Messages
 
 Explain
 
@@ -106,7 +106,7 @@ How to fix it
 
 ---
 
-# Color Blindness
+## Color Blindness
 
 Support
 
@@ -120,7 +120,7 @@ Never use red vs green alone.
 
 ---
 
-# Flashing
+## Flashing
 
 Avoid flashing animations.
 
@@ -128,6 +128,6 @@ Especially during gameplay.
 
 ---
 
-# Accessibility Goal
+## Accessibility Goal
 
 Every player should be able to enjoy the game comfortably.

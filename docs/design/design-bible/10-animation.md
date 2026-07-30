@@ -12,7 +12,7 @@ Not notice the animation.
 
 ---
 
-# Motion Goals
+## Motion Goals
 
 Guide attention
 
@@ -24,7 +24,7 @@ Increase delight
 
 ---
 
-# Principles
+## Principles
 
 Fast
 
@@ -38,7 +38,7 @@ Interruptible
 
 ---
 
-# Use Motion For
+## Use Motion For
 
 Navigation
 
@@ -60,7 +60,7 @@ Completion
 
 ---
 
-# Never Animate
+## Never Animate
 
 Large blocks of text
 
@@ -72,7 +72,7 @@ Everything at once
 
 ---
 
-# Gameplay
+## Gameplay
 
 Correct Answer
 
@@ -100,7 +100,7 @@ Encouragement
 
 ---
 
-# Transition
+## Transition
 
 Transitions should preserve context.
 
@@ -108,7 +108,7 @@ Avoid hard cuts whenever possible.
 
 ---
 
-# Loading
+## Loading
 
 Skeleton preferred.
 
@@ -116,7 +116,7 @@ Spinner only when unavoidable.
 
 ---
 
-# Micro Interaction
+## Micro Interaction
 
 Buttons
 
@@ -144,7 +144,7 @@ Celebration
 
 ---
 
-# Achievement Animation
+## Achievement Animation
 
 Short.
 
@@ -154,7 +154,7 @@ Never longer than necessary.
 
 ---
 
-# Confetti
+## Confetti
 
 Use only for
 
@@ -164,7 +164,7 @@ Never after every game.
 
 ---
 
-# Sound
+## Sound
 
 Sound and animation should reinforce each other.
 
@@ -172,7 +172,7 @@ Never compete.
 
 ---
 
-# Accessibility
+## Accessibility
 
 Support
 
@@ -182,7 +182,7 @@ Animations should respect user preferences.
 
 ---
 
-# Overall Feeling
+## Overall Feeling
 
 Calm.
 

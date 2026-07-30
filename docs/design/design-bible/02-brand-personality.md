@@ -10,7 +10,7 @@ It should never feel like an exam.
 
 ---
 
-# Brand Archetype
+## Brand Archetype
 
 Primary
 
@@ -50,7 +50,7 @@ The application is not a classroom.
 
 ---
 
-# Personality
+## Personality
 
 Memory Arena should feel:
 
@@ -96,7 +96,7 @@ Never feel:
 
 ---
 
-# Emotional Journey
+## Emotional Journey
 
 When opening the app
 
@@ -126,7 +126,7 @@ Play one more round
 
 ---
 
-# Brand Keywords
+## Brand Keywords
 
 Progress
 
@@ -154,7 +154,7 @@ Arena
 
 ---
 
-# Voice
+## Voice
 
 The interface speaks like a coach.
 
@@ -196,7 +196,7 @@ IQ Score.
 
 ---
 
-# Motivation Style
+## Motivation Style
 
 Reward effort.
 
@@ -208,7 +208,7 @@ Never shame failure.
 
 ---
 
-# Success Feeling
+## Success Feeling
 
 Players should leave each session thinking:
 

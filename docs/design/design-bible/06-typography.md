@@ -10,7 +10,7 @@ Never force users to decode text.
 
 ---
 
-# Font Style
+## Font Style
 
 Use a modern sans-serif.
 
@@ -32,7 +32,7 @@ Display fonts may be used ONLY for logo.
 
 ---
 
-# Hierarchy
+## Hierarchy
 
 Display
 
@@ -74,7 +74,7 @@ Used for
 
 ---
 
-# Text Alignment
+## Text Alignment
 
 Default
 
@@ -93,7 +93,7 @@ Avoid justified text.
 
 ---
 
-# Text Length
+## Text Length
 
 Short.
 
@@ -105,7 +105,7 @@ Never write paragraphs inside cards.
 
 ---
 
-# Numbers
+## Numbers
 
 Scores
 
@@ -119,7 +119,7 @@ Players must recognize numbers immediately.
 
 ---
 
-# Emphasis
+## Emphasis
 
 Prefer
 
@@ -139,7 +139,7 @@ Decorative typography.
 
 ---
 
-# Button Text
+## Button Text
 
 Use verbs.
 
@@ -165,7 +165,7 @@ Submit
 
 ---
 
-# Tone
+## Tone
 
 Simple.
 

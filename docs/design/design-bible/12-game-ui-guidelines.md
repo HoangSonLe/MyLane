@@ -10,7 +10,7 @@ The game remains.
 
 ---
 
-# Gameplay Priority
+## Gameplay Priority
 
 Gameplay should occupy approximately 80% of the screen.
 
@@ -20,7 +20,7 @@ Menus should stay hidden.
 
 ---
 
-# Gameplay Layout
+## Gameplay Layout
 
 Top
 
@@ -42,7 +42,7 @@ Optional Controls
 
 ---
 
-# HUD
+## HUD
 
 Contains only essential information.
 
@@ -62,7 +62,7 @@ Nothing else.
 
 ---
 
-# Gameplay Area
+## Gameplay Area
 
 Always receives visual priority.
 
@@ -74,7 +74,7 @@ No floating widgets.
 
 ---
 
-# Input Area
+## Input Area
 
 Easy to reach.
 
@@ -84,7 +84,7 @@ Immediate feedback.
 
 ---
 
-# Pause
+## Pause
 
 Pause should freeze gameplay.
 
@@ -92,7 +92,7 @@ Never restart automatically.
 
 ---
 
-# Retry
+## Retry
 
 Retry should be instant.
 
@@ -102,7 +102,7 @@ Players retry frequently.
 
 ---
 
-# Success Feedback
+## Success Feedback
 
 Immediate.
 
@@ -122,7 +122,7 @@ Progress update
 
 ---
 
-# Failure Feedback
+## Failure Feedback
 
 Encouraging.
 
@@ -146,7 +146,7 @@ Incorrect
 
 ---
 
-# Timer
+## Timer
 
 Readable.
 
@@ -156,7 +156,7 @@ Never jump around.
 
 ---
 
-# Score
+## Score
 
 Smooth updates.
 
@@ -166,7 +166,7 @@ No unnecessary animation.
 
 ---
 
-# Combo
+## Combo
 
 Celebrate combos.
 
@@ -174,7 +174,7 @@ Do not interrupt gameplay.
 
 ---
 
-# Streak
+## Streak
 
 Reward consistency.
 
@@ -184,7 +184,7 @@ Avoid pressure.
 
 ---
 
-# Progress
+## Progress
 
 Always show progress when useful.
 
@@ -198,7 +198,7 @@ Round 4 / 10
 
 ---
 
-# Difficulty
+## Difficulty
 
 Clearly visible.
 
@@ -206,7 +206,7 @@ Players should always know current difficulty.
 
 ---
 
-# Session Length
+## Session Length
 
 Target
 
@@ -220,7 +220,7 @@ Quick sessions encourage replay.
 
 ---
 
-# Interruption
+## Interruption
 
 Never interrupt gameplay with
 
@@ -234,7 +234,7 @@ Friend requests
 
 ---
 
-# Sound
+## Sound
 
 Optional.
 
@@ -242,7 +242,7 @@ Always configurable.
 
 ---
 
-# Haptic
+## Haptic
 
 Optional.
 
@@ -250,7 +250,7 @@ Never required.
 
 ---
 
-# Accessibility
+## Accessibility
 
 Support
 
@@ -264,7 +264,7 @@ Color Blind Mode
 
 ---
 
-# Daily Challenge
+## Daily Challenge
 
 Should feel special.
 
@@ -272,7 +272,7 @@ Never mandatory.
 
 ---
 
-# Ranking
+## Ranking
 
 Show after gameplay.
 
@@ -280,7 +280,7 @@ Never during gameplay.
 
 ---
 
-# Achievement
+## Achievement
 
 Celebrate after the game.
 
@@ -288,13 +288,13 @@ Never interrupt the game.
 
 ---
 
-# Multiplayer
+## Multiplayer
 
 Opponent information should never hide gameplay.
 
 ---
 
-# Spectator
+## Spectator
 
 Gameplay remains primary.
 
@@ -302,7 +302,7 @@ Chat remains secondary.
 
 ---
 
-# Replay
+## Replay
 
 One tap.
 
@@ -310,7 +310,7 @@ Players should replay immediately.
 
 ---
 
-# Future Games
+## Future Games
 
 Every future game should reuse
 

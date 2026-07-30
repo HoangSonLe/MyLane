@@ -8,7 +8,7 @@ The interface exists to support gameplay, not replace it.
 
 ---
 
-# Principle 1
+## Principle 1
 
 Game Before Dashboard
 
@@ -22,7 +22,7 @@ Gameplay is primary.
 
 ---
 
-# Principle 2
+## Principle 2
 
 One Primary Action
 
@@ -50,7 +50,7 @@ Never make users choose between multiple equally important actions.
 
 ---
 
-# Principle 3
+## Principle 3
 
 Reduce Cognitive Load
 
@@ -66,7 +66,7 @@ Keep interactions simple.
 
 ---
 
-# Principle 4
+## Principle 4
 
 Progress Without Pressure
 
@@ -84,7 +84,7 @@ It is not the center of the experience.
 
 ---
 
-# Principle 5
+## Principle 5
 
 Gameplay Dominates
 
@@ -100,7 +100,7 @@ Notifications should never interrupt gameplay.
 
 ---
 
-# Principle 6
+## Principle 6
 
 Consistency
 
@@ -112,7 +112,7 @@ The design system should grow naturally.
 
 ---
 
-# Principle 7
+## Principle 7
 
 Delight
 
@@ -130,7 +130,7 @@ Not giant rewards.
 
 ---
 
-# Principle 8
+## Principle 8
 
 Mobile First
 
@@ -142,7 +142,7 @@ Never design desktop first.
 
 ---
 
-# Principle 9
+## Principle 9
 
 Expandable
 
@@ -152,7 +152,7 @@ The design should not depend on one specific game.
 
 ---
 
-# Principle 10
+## Principle 10
 
 Invisible UI
 

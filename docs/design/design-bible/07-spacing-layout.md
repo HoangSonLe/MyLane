@@ -10,7 +10,7 @@ The interface should breathe.
 
 ---
 
-# Grid
+## Grid
 
 Use an 8-point spacing system.
 
@@ -38,7 +38,7 @@ Avoid random values.
 
 ---
 
-# Screen Padding
+## Screen Padding
 
 Mobile
 
@@ -50,7 +50,7 @@ Increase padding gradually.
 
 ---
 
-# Vertical Rhythm
+## Vertical Rhythm
 
 Related components
 
@@ -68,7 +68,7 @@ Maintain rhythm across all screens.
 
 ---
 
-# Layout
+## Layout
 
 Each screen should contain
 
@@ -90,7 +90,7 @@ Never mix unrelated content.
 
 ---
 
-# Card Spacing
+## Card Spacing
 
 Internal spacing should remain consistent.
 
@@ -108,7 +108,7 @@ Use the same spacing everywhere.
 
 ---
 
-# Touch Targets
+## Touch Targets
 
 Every interactive component should be thumb-friendly.
 
@@ -116,7 +116,7 @@ Never place tiny buttons.
 
 ---
 
-# Corner Radius
+## Corner Radius
 
 Use a consistent radius system.
 
@@ -132,7 +132,7 @@ Do not invent custom radius values.
 
 ---
 
-# Shadows
+## Shadows
 
 Soft.
 
@@ -144,7 +144,7 @@ Never use shadows as decoration.
 
 ---
 
-# Borders
+## Borders
 
 Use borders only when needed.
 
@@ -156,7 +156,7 @@ Borders second.
 
 ---
 
-# Responsive
+## Responsive
 
 Design mobile first.
 
@@ -166,7 +166,7 @@ Not the opposite.
 
 ---
 
-# Fold
+## Fold
 
 Important content should appear above the fold whenever possible.
 

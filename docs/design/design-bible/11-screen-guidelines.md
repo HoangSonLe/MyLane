@@ -8,7 +8,7 @@ If a screen tries to do too much, split it.
 
 ---
 
-# Standard Screen Structure
+## Standard Screen Structure
 
 Every screen follows this hierarchy.
 
@@ -34,7 +34,7 @@ Never change this order unless gameplay requires it.
 
 ---
 
-# Header
+## Header
 
 Contains
 
@@ -46,7 +46,7 @@ Never overload the header.
 
 ---
 
-# Primary Content
+## Primary Content
 
 The reason this screen exists.
 
@@ -78,7 +78,7 @@ Configuration
 
 ---
 
-# Secondary Content
+## Secondary Content
 
 Supports the primary content.
 
@@ -96,7 +96,7 @@ Achievements
 
 ---
 
-# Primary Action
+## Primary Action
 
 Every screen must have ONE dominant action.
 
@@ -118,7 +118,7 @@ Never create two competing primary actions.
 
 ---
 
-# Navigation
+## Navigation
 
 Only contains destination changes.
 
@@ -126,7 +126,7 @@ Never place gameplay actions inside navigation.
 
 ---
 
-# Empty State
+## Empty State
 
 Every screen must define an empty state.
 
@@ -148,7 +148,7 @@ Every empty state should explain:
 
 ---
 
-# Loading State
+## Loading State
 
 Every screen should define loading behavior.
 
@@ -158,7 +158,7 @@ Avoid blank screens.
 
 ---
 
-# Error State
+## Error State
 
 Every screen should define recovery.
 
@@ -172,7 +172,7 @@ Back
 
 ---
 
-# Responsive
+## Responsive
 
 Mobile first.
 
@@ -182,13 +182,13 @@ Desktop last.
 
 ---
 
-# Fold
+## Fold
 
 Important information should appear without scrolling.
 
 ---
 
-# Scroll
+## Scroll
 
 Prefer one vertical scroll.
 
@@ -196,7 +196,7 @@ Avoid nested scrolling.
 
 ---
 
-# Section Rules
+## Section Rules
 
 Each section should answer one question.
 
@@ -226,7 +226,7 @@ What have I earned?
 
 ---
 
-# Home Screen
+## Home Screen
 
 Purpose
 
@@ -236,7 +236,7 @@ Not statistics.
 
 ---
 
-# Gameplay Screen
+## Gameplay Screen
 
 Purpose
 
@@ -246,7 +246,7 @@ Nothing else.
 
 ---
 
-# Result Screen
+## Result Screen
 
 Purpose
 
@@ -256,7 +256,7 @@ Encourage replay.
 
 ---
 
-# Profile
+## Profile
 
 Purpose
 
@@ -268,7 +268,7 @@ History
 
 ---
 
-# Settings
+## Settings
 
 Purpose
 
@@ -278,7 +278,7 @@ Never mix gameplay.
 
 ---
 
-# Leaderboard
+## Leaderboard
 
 Purpose
 
@@ -288,7 +288,7 @@ Never hide the player's own rank.
 
 ---
 
-# Dialog
+## Dialog
 
 One decision.
 

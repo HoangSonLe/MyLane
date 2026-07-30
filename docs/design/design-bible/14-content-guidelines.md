@@ -10,7 +10,7 @@ Every message should help players continue playing.
 
 ---
 
-# Tone of Voice
+## Tone of Voice
 
 The tone should always be:
 
@@ -31,7 +31,7 @@ Avoid sounding:
 
 ---
 
-# Writing Principles
+## Writing Principles
 
 Write short sentences.
 
@@ -45,7 +45,7 @@ One idea per sentence.
 
 ---
 
-# Button Labels
+## Button Labels
 
 Use action verbs.
 
@@ -81,7 +81,7 @@ Confirm Action
 
 ---
 
-# Titles
+## Titles
 
 Keep titles concise.
 
@@ -101,7 +101,7 @@ Avoid long descriptive titles.
 
 ---
 
-# Empty States
+## Empty States
 
 Every empty state should contain:
 
@@ -125,7 +125,7 @@ Play Now
 
 ---
 
-# Error Messages
+## Error Messages
 
 Always explain:
 
@@ -146,7 +146,7 @@ Avoid technical error codes.
 
 ---
 
-# Success Messages
+## Success Messages
 
 Celebrate progress.
 
@@ -166,7 +166,7 @@ Avoid exaggerated praise.
 
 ---
 
-# Failure Messages
+## Failure Messages
 
 Encourage retry.
 
@@ -192,7 +192,7 @@ Failure
 
 ---
 
-# Achievement Text
+## Achievement Text
 
 Keep achievement names memorable.
 
@@ -210,7 +210,7 @@ Lightning Recall
 
 ---
 
-# Leaderboard
+## Leaderboard
 
 Show ranking respectfully.
 
@@ -218,7 +218,7 @@ Avoid language that shames lower-ranked players.
 
 ---
 
-# Notifications
+## Notifications
 
 Keep notifications under two lines.
 
@@ -232,7 +232,7 @@ New achievement unlocked.
 
 ---
 
-# Localization
+## Localization
 
 Avoid culture-specific jokes.
 
@@ -242,7 +242,7 @@ Keep wording easy to translate.
 
 ---
 
-# Accessibility
+## Accessibility
 
 Avoid using emoji as the only meaning.
 

@@ -12,7 +12,7 @@ Never use colors purely for decoration.
 
 ---
 
-# Design Goals
+## Design Goals
 
 The palette should feel:
 
@@ -28,9 +28,9 @@ Players should feel excited only during interaction.
 
 ---
 
-# Color Roles
+## Color Roles
 
-## Background
+### Background
 
 The main application background.
 
@@ -45,7 +45,7 @@ Purpose:
 
 ---
 
-## Surface
+### Surface
 
 Used for:
 
@@ -58,7 +58,7 @@ Surface should be slightly brighter than Background.
 
 ---
 
-## Surface Elevated
+### Surface Elevated
 
 Used for
 
@@ -71,7 +71,7 @@ Should create depth without heavy shadows.
 
 ---
 
-## Primary
+### Primary
 
 Represents
 
@@ -83,7 +83,7 @@ There should only be ONE primary color.
 
 ---
 
-## Secondary
+### Secondary
 
 Supports Primary.
 
@@ -95,7 +95,7 @@ Used for
 
 ---
 
-## Accent
+### Accent
 
 Accent attracts attention.
 
@@ -112,7 +112,7 @@ Never overuse Accent.
 
 ---
 
-## Success
+### Success
 
 Used for
 
@@ -127,7 +127,7 @@ Never overly saturated.
 
 ---
 
-## Warning
+### Warning
 
 Used for
 
@@ -139,7 +139,7 @@ Not for errors.
 
 ---
 
-## Error
+### Error
 
 Only used when something actually fails.
 
@@ -155,7 +155,7 @@ Gameplay mistakes should encourage retry.
 
 ---
 
-## Information
+### Information
 
 Used for
 
@@ -171,7 +171,7 @@ Hints
 
 ---
 
-# Semantic Rules
+## Semantic Rules
 
 Green
 
@@ -207,7 +207,7 @@ Never mix meanings.
 
 ---
 
-# Contrast
+## Contrast
 
 Text should always remain readable.
 
@@ -227,7 +227,7 @@ Never rely only on color.
 
 ---
 
-# Game Categories
+## Game Categories
 
 Each game category may have an accent color.
 
@@ -271,7 +271,7 @@ The UI does not.
 
 ---
 
-# Future Themes
+## Future Themes
 
 Support
 

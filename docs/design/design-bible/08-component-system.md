@@ -10,7 +10,7 @@ Consistency is more important than originality.
 
 ---
 
-# Component Hierarchy
+## Component Hierarchy
 
 Foundation
 
@@ -34,7 +34,7 @@ Never skip this hierarchy.
 
 ---
 
-# Button
+## Button
 
 Purpose
 
@@ -57,7 +57,7 @@ Never place two primary buttons side by side.
 
 ---
 
-## Secondary Button
+### Secondary Button
 
 Purpose
 
@@ -77,7 +77,7 @@ Secondary buttons should never compete with Primary.
 
 ---
 
-## Ghost Button
+### Ghost Button
 
 Purpose
 
@@ -93,7 +93,7 @@ History
 
 ---
 
-## Icon Button
+### Icon Button
 
 Purpose
 
@@ -117,7 +117,7 @@ Never rely on icon only for destructive actions.
 
 ---
 
-# Card
+## Card
 
 Purpose
 
@@ -147,7 +147,7 @@ Keep them focused.
 
 ---
 
-# Game Card
+## Game Card
 
 Contains
 
@@ -171,7 +171,7 @@ Completion
 
 ---
 
-# Player Card
+## Player Card
 
 Contains
 
@@ -189,7 +189,7 @@ Daily Streak
 
 ---
 
-# Achievement Card
+## Achievement Card
 
 Contains
 
@@ -203,7 +203,7 @@ Unlocked Time
 
 ---
 
-# Statistic Card
+## Statistic Card
 
 Contains
 
@@ -217,7 +217,7 @@ Never display more than one important number.
 
 ---
 
-# Input
+## Input
 
 Purpose
 
@@ -243,7 +243,7 @@ Number
 
 ---
 
-# Search Bar
+## Search Bar
 
 Always place near the top.
 
@@ -251,7 +251,7 @@ Never hide search unless necessary.
 
 ---
 
-# Dialog
+## Dialog
 
 Purpose
 
@@ -279,7 +279,7 @@ Secondary Action
 
 ---
 
-# Toast
+## Toast
 
 Purpose
 
@@ -297,7 +297,7 @@ Never block gameplay.
 
 ---
 
-# Bottom Navigation
+## Bottom Navigation
 
 Contains only primary destinations.
 
@@ -313,7 +313,7 @@ Never place gameplay inside More menu.
 
 ---
 
-# Top App Bar
+## Top App Bar
 
 Contains
 
@@ -327,7 +327,7 @@ Never overload.
 
 ---
 
-# Tabs
+## Tabs
 
 Used only for switching related content.
 
@@ -335,7 +335,7 @@ Never use Tabs as primary navigation.
 
 ---
 
-# Progress Bar
+## Progress Bar
 
 Purpose
 
@@ -353,7 +353,7 @@ Challenge Progress
 
 ---
 
-# Badge
+## Badge
 
 Purpose
 
@@ -375,7 +375,7 @@ Never overuse badges.
 
 ---
 
-# Avatar
+## Avatar
 
 Supports
 
@@ -389,7 +389,7 @@ Always circular.
 
 ---
 
-# Empty State
+## Empty State
 
 Contains
 
@@ -405,7 +405,7 @@ Avoid blank screens.
 
 ---
 
-# Loading
+## Loading
 
 Use Skeleton Loading.
 
@@ -413,7 +413,7 @@ Avoid large spinners whenever possible.
 
 ---
 
-# Error State
+## Error State
 
 Explain
 
@@ -433,7 +433,7 @@ Go Home
 
 ---
 
-# Notification
+## Notification
 
 Should be short.
 
@@ -445,7 +445,7 @@ Never interrupt gameplay.
 
 ---
 
-# Tooltip
+## Tooltip
 
 Explain.
 
@@ -455,7 +455,7 @@ Keep under two lines.
 
 ---
 
-# Dropdown
+## Dropdown
 
 Use only when options exceed available space.
 
@@ -463,19 +463,19 @@ Avoid nested dropdowns.
 
 ---
 
-# Checkbox
+## Checkbox
 
 Used for multiple selections.
 
 ---
 
-# Radio Button
+## Radio Button
 
 Used for single selection.
 
 ---
 
-# Switch
+## Switch
 
 Used for immediate on/off settings.
 
@@ -483,7 +483,7 @@ Never require Save after switching.
 
 ---
 
-# Slider
+## Slider
 
 Used only for continuous values.
 
@@ -497,7 +497,7 @@ Brightness
 
 ---
 
-# Timer
+## Timer
 
 Must remain readable.
 
@@ -505,7 +505,7 @@ Always use monospaced numbers if possible.
 
 ---
 
-# Score
+## Score
 
 Should update smoothly.
 
@@ -513,7 +513,7 @@ Avoid flashing.
 
 ---
 
-# Leaderboard Item
+## Leaderboard Item
 
 Contains
 
@@ -531,7 +531,7 @@ Highlight current user.
 
 ---
 
-# Match History Item
+## Match History Item
 
 Contains
 
@@ -549,7 +549,7 @@ View Details
 
 ---
 
-# Accessibility
+## Accessibility
 
 Every component must support
 
@@ -565,7 +565,7 @@ Responsive Layout
 
 ---
 
-# Component Rules
+## Component Rules
 
 Do
 

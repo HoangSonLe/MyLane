@@ -8,7 +8,7 @@ Icons never replace clear labels.
 
 ---
 
-# Style
+## Style
 
 Modern
 
@@ -22,7 +22,7 @@ Minimal
 
 ---
 
-# Stroke
+## Stroke
 
 Consistent weight.
 
@@ -30,7 +30,7 @@ Never mix outline and filled icons randomly.
 
 ---
 
-# Corner Style
+## Corner Style
 
 Rounded.
 
@@ -38,7 +38,7 @@ Avoid sharp geometric icons.
 
 ---
 
-# Size Hierarchy
+## Size Hierarchy
 
 Small
 
@@ -52,7 +52,7 @@ Never invent random sizes.
 
 ---
 
-# Color
+## Color
 
 Icons inherit semantic color.
 
@@ -60,7 +60,7 @@ Do not color icons only for decoration.
 
 ---
 
-# Icon Categories
+## Icon Categories
 
 Navigation
 
@@ -80,7 +80,7 @@ Status
 
 ---
 
-# Gameplay Icons
+## Gameplay Icons
 
 Sequence
 
@@ -110,7 +110,7 @@ Exit
 
 ---
 
-# Navigation Icons
+## Navigation Icons
 
 Home
 
@@ -128,7 +128,7 @@ History
 
 ---
 
-# Status Icons
+## Status Icons
 
 Online
 
@@ -144,7 +144,7 @@ Upload
 
 ---
 
-# Feedback Icons
+## Feedback Icons
 
 Correct
 
@@ -160,7 +160,7 @@ Loading
 
 ---
 
-# Rules
+## Rules
 
 Always pair unfamiliar icons with text.
 
