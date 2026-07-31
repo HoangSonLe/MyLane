@@ -1,0 +1,45 @@
+import type { ProfileData } from './profile.interface'
+
+export const MOCK_PROFILE: ProfileData = {
+  username: 'Alex Rivera',
+  handle: 'alexr',
+  joinedLabel: 'Joined Jun 2024',
+  overallElo: 1487,
+  categoryElo: [
+    { category: 'number',   label: 'Number Memory',   elo: 1620, delta: +18 },
+    { category: 'alphabet', label: 'Alphabet Memory',  elo: 1390, delta: -12 },
+    { category: 'grid',     label: 'Grid Memory',      elo: 1510, delta:  +5 },
+    { category: 'sequence', label: 'Sequence Memory',  elo: 1428, delta:  +0 },
+  ],
+  categoryBests: [
+    { category: 'number',   label: 'Number',   practiceScore: 4200, practiceLevel: 18, rankedScore: 3860, rankedLevel: 16, highestLevel: 18 },
+    { category: 'alphabet', label: 'Alphabet', practiceScore: 2950, practiceLevel: 13, rankedScore: 2640, rankedLevel: 12, highestLevel: 13 },
+    { category: 'grid',     label: 'Grid',     practiceScore: 3540, practiceLevel: 15, rankedScore: 3110, rankedLevel: 14, highestLevel: 15 },
+    { category: 'sequence', label: 'Sequence', practiceScore: 3220, practiceLevel: 14, rankedScore: 2980, rankedLevel: 13, highestLevel: 14 },
+  ],
+  totalGames: 284,
+  wins: 148,
+  losses: 112,
+  draws: 24,
+  friends: [
+    { id: '1', name: 'Mia Torres',  handle: 'mia_t',     elo: 1480, status: 'online' },
+    { id: '2', name: 'Jake Norris', handle: 'jake_n',    elo: 1310, status: 'in-game' },
+    { id: '3', name: 'Priya Mehta', handle: 'priya.m',   elo: 1622, status: 'online' },
+    { id: '4', name: 'Sam Okafor',  handle: 'samokafor', elo: 1055, status: 'offline' },
+    { id: '5', name: 'Lena Park',   handle: 'lena_p',    elo: 1740, status: 'online' },
+  ],
+  matchHistory: [
+    { id: 'm1',  category: 'number',   categoryLabel: 'Number',   mode: 'Solo Ranked',    outcome: 'win',  score: 3860, playedAt: 'Today' },
+    { id: 'm2',  category: 'sequence', categoryLabel: 'Sequence', mode: 'Versus Ranked',  outcome: 'win',  score: 2980, opponentName: 'Mia Torres',  eloChange: +18, playedAt: 'Today' },
+    { id: 'm3',  category: 'alphabet', categoryLabel: 'Alphabet', mode: 'Versus Ranked',  outcome: 'loss', score: 2410, opponentName: 'Priya Mehta', eloChange: -12, playedAt: 'Today' },
+    { id: 'm4',  category: 'grid',     categoryLabel: 'Grid',     mode: 'Solo Practice',  outcome: 'win',  score: 3110, playedAt: 'Yesterday' },
+    { id: 'm5',  category: 'number',   categoryLabel: 'Number',   mode: 'Versus Ranked',  outcome: 'win',  score: 3540, opponentName: 'Jake Norris', eloChange: +14, playedAt: 'Yesterday' },
+    { id: 'm6',  category: 'sequence', categoryLabel: 'Sequence', mode: 'Solo Practice',  outcome: 'win',  score: 2780, playedAt: 'Yesterday' },
+    { id: 'm7',  category: 'alphabet', categoryLabel: 'Alphabet', mode: 'Solo Ranked',    outcome: 'loss', score: 2120, playedAt: '2d ago' },
+    { id: 'm8',  category: 'grid',     categoryLabel: 'Grid',     mode: 'Versus Unranked', outcome: 'draw', score: 2640, opponentName: 'Sam Okafor',  playedAt: '2d ago' },
+    { id: 'm9',  category: 'number',   categoryLabel: 'Number',   mode: 'Solo Practice',  outcome: 'win',  score: 4200, playedAt: '3d ago' },
+    { id: 'm10', category: 'sequence', categoryLabel: 'Sequence', mode: 'Versus Ranked',  outcome: 'loss', score: 2210, opponentName: 'Lena Park',   eloChange: -20, playedAt: '3d ago' },
+    { id: 'm11', category: 'grid',     categoryLabel: 'Grid',     mode: 'Solo Ranked',    outcome: 'win',  score: 2990, playedAt: '4d ago' },
+    { id: 'm12', category: 'alphabet', categoryLabel: 'Alphabet', mode: 'Versus Ranked',  outcome: 'win',  score: 2640, opponentName: 'Jake Norris', eloChange: +10, playedAt: '4d ago' },
+  ],
+}

@@ -1,0 +1,92 @@
+import { Card } from '@/components/ui/card'
+
+import type { ResultData } from '@/services/result/result.interface'
+
+export function RankedBreakdownCard({ data }: { data: ResultData }) {
+  const isRanked =
+    data.mode === 'solo-ranked' || data.mode === 'versus-ranked'
+  if (!isRanked || !data.rankedBreakdown) return null
+
+  const b = data.rankedBreakdown
+  const rows: { label: string; value: string; note?: string }[] = [
+    { label: 'Base Score', value: b.baseScore.toLocaleString() },
+    { label: 'Speed Bonus', value: `+${b.speedBonus.toLocaleString()}` },
+    { label: 'Difficulty', value: `×${b.difficultyMultiplier.toFixed(1)}`, note: 'multiplier' },
+    { label: 'Perfect Bonus', value: b.perfectBonus > 0 ? `+${b.perfectBonus.toLocaleString()}` : '—' },
+    { label: 'Completion', value: `×${b.completionMultiplier.toFixed(1)}`, note: 'multiplier' },
+  ]
+
+  return (
+    <div className="mx-4 flex flex-col gap-0">
+      <Card className="overflow-hidden" shadow="sm">
+        {/* Header */}
+        <div
+          className="px-4 py-3"
+          style={{ borderBottom: '1px solid var(--ma-border-subtle)' }}
+        >
+          <p className="text-[11px] font-semibold uppercase tracking-widest" style={{ color: 'var(--ma-fg-subtle)' }}>
+            Score Breakdown
+          </p>
+        </div>
+
+        {/* Rows */}
+        <div className="flex flex-col">
+          {rows.map((row, i) => (
+            <div
+              key={row.label}
+              className="flex items-center justify-between px-4 py-3"
+              style={{
+                borderTop: i > 0 ? '1px solid var(--ma-border-subtle)' : undefined,
+              }}
+            >
+              <div className="flex flex-col gap-0.5">
+                <span className="text-[13px] font-medium" style={{ color: 'var(--ma-fg)' }}>
+                  {row.label}
+                </span>
+                {row.note && (
+                  <span className="text-[11px]" style={{ color: 'var(--ma-fg-subtle)' }}>
+                    {row.note}
+                  </span>
+                )}
+              </div>
+              <span
+                className="text-[14px] font-semibold tabular-nums"
+                style={{
+                  color:
+                    row.value === '—'
+                      ? 'var(--ma-fg-subtle)'
+                      : row.value.startsWith('+')
+                      ? 'var(--ma-success)'
+                      : row.value.startsWith('×') && row.value !== '×1.0'
+                      ? 'var(--ma-brand)'
+                      : 'var(--ma-fg)',
+                }}
+              >
+                {row.value}
+              </span>
+            </div>
+          ))}
+        </div>
+
+        {/* Total */}
+        <div
+          className="flex items-center justify-between px-4 py-3.5"
+          style={{
+            borderTop: '1px solid var(--ma-border)',
+            background: 'var(--ma-surface-raised)',
+          }}
+        >
+          <span className="text-[13px] font-bold" style={{ color: 'var(--ma-fg)' }}>
+            Total
+          </span>
+          <span
+            className="text-[16px] font-bold tabular-nums"
+            style={{ color: 'var(--ma-fg)' }}
+          >
+            {data.score.toLocaleString()}
+          </span>
+        </div>
+      </Card>
+    </div>
+  )
+}

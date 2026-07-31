@@ -1,0 +1,177 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  /* ─── Memory Arena Design Tokens ─── */
+  --font-sans: 'Inter', 'Inter Fallback', sans-serif;
+
+  /* Radius scale */
+  --radius-sm:  0.375rem;   /* 6px  */
+  --radius-md:  0.75rem;    /* 12px */
+  --radius-lg:  1rem;       /* 16px */
+  --radius-xl:  1.25rem;    /* 20px */
+  --radius-2xl: 1.5rem;     /* 24px */
+  --radius-3xl: 1.875rem;   /* 30px */
+  --radius-4xl: 2.25rem;    /* 36px */
+
+  /* Semantic color tokens (wired to CSS vars below) */
+  --color-background:         var(--ma-bg);
+  --color-surface:            var(--ma-surface);
+  --color-surface-raised:     var(--ma-surface-raised);
+  --color-foreground:         var(--ma-fg);
+  --color-muted-foreground:   var(--ma-fg-muted);
+  --color-subtle:             var(--ma-fg-subtle);
+  --color-brand:              var(--ma-brand);
+  --color-brand-foreground:   var(--ma-brand-fg);
+  --color-brand-soft:         var(--ma-brand-soft);
+  --color-success:            var(--ma-success);
+  --color-warning:            var(--ma-warning);
+  --color-danger:             var(--ma-danger);
+  --color-border:             var(--ma-border);
+  --color-border-subtle:      var(--ma-border-subtle);
+  --color-ring:               var(--ma-ring);
+
+  /* shadcn compatibility */
+  --color-card:               var(--ma-surface);
+  --color-card-foreground:    var(--ma-fg);
+  --color-primary:            var(--ma-brand);
+  --color-primary-foreground: var(--ma-brand-fg);
+  --color-secondary:          var(--ma-surface-raised);
+  --color-secondary-foreground: var(--ma-fg);
+  --color-muted:              var(--ma-surface-raised);
+  --color-accent:             var(--ma-brand-soft);
+  --color-accent-foreground:  var(--ma-fg);
+  --color-destructive:        var(--ma-danger);
+  --color-input:              var(--ma-border);
+  --color-popover:            var(--ma-surface);
+  --color-popover-foreground: var(--ma-fg);
+
+  /* sidebar (unused but required by shadcn import) */
+  --color-sidebar-ring:               var(--ma-ring);
+  --color-sidebar-border:             var(--ma-border);
+  --color-sidebar-accent-foreground:  var(--ma-fg);
+  --color-sidebar-accent:             var(--ma-surface-raised);
+  --color-sidebar-primary-foreground: var(--ma-brand-fg);
+  --color-sidebar-primary:            var(--ma-brand);
+  --color-sidebar-foreground:         var(--ma-fg);
+  --color-sidebar:                    var(--ma-surface);
+
+  /* charts */
+  --color-chart-1: var(--ma-brand);
+  --color-chart-2: oklch(0.65 0.18 160);
+  --color-chart-3: oklch(0.65 0.18 200);
+  --color-chart-4: oklch(0.65 0.18 240);
+  --color-chart-5: oklch(0.65 0.18 280);
+}
+
+/* ─── Memory Arena: always dark theme ─── */
+:root {
+  color-scheme: dark;
+
+  /* Core palette */
+  --ma-bg:             oklch(0.12 0.01 260);    /* deep neutral navy-black */
+  --ma-surface:        oklch(0.17 0.011 260);   /* card surface */
+  --ma-surface-raised: oklch(0.21 0.013 260);   /* hovered / active surface */
+
+  /* Foreground */
+  --ma-fg:             oklch(0.92 0.005 260);   /* near-white, soft */
+  --ma-fg-muted:       oklch(0.60 0.007 260);   /* secondary text */
+  --ma-fg-subtle:      oklch(0.40 0.007 260);   /* placeholder / disabled */
+
+  /* Brand accent: warm amber – used sparingly */
+  --ma-brand:          oklch(0.76 0.14 74);     /* slightly desaturated amber */
+  --ma-brand-fg:       oklch(0.14 0.02 74);     /* dark text on brand */
+  --ma-brand-soft:     oklch(0.76 0.14 74 / 0.10); /* subtle tint bg */
+
+  /* Icon container neutral (replaces brand-soft for non-CTA icons) */
+  --ma-icon-bg:        oklch(0.21 0.013 260);   /* neutral surface-raised */
+  --ma-icon-fg:        oklch(0.65 0.007 260);   /* icon color – neutral, not brand */
+
+  /* Semantic */
+  --ma-success:        oklch(0.70 0.15 145);
+  --ma-warning:        oklch(0.78 0.16 65);
+  --ma-danger:         oklch(0.62 0.19 22);
+
+  /* Borders */
+  --ma-border:         oklch(1 0 0 / 0.07);
+  --ma-border-subtle:  oklch(1 0 0 / 0.04);
+  --ma-ring:           oklch(0.76 0.14 74 / 0.40);
+
+  /* Interaction state — toggle on, selected chips (R: calm blue, not green, not brand) */
+  --ma-active:         oklch(0.58 0.11 230);    /* calm desaturated blue */
+  --ma-active-soft:    oklch(0.58 0.11 230 / 0.12);
+
+  /* Progress / XP — never brand amber (R13) */
+  --ma-progress:       oklch(0.68 0.12 200);    /* calm teal */
+  --ma-progress-soft:  oklch(0.68 0.12 200 / 0.15);
+
+  /* Toggle track colors */
+  --ma-toggle-off:     oklch(0.26 0.013 260);   /* neutral off-state */
+  --ma-toggle-on:      var(--ma-active);         /* blue on-state (I5) */
+
+  /* Named elevation shadows (I10) */
+  --ma-shadow-sm:      0 1px 4px oklch(0 0 0 / 0.18);
+  --ma-shadow-md:      0 4px 16px oklch(0 0 0 / 0.28);
+  --ma-shadow-lg:      0 8px 32px oklch(0 0 0 / 0.40);
+
+  /* Motion scale (I8) */
+  --ma-duration-micro:   100ms;
+  --ma-duration-base:    200ms;
+  --ma-duration-expand:  300ms;
+  --ma-ease-standard:    cubic-bezier(0.2, 0, 0, 1);
+  --ma-ease-spring:      cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* radius default used by shadcn */
+  --radius: 1rem;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+
+  /* Smooth scroll & momentum on iOS */
+  html {
+    -webkit-tap-highlight-color: transparent;
+    scroll-behavior: smooth;
+  }
+}
+
+/* ─── Utility: thumb-friendly focus ring ─── */
+@layer utilities {
+  .ring-brand {
+    --tw-ring-color: var(--ma-ring);
+  }
+
+  /* Skeleton shimmer */
+  @keyframes shimmer {
+    0%   { background-position: -200% 0; }
+    100% { background-position:  200% 0; }
+  }
+
+  .skeleton {
+    background: linear-gradient(
+      90deg,
+      oklch(0.22 0.014 260) 25%,
+      oklch(0.26 0.014 260) 50%,
+      oklch(0.22 0.014 260) 75%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.6s ease-in-out infinite;
+    border-radius: var(--radius-md);
+  }
+
+  /* Toggle track */
+  .toggle-track {
+    transition: background-color var(--ma-duration-base) var(--ma-ease-standard);
+  }
+  .toggle-thumb {
+    transition: transform var(--ma-duration-base) var(--ma-ease-spring);
+  }
+}
