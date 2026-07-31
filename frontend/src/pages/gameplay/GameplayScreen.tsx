@@ -21,6 +21,8 @@ interface Props {
   mode?: ModeId
   onBack?: () => void
   onQuit?: () => void
+  /** Ranked run ended (first wrong answer) — navigate to Result. Not used in Practice, which retries the level instead. */
+  onGameOver?: () => void
 }
 
 // ─── Main export ───────────────────────────────────────────────────
@@ -29,6 +31,7 @@ export function GameplayScreen({
   mode = ModeId.SOLO_PRACTICE,
   onBack,
   onQuit,
+  onGameOver,
 }: Props) {
   const [screenState, setScreenState] = useState<ScreenState>(ScreenState.NORMAL)
   const [gameType, setGameType]       = useState<GameId>(initialGameType)
@@ -373,7 +376,13 @@ export function GameplayScreen({
 
             {/* Bottom prompt bar */}
             <div className="mt-auto">
-              <PromptBar phase={phase} onStart={() => startRound(level)} gameType={gameType} />
+              <PromptBar
+                phase={phase}
+                onStart={() => startRound(level)}
+                gameType={gameType}
+                mode={mode}
+                onGameOver={onGameOver}
+              />
             </div>
           </>
         )}

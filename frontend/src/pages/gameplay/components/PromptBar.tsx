@@ -1,6 +1,6 @@
 import { Card } from '@/components/ui/card'
 import { IconPlay, IconRefresh } from './icons'
-import { Phase, GameId } from '@/configs/enum'
+import { Phase, GameId, ModeId } from '@/configs/enum'
 
 function IconSpinner() {
   return (
@@ -11,7 +11,19 @@ function IconSpinner() {
   )
 }
 
-export function PromptBar({ phase, onStart, gameType }: { phase: Phase; onStart: () => void; gameType: GameId }) {
+export function PromptBar({
+  phase,
+  onStart,
+  gameType,
+  mode,
+  onGameOver,
+}: {
+  phase: Phase
+  onStart: () => void
+  gameType: GameId
+  mode: ModeId
+  onGameOver?: () => void
+}) {
   if (phase === Phase.IDLE) {
     return (
       <button
@@ -69,6 +81,20 @@ export function PromptBar({ phase, onStart, gameType }: { phase: Phase; onStart:
     )
   }
   if (phase === Phase.WRONG) {
+    // Ranked runs end on the first mistake — score is final, go to Result.
+    // Practice has "no pressure" (docs/gameplay/README.md) — retry the level instead.
+    if (mode === ModeId.SOLO_RANKED && onGameOver) {
+      return (
+        <button
+          type="button"
+          onClick={onGameOver}
+          className="flex w-full items-center justify-center gap-2 rounded-2xl py-4 text-[15px] font-semibold transition-all active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ma-ring)]"
+          style={{ background: 'var(--ma-brand)', color: 'var(--ma-brand-fg)', boxShadow: 'var(--ma-shadow-md)' }}
+        >
+          See result
+        </button>
+      )
+    }
     return (
       <button
         type="button"

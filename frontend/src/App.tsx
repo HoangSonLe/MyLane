@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { EntryPoint } from '@/configs/enum'
+import { EntryPoint, GameId, ModeId } from '@/configs/enum'
+import { useAuthStore } from '@/stores/auth.store'
 import { LandingScreen } from '@/pages/landing/LandingScreen'
 import { LoginScreen } from '@/pages/auth/LoginScreen'
 import { HomeScreen } from '@/pages/home/HomeScreen'
@@ -12,8 +13,12 @@ import { SettingsScreen } from '@/pages/settings/SettingsScreen'
 import { ResultScreen } from '@/pages/result/ResultScreen'
 import { ProfileScreen } from '@/pages/profile/ProfileScreen'
 import { LeaderboardScreen } from '@/pages/leaderboard/LeaderboardScreen'
-import { DialogDemoScreen } from '@/pages/dialog/DialogDemoScreen'
 
+/**
+ * Real navigation state machine — follows the flow in
+ * docs/ui/screen-inventory-and-flow.md. Landing is the only entry point;
+ * every other screen is reached the same way a player would reach it.
+ */
 type Screen =
   | 'landing'
   | 'login'
@@ -27,150 +32,142 @@ type Screen =
   | 'leaderboard'
   | 'result'
   | 'profile'
-  | 'dialog'
 
-const SCREENS: { id: Screen; label: string; activeColor: string; activeText: string }[] = [
-  { id: 'landing', label: 'Landing', activeColor: 'var(--ma-active)', activeText: '#fff' },
-  { id: 'login', label: 'Login', activeColor: 'var(--ma-progress)', activeText: '#fff' },
-  { id: 'home', label: 'Home', activeColor: 'oklch(0.58 0.14 145)', activeText: '#fff' },
-  { id: 'lobby', label: 'Lobby', activeColor: 'oklch(0.62 0.19 22)', activeText: '#fff' },
-  { id: 'versus-room', label: 'Versus Room', activeColor: 'oklch(0.62 0.19 22)', activeText: '#fff' },
-  { id: 'versus-game', label: 'Versus Game', activeColor: 'oklch(0.62 0.19 22)', activeText: '#fff' },
-  { id: 'game-select', label: 'Game Select', activeColor: 'oklch(0.58 0.11 230)', activeText: '#fff' },
-  { id: 'game', label: 'Game', activeColor: 'oklch(0.72 0.16 175)', activeText: '#fff' },
-  { id: 'leaderboard', label: 'Leaderboard', activeColor: 'oklch(0.62 0.16 45)', activeText: '#fff' },
-  { id: 'result', label: 'Result', activeColor: 'oklch(0.60 0.18 300)', activeText: '#fff' },
-  { id: 'profile', label: 'Profile', activeColor: 'oklch(0.55 0.16 255)', activeText: '#fff' },
-  { id: 'settings', label: 'Settings', activeColor: 'var(--ma-brand)', activeText: 'var(--ma-brand-fg)' },
-  { id: 'dialog', label: 'Dialog', activeColor: 'oklch(0.62 0.19 22)', activeText: '#fff' },
-]
+/**
+ * Screens that require a real (non-guest) account — per docs/gameplay/README.md
+ * ("Login required for full features (Versus, saved records, Elo, friends, leaderboard)").
+ * Guest is Solo Practice only.
+ */
+const GUEST_BLOCKED: Screen[] = ['lobby', 'versus-room', 'versus-game', 'leaderboard']
 
 export default function App() {
   const [screen, setScreen] = useState<Screen>('landing')
+  const [pendingScreen, setPendingScreen] = useState<Screen | null>(null)
+  const [session, setSession] = useState<{ game: GameId; mode: ModeId }>({
+    game: GameId.SEQUENCE,
+    mode: ModeId.SOLO_PRACTICE,
+  })
 
-  return (
-    <div className="relative">
-      {/* Screen switcher — prototype nav */}
-      <div
-        className="fixed left-1/2 top-[52px] z-50 -translate-x-1/2"
-        aria-label="Screen switcher — prototype only"
-      >
-        <div
-          className="flex flex-wrap justify-center gap-1 rounded-2xl p-1"
-          style={{
-            background: 'var(--ma-surface)',
-            boxShadow: 'var(--ma-shadow-md)',
-            border: '1px solid var(--ma-border)',
-          }}
-        >
-          {SCREENS.map((s) => (
-            <button
-              key={s.id}
-              onClick={() => setScreen(s.id)}
-              className={[
-                'rounded-xl px-3 py-1 text-[11px] font-semibold',
-                'transition-colors duration-[var(--ma-duration-micro)]',
-                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ma-ring)]',
-                screen !== s.id ? 'text-[var(--ma-fg-muted)] hover:text-[var(--ma-fg)]' : '',
-              ].join(' ')}
-              style={
-                screen === s.id
-                  ? { background: s.activeColor, color: s.activeText }
-                  : undefined
-              }
-            >
-              {s.label}
-            </button>
-          ))}
-        </div>
-      </div>
+  /** Single choke point for navigation — redirects to Login if the target needs an account. */
+  function goTo(next: Screen) {
+    const { user } = useAuthStore.getState()
+    if ((!user || user.isGuest) && GUEST_BLOCKED.includes(next)) {
+      setPendingScreen(next)
+      setScreen('login')
+      return
+    }
+    setScreen(next)
+  }
 
-      {screen === 'landing' && (
+  switch (screen) {
+    case 'landing':
+      return (
         <LandingScreen
           onPlayNow={() => setScreen('home')}
-          onLogIn={() => setScreen('login')}
+          onLogIn={() => goTo('login')}
         />
-      )}
+      )
 
-      {screen === 'login' && (
+    case 'login':
+      return (
         <LoginScreen
-          onSuccess={() => setScreen('home')}
-          onBack={() => setScreen('landing')}
+          onSuccess={() => {
+            const next = pendingScreen ?? 'home'
+            setPendingScreen(null)
+            setScreen(next)
+          }}
+          onBack={() => {
+            setPendingScreen(null)
+            setScreen('landing')
+          }}
         />
-      )}
+      )
 
-      {screen === 'home' && (
+    case 'home':
+      return (
         <HomeScreen
           onNavigate={(id) => {
             if (id === 'game') setScreen('game-select')
-            else if (id === 'lobby') setScreen('lobby')
+            else if (id === 'lobby') goTo('lobby')
             else if (id === 'settings') setScreen('settings')
             else if (id === 'profile') setScreen('profile')
           }}
         />
-      )}
+      )
 
-      {screen === 'lobby' && (
+    case 'lobby':
+      return (
         <LobbyScreen
           onBack={() => setScreen('home')}
           onNavigate={(id) => {
             if (id === 'matchmaking' || id === 'game-select' || id === 'game') setScreen('game-select')
-            else if (id === 'create-room' || id === 'join-room') setScreen('versus-room')
+            else if (id === 'create-room' || id === 'join-room') goTo('versus-room')
             else if (id === 'profile') setScreen('profile')
-            else if (id === 'leaderboard') setScreen('leaderboard')
+            else if (id === 'leaderboard') goTo('leaderboard')
             else if (id === 'settings') setScreen('settings')
-            else if (id === 'login') setScreen('login')
+            else if (id === 'login') goTo('login')
           }}
         />
-      )}
+      )
 
-      {screen === 'versus-room' && (
+    case 'versus-room':
+      return (
         <VersusRoomScreen
           onBack={() => setScreen('lobby')}
           onNavigate={(id) => {
-            if (id === 'game') setScreen('versus-game')
-            else if (id === 'login') setScreen('login')
-            else if (id === 'lobby') setScreen('lobby')
+            if (id === 'game') goTo('versus-game')
+            else if (id === 'login') goTo('login')
+            else if (id === 'lobby') goTo('lobby')
           }}
         />
-      )}
+      )
 
-      {screen === 'versus-game' && (
+    case 'versus-game':
+      return (
         <VersusGameplayScreen
           onQuit={() => setScreen('versus-room')}
           onMatchEnd={() => setScreen('lobby')}
         />
-      )}
+      )
 
-      {screen === 'game-select' && (
+    case 'game-select':
+      return (
         <GameSelectScreen
           entryPoint={EntryPoint.HOME}
           onBack={() => setScreen('home')}
-          onNavigate={(id) => {
-            if (id === 'game' || id === 'matchmaking') setScreen('game')
-            else if (id === 'login') setScreen('login')
+          onNavigate={(id, meta) => {
+            if (id === 'game' || id === 'matchmaking') {
+              if (meta) setSession({ game: meta.game, mode: meta.mode })
+              setScreen('game')
+            } else if (id === 'login') goTo('login')
             else if (id === 'settings') setScreen('settings')
           }}
         />
-      )}
+      )
 
-      {screen === 'game' && (
+    case 'game':
+      return (
         <GameplayScreen
+          gameType={session.game}
+          mode={session.mode}
           onBack={() => setScreen('game-select')}
           onQuit={() => setScreen('home')}
+          onGameOver={() => setScreen('result')}
         />
-      )}
+      )
 
-      {screen === 'result' && (
+    case 'result':
+      return (
         <ResultScreen
           entryPoint={EntryPoint.HOME}
           onPlayAgain={() => setScreen('game-select')}
           onHome={() => setScreen('home')}
           onViewDetail={() => setScreen('profile')}
         />
-      )}
+      )
 
-      {screen === 'profile' && (
+    case 'profile':
+      return (
         <ProfileScreen
           onBack={() => setScreen('home')}
           onEditProfile={() => console.log('[app] Edit Profile')}
@@ -180,27 +177,31 @@ export default function App() {
             else if (id === 'settings') setScreen('settings')
           }}
         />
-      )}
+      )
 
-      {screen === 'leaderboard' && (
+    case 'leaderboard':
+      return (
         <LeaderboardScreen
           onBack={() => setScreen('home')}
           onViewProfile={() => setScreen('profile')}
           onNavigate={(id) => {
-            if (id === 'login') setScreen('login')
+            if (id === 'login') goTo('login')
             else if (id === 'home') setScreen('home')
           }}
         />
-      )}
+      )
 
-      {screen === 'settings' && (
+    case 'settings':
+      return (
         <SettingsScreen
           onBack={() => setScreen('home')}
           onLogOut={() => setScreen('landing')}
         />
-      )}
+      )
 
-      {screen === 'dialog' && <DialogDemoScreen />}
-    </div>
-  )
+    default: {
+      const _exhaustiveCheck: never = screen
+      return _exhaustiveCheck
+    }
+  }
 }

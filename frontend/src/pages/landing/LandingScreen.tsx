@@ -1,8 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { StatusBanner } from '@/components/ui/StatusBanner'
-import { StatePill } from '@/components/ui/StatePill'
-
-import { ScreenState } from '@/configs/enum'
+import { useNetworkStatus } from '@/lib/hooks/useNetworkStatus'
+import { useAuthStore } from '@/stores/auth.store'
 
 // ─── Spinner icon ────────────────────────────────────────────────
 function IconSpinner() {
@@ -159,7 +158,7 @@ function CtaArea({
         }}
       >
         {disabled && <IconSpinner />}
-        {disabled ? 'Checking session…' : 'Play Now'}
+        {disabled ? 'Initializing…' : 'Play Now'}
       </button>
 
       {/* Secondary — Log In */}
@@ -211,10 +210,36 @@ export function LandingScreen({
   onPlayNow?: () => void
   onLogIn?: () => void
 }) {
-  const [screenState, setScreenState] = useState<ScreenState>(ScreenState.NORMAL)
+  const { isOffline } = useNetworkStatus()
+  const { isLoading, errorMessage, checkSession, loginAsGuest, clearError } = useAuthStore()
+  const [isCheckingSession, setIsCheckingSession] = useState(true)
 
-  const isLoading = screenState === ScreenState.LOADING
-  const isOffline = screenState === ScreenState.OFFLINE
+  // Initial session check via Zustand auth store — this is the only
+  // loading state that should skeleton the hero (avoids a blank screen
+  // while a saved session is restored). Submitting Play Now afterwards
+  // must not re-trigger this skeleton or change the layout.
+  useEffect(() => {
+    let isMounted = true
+    checkSession().then((session) => {
+      if (!isMounted) return
+      if (session) {
+        onPlayNow?.()
+        return
+      }
+      setIsCheckingSession(false)
+    })
+    return () => { isMounted = false }
+  }, [checkSession, onPlayNow])
+
+  async function handlePlayNow() {
+    clearError()
+    try {
+      await loginAsGuest()
+      onPlayNow?.()
+    } catch {
+      // Error captured in useAuthStore
+    }
+  }
 
   return (
     <div
@@ -226,7 +251,7 @@ export function LandingScreen({
         id="main-content"
         className="flex flex-1 flex-col items-center justify-center px-6 pt-16"
       >
-        {/* Offline banner — appears above the centred card, inside the flow */}
+        {/* Offline banner */}
         {isOffline && (
           <div className="mb-6 w-full max-w-xs">
             <StatusBanner
@@ -235,27 +260,31 @@ export function LandingScreen({
             />
           </div>
         )}
+
+        {/* Real Error banner if session creation fails */}
+        {errorMessage && (
+          <div className="mb-6 w-full max-w-xs">
+            <StatusBanner
+              variant="error"
+              message={errorMessage}
+              onRetry={handlePlayNow}
+            />
+          </div>
+        )}
+
         <div className="flex w-full max-w-xs flex-col items-center gap-10">
-          <BrandArea skeleton={isLoading} />
+          <BrandArea skeleton={isCheckingSession} />
 
           <CtaArea
-            skeleton={isLoading}
+            skeleton={isCheckingSession}
             disabled={isLoading}
-            onPlayNow={onPlayNow ?? (() => {})}
+            onPlayNow={handlePlayNow}
             onLogIn={onLogIn ?? (() => {})}
           />
 
-          {!isLoading && <GuestNote />}
+          {!isCheckingSession && <GuestNote />}
         </div>
       </main>
-
-      {/* ── State switcher (prototype only) ── */}
-      <StatePill
-        current={screenState}
-        onChange={setScreenState}
-        states={[ScreenState.NORMAL, ScreenState.LOADING, ScreenState.OFFLINE]}
-        position="bottom-8"
-      />
     </div>
   )
 }

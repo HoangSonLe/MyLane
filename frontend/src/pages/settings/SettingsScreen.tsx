@@ -24,6 +24,7 @@ import {
   IconBack,
 } from './components/icons'
 import { MOCK_LINKED_METHODS } from '@/services/settings/settings.mock'
+import { useAuthStore } from '@/stores/auth.store'
 
 import { ScreenState } from '@/configs/enum'
 
@@ -39,6 +40,7 @@ export function SettingsScreen({
 }) {
   const [screenState, setScreenState] = useState<ScreenState>(ScreenState.NORMAL)
   const [, startTransition] = useTransition()
+  const logout = useAuthStore((s) => s.logout)
 
   // Settings toggles
   const [notifications, setNotifications] = useState(true)
@@ -71,13 +73,12 @@ export function SettingsScreen({
     startTransition(() => setScreenState(s))
   }
 
-  function handleLogOutConfirm() {
+  async function handleLogOutConfirm() {
     setLogOutBusy(true)
-    setTimeout(() => {
-      setLogOutBusy(false)
-      setLogOutDialogVisible(false)
-      onLogOut?.()
-    }, 1200)
+    await logout()
+    setLogOutBusy(false)
+    setLogOutDialogVisible(false)
+    onLogOut?.()
   }
 
   const isLoading = screenState === ScreenState.LOADING

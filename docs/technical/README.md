@@ -23,6 +23,7 @@ Zero-cost start · mobile-first web game · fast to build · easy to scale later
 - [AI Coding Rules](ai-coding-rules.md)
 - [v0 Screen Prompts](v0-screen-prompts.md) — per-screen, content-only prompts for v0
 - [Screen Display Data Models](screen-display-data-models.md) — screen-level view models for rendering UI
+- [Mock Auth API](mock-auth-api.md) — how login is faked (MSW + standalone mock server) until the ASP.NET Core API exists
 
 ---
 
@@ -36,6 +37,7 @@ Zero-cost start · mobile-first web game · fast to build · easy to scale later
 | UI components | shadcn/ui |
 | Client state | Zustand |
 | Server state | TanStack Query |
+| HTTP client | Axios |
 | Forms | React Hook Form + Zod |
 | Animation | Motion (Framer Motion) |
 | Icons | Lucide React |
@@ -120,9 +122,37 @@ Single command to bring up the full environment: `docker compose up`.
 
 ---
 
-## Scaling Roadmap
+## Scaling & Hybrid Microservice Architecture (C# + Go)
 
-No framework changes at any stage below — only infrastructure and service topology change.
+No framework changes at Version 1 — only infrastructure and service topology change as the platform scales.
+
+### Phase 1 (Version 1 - MVP): Single Stack (C# ASP.NET Core 9)
+- **C# ASP.NET Core 9 + SignalR**: Selected for initial fast time-to-market. SignalR provides built-in WebSocket fallback, room management, and session reconnect out of the box. Handles ~10,000 to 50,000 concurrent connections comfortably on standard VPS.
+
+### Phase 2 (High Scale / Hybrid Integration): C# + Go Microservices
+When scaling beyond 50,000–100,000 concurrent players or when high-throughput matchmaking requires minimal RAM overhead, **Golang services are added alongside C# without rewriting Version 1 core logic**:
+
+```text
+                           React 19 Frontend
+                                   │
+              ┌────────────────────┴────────────────────┐
+              ▼                                         ▼
+   C# ASP.NET Core Backend                      Go Microservices (Incremental)
+(Auth, Profile, Leaderboard, DB)               (Matchmaking, Dedicated 1v1 PvP, Tournament)
+              │                                         │
+              └────────────────────┬────────────────────┘
+                                   ▼
+                       gRPC / Redis Pub/Sub
+```
+
+- **C# ASP.NET Core**: Retained for complex business logic, CRUD, Auth, User Profiles, Leaderboard, and PostgreSQL operations.
+- **Go Microservices (Added incrementally)**:
+  - **Go Matchmaking Engine**: High-speed player queue matching with minimal latency.
+  - **Go Game Server**: Lightweight WebSocket server handling 1v1 PvP state streams and server-controlled countdowns using Goroutines.
+  - **Go Tournament Engine**: High-concurrency tournament ladder processing.
+- **Inter-service Communication**: C# and Go services communicate via high-performance **gRPC** calls and **Redis Pub/Sub** message streams.
+
+---
 
 **~100 concurrent players** — move off free hosting tiers, deploy to a single Ubuntu VPS:
 
@@ -149,11 +179,11 @@ React → API Gateway → User API (login/profile/friends/history/leaderboard, P
                      → Game API (match/room/realtime/countdown, SignalR Hub, Redis)
 ```
 
-**~100,000 players** — only if SignalR becomes the bottleneck, split out a dedicated game server:
+**~100,000 players** — split out dedicated Go game server:
 
 ```
 React → Load Balancer → ASP.NET Core API (login/user/profile/history/ranking, PostgreSQL)
-                       → Go Game Server (matchmaking/room/WebSocket/tournament, Redis Pub/Sub)
+                       → Go Game Server (matchmaking/room/WebSocket/tournament via gRPC & Redis Pub/Sub)
 ```
 
 **Later, if needed**: RabbitMQ/Kafka/BackgroundService, Sentry/Grafana/Prometheus, MinIO, Kubernetes — none required for Version 1.

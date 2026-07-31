@@ -490,6 +490,7 @@ Sau khi người chơi hoàn thành **Level 10** của bất kỳ thể loại n
 | UI              | shadcn/ui                       | Dễ custom giao diện game       |
 | State           | Zustand                         | Đơn giản, đủ mạnh              |
 | Server State    | TanStack Query                  | Cache API, Retry, Loading      |
+| HTTP Client     | Axios                           | Request REST API, Interceptor  |
 | Form            | React Hook Form + Zod           | Validate form                  |
 | Animation       | Motion (Framer Motion)          | Countdown, Popup, Transition   |
 | Icon            | Lucide React                    | Nhẹ                            |
@@ -563,8 +564,9 @@ docker compose up
 
 Là có toàn bộ môi trường.
 
-### 16.8. Kiến trúc Version 1
+### 16.8. Kiến trúc Version 1 & Định hướng Hybrid Microservices (C# + Go)
 
+**Version 1 (Hiện tại - Single Stack C# .NET 9):**
 ```text
                 React + Vite (PWA)
                         │
@@ -575,6 +577,25 @@ Là có toàn bộ môi trường.
                  │              │
             PostgreSQL        Redis
 ```
+
+**Giai đoạn Scale lớn / Tích hợp Hybrid (C# + Go):**
+Khi cần mở rộng quy mô lên hàng chục ngàn đến hàng trăm ngàn người chơi đồng thời, các service bằng **Go** được viết bổ sung để chạy song song mà không cần đập đi xây lại code C# ở V1:
+
+```text
+                           React 19 Frontend
+                                   │
+              ┌────────────────────┴────────────────────┐
+              ▼                                         ▼
+   C# ASP.NET Core Backend                      Go Microservices (Viết thêm)
+(Auth, Profile, Leaderboard, DB)               (Matchmaking, Dedicated 1v1 PvP, Tournament)
+              │                                         │
+              └────────────────────┬────────────────────┘
+                                   ▼
+                       gRPC / Redis Pub/Sub
+```
+- **C# Backend**: Giữ nguyên xử lý Auth, Profile, Leaderboard, CRUD Database.
+- **Go Microservices**: Đảm nhận Matchmaking Engine, WebSocket Game Server 1v1 PvP, và Tournament Engine.
+- **Giao tiếp liên Service**: Dùng **gRPC** và **Redis Pub/Sub**.
 
 ### 16.9. Các tính năng Version 1
 
