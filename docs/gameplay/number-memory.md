@@ -2,7 +2,7 @@
 
 Route: `/games/numbers`
 
-Source: [`MEMORY_ARENA_GAME_DESIGN.md`](../../MEMORY_ARENA_GAME_DESIGN.md) §2.1. Shared systems (scoring, Elo, modes) live in [`README.md`](README.md).
+Source: [`MY_LANE_GAME_DESIGN.md`](../../MY_LANE_GAME_DESIGN.md) §2.1. Shared systems (scoring, Elo, modes) live in [`README.md`](README.md).
 
 ---
 
@@ -20,7 +20,7 @@ Digits 1–9, sampled with replacement (can repeat within one sequence).
 
 ## Round Flow
 
-1. **Viewing phase** — the sequence is shown for `viewTime` seconds. Player may only look, not input.
+1. **Viewing phase** — the sequence is shown for `viewTime` seconds. Player may only look, not input. Player may **Skip** the remainder of this phase to move straight to Answering; skipping does not change `answerTime` or scoring, it only ends the viewing wait early.
 2. **Answering phase** — the sequence is hidden (shown as `?`). Player must tap the digits in the exact order seen, within `answerTime` seconds.
 3. The system checks the full entered sequence against the original as soon as enough digits are entered, or when time runs out.
 
@@ -62,7 +62,7 @@ Added on top of both `viewTime` and `answerTime`:
 
 ## Controls
 
-Player can **Pause** mid-round and **Resume** at the exact same state, or **Reset** the round at any time.
+Player can **Pause** mid-round and **Resume** at the exact same state, or **Reset** the round at any time. During the Viewing phase, player can also **Skip** ahead to Answering early (see Round Flow).
 
 ## Endless Mode
 

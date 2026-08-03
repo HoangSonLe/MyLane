@@ -1,7 +1,13 @@
+import { useState } from 'react'
 import { Card } from '@/components/ui/card'
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
+import { SettingsRow } from '@/components/ui/settings'
 import { IconPlay, IconRefresh } from './icons'
-import { GAME_LABELS, MODE_LABELS } from '@/services/gameplay/gameplay-screen.types'
+import { getGameLabels, getModeLabels } from '@/services/gameplay/gameplay-screen.types'
 import { GameId, ModeId } from '@/configs/enum'
+import { useTranslation } from '@/i18n/useTranslation'
+import { useSoundsStore } from '@/stores/sounds.store'
+import { useHapticsStore } from '@/stores/haptics.store'
 
 function IconX() {
   return (
@@ -20,43 +26,111 @@ function IconSettings() {
   )
 }
 
+function IconVolume() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M11 5L6 9H3v6h3l5 4V5zM15 9a4 4 0 010 6M18 6a8 8 0 010 12" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
+function IconVibrate() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <rect x="7" y="4" width="10" height="16" rx="2" stroke="currentColor" strokeWidth="1.75" />
+      <path d="M4 8v8M20 8v8" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
+    </svg>
+  )
+}
+
 export function PauseOverlay({
   gameType,
   mode,
   onResume,
   onReset,
-  onSettings,
   onQuit,
 }: {
   gameType: GameId
   mode: ModeId
   onResume: () => void
   onReset: () => void
-  onSettings: () => void
   onQuit: () => void
 }) {
+  const { t } = useTranslation()
+  const gameLabels = getGameLabels(t)
+  const modeLabels = getModeLabels(t)
   const isSolo = mode === ModeId.SOLO_PRACTICE || mode === ModeId.SOLO_RANKED
+  const [confirmation, setConfirmation] = useState<'reset' | 'quit' | null>(null)
+  const [showSettings, setShowSettings] = useState(false)
+  const soundsEnabled = useSoundsStore((state) => state.enabled)
+  const setSoundsEnabled = useSoundsStore((state) => state.setEnabled)
+  const hapticsEnabled = useHapticsStore((state) => state.enabled)
+  const setHapticsEnabled = useHapticsStore((state) => state.setEnabled)
+
+  if (showSettings) {
+    return (
+      <div
+        className="fixed inset-0 z-40 flex items-end justify-center"
+        style={{ background: 'oklch(0 0 0 / 0.6)', backdropFilter: 'blur(6px)' }}
+        role="dialog"
+        aria-modal="true"
+        aria-label={t.settings.title}
+      >
+        <Card className="w-full max-w-sm mb-6 mx-4 overflow-hidden p-0" radius="3xl" shadow="lg">
+          <div className="flex items-center justify-between border-b border-[var(--ma-border)] px-5 py-4">
+            <p className="text-[17px] font-bold" style={{ color: 'var(--ma-fg)' }}>{t.settings.title}</p>
+            <button
+              type="button"
+              onClick={() => setShowSettings(false)}
+              aria-label={t.common.close}
+              className="flex h-9 w-9 items-center justify-center rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ma-ring)]"
+              style={{ background: 'var(--ma-surface-raised)', color: 'var(--ma-fg-muted)' }}
+            >
+              <IconX />
+            </button>
+          </div>
+          <SettingsRow
+            icon={<IconVolume />}
+            label={t.settings.soundEffects}
+            description={t.settings.soundEffectsDesc}
+            checked={soundsEnabled}
+            onToggle={setSoundsEnabled}
+          />
+          <div className="mx-4 h-px bg-[var(--ma-border)]" />
+          <SettingsRow
+            icon={<IconVibrate />}
+            label={t.settings.hapticFeedback}
+            description={t.settings.hapticFeedbackDesc}
+            checked={hapticsEnabled}
+            onToggle={setHapticsEnabled}
+          />
+        </Card>
+      </div>
+    )
+  }
+
   return (
-    <div
-      className="fixed inset-0 z-40 flex items-end justify-center"
-      style={{ background: 'oklch(0 0 0 / 0.6)', backdropFilter: 'blur(6px)' }}
-      role="dialog"
-      aria-modal="true"
-      aria-label="Game paused"
-    >
-      <Card className="w-full max-w-sm mb-6 mx-4 flex flex-col gap-3 p-5" radius="3xl" shadow="lg">
+    <>
+      <div
+        className="fixed inset-0 z-40 flex items-end justify-center"
+        style={{ background: 'oklch(0 0 0 / 0.6)', backdropFilter: 'blur(6px)' }}
+        role="dialog"
+        aria-modal="true"
+        aria-label={t.pauseOverlay.gamePaused}
+      >
+        <Card className="w-full max-w-sm mb-6 mx-4 flex flex-col gap-3 p-5" radius="3xl" shadow="lg">
         {/* Header */}
         <div className="flex items-center justify-between pb-1">
           <div>
-            <p className="text-[17px] font-bold" style={{ color: 'var(--ma-fg)' }}>Paused</p>
+            <p className="text-[17px] font-bold" style={{ color: 'var(--ma-fg)' }}>{t.pauseOverlay.paused}</p>
             <p className="text-[12px]" style={{ color: 'var(--ma-fg-muted)' }}>
-              {GAME_LABELS[gameType]} &middot; {MODE_LABELS[mode]}
+              {gameLabels[gameType]} &middot; {modeLabels[mode]}
             </p>
           </div>
           <button
             type="button"
             onClick={onResume}
-            aria-label="Close pause menu"
+            aria-label={t.pauseOverlay.closePauseMenu}
             className="flex h-9 w-9 items-center justify-center rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ma-ring)]"
             style={{ background: 'var(--ma-surface-raised)', color: 'var(--ma-fg-muted)' }}
           >
@@ -76,13 +150,13 @@ export function PauseOverlay({
           }}
         >
           <IconPlay />
-          Resume
+          {t.pauseOverlay.resume}
         </button>
 
         {/* Reset */}
         <button
           type="button"
-          onClick={onReset}
+          onClick={() => setConfirmation('reset')}
           className="flex w-full items-center justify-center gap-2 rounded-2xl py-3.5 text-[15px] font-semibold transition-all active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ma-ring)]"
           style={{
             background: 'var(--ma-surface-raised)',
@@ -91,14 +165,14 @@ export function PauseOverlay({
           }}
         >
           <IconRefresh />
-          Reset round
+          {t.pauseOverlay.resetRound}
         </button>
 
         {/* Settings — Solo only */}
         {isSolo && (
           <button
             type="button"
-            onClick={onSettings}
+            onClick={() => setShowSettings(true)}
             className="flex w-full items-center justify-center gap-2 rounded-2xl py-3.5 text-[15px] font-semibold transition-all active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ma-ring)]"
             style={{
               background: 'var(--ma-surface-raised)',
@@ -107,14 +181,14 @@ export function PauseOverlay({
             }}
           >
             <IconSettings />
-            Settings
+            {t.pauseOverlay.settings}
           </button>
         )}
 
         {/* Quit */}
         <button
           type="button"
-          onClick={onQuit}
+          onClick={() => setConfirmation('quit')}
           className="flex w-full items-center justify-center gap-2 rounded-2xl py-3.5 text-[15px] font-semibold transition-all active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ma-ring)]"
           style={{
             background: 'oklch(0.62 0.19 22 / 0.10)',
@@ -123,9 +197,25 @@ export function PauseOverlay({
           }}
         >
           <IconX />
-          Quit game
+          {t.pauseOverlay.quitGame}
         </button>
-      </Card>
-    </div>
+        </Card>
+      </div>
+      <ConfirmDialog
+        open={confirmation !== null}
+        variant="danger"
+        title={confirmation === 'reset' ? t.pauseOverlay.resetConfirmTitle : t.pauseOverlay.quitConfirmTitle}
+        message={confirmation === 'reset' ? t.pauseOverlay.resetConfirmMessage : t.pauseOverlay.quitConfirmMessage}
+        confirmLabel={confirmation === 'reset' ? t.pauseOverlay.resetRound : t.pauseOverlay.quitGame}
+        cancelLabel={t.pauseOverlay.keepPlaying}
+        onConfirm={() => {
+          const action = confirmation
+          setConfirmation(null)
+          if (action === 'reset') onReset()
+          if (action === 'quit') onQuit()
+        }}
+        onCancel={() => setConfirmation(null)}
+      />
+    </>
   )
 }

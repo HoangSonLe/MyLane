@@ -1,6 +1,7 @@
 import { Card } from '@/components/ui/card'
 
 import type { PlayerSlot } from '@/services/versus-room/versus-room.interface'
+import { useTranslation } from '@/i18n/useTranslation'
 
 function IconTrophy() {
   return (
@@ -33,6 +34,7 @@ export function PlayerSlotCard({
   isEmpty?: boolean
   skeleton?: boolean
 }) {
+  const { t } = useTranslation()
   if (skeleton) {
     return (
       <Card padding="1rem">
@@ -87,31 +89,31 @@ export function PlayerSlotCard({
         </div>
 
         {/* Name + handle */}
-        <div className="flex flex-1 min-w-0 flex-col">
-          <div className="flex items-center gap-2">
-            <span className="text-[13px] font-semibold truncate" style={{ color: isEmpty ? 'var(--ma-fg-subtle)' : 'var(--ma-fg)' }}>
-              {isEmpty ? 'Waiting for opponent…' : slot?.name}
+        <div className="flex flex-1 min-w-0 flex-col justify-center">
+          <div className="flex items-center gap-1.5 min-w-0">
+            <span className="text-[13px] font-semibold truncate min-w-0" style={{ color: isEmpty ? 'var(--ma-fg-subtle)' : 'var(--ma-fg)' }}>
+              {isEmpty ? t.versusRoom.waitingForOpponent : slot?.name}
             </span>
             {isHost && !isEmpty && (
               <span
-                className="shrink-0 text-[10px] font-semibold uppercase tracking-wider px-1.5 py-0.5"
+                className="shrink-0 text-[10px] font-semibold uppercase tracking-wider px-1.5 py-0.5 whitespace-nowrap"
                 style={{
                   borderRadius: 'var(--radius-sm)',
                   background: 'var(--ma-brand-soft)',
                   color: 'var(--ma-brand)',
                 }}
               >
-                Host
+                {t.versusRoom.hostLabel}
               </span>
             )}
           </div>
           {!isEmpty && slot && (
-            <div className="flex items-center gap-2 mt-0.5">
-              <span className="text-[11px]" style={{ color: 'var(--ma-fg-subtle)' }}>
+            <div className="flex items-center gap-1.5 mt-0.5 min-w-0">
+              <span className="text-[11px] truncate min-w-0 shrink" style={{ color: 'var(--ma-fg-subtle)' }}>
                 @{slot.handle}
               </span>
-              <span style={{ color: 'var(--ma-border)', fontSize: '10px' }} aria-hidden="true">&middot;</span>
-              <span className="flex items-center gap-1 text-[11px] font-semibold" style={{ color: 'var(--ma-progress)' }}>
+              <span className="shrink-0" style={{ color: 'var(--ma-border)', fontSize: '10px' }} aria-hidden="true">&middot;</span>
+              <span className="flex shrink-0 items-center gap-1 text-[11px] font-semibold whitespace-nowrap" style={{ color: 'var(--ma-progress)' }}>
                 <IconTrophy />
                 {slot.elo}
               </span>
@@ -122,16 +124,16 @@ export function PlayerSlotCard({
         {/* Ready indicator */}
         {!isEmpty && slot && (
           <div
-            className="shrink-0 flex items-center gap-1.5 px-2 py-1"
+            className="shrink-0 flex items-center gap-1.5 px-2 py-1 whitespace-nowrap"
             style={{
               borderRadius: 'var(--radius-xl)',
               background: slot.ready ? 'oklch(0.70 0.15 145 / 0.12)' : 'var(--ma-surface-raised)',
               border: `1px solid ${slot.ready ? 'oklch(0.70 0.15 145 / 0.30)' : 'var(--ma-border)'}`,
             }}
-            aria-label={slot.ready ? `${slot.name} is ready` : `${slot.name} is not ready`}
+            aria-label={slot.ready ? t.versusRoom.playerReadyAria(slot.name) : t.versusRoom.playerNotReadyAria(slot.name)}
           >
             <span
-              className="inline-block"
+              className="inline-block shrink-0"
               style={{
                 height: '7px',
                 width: '7px',
@@ -141,10 +143,10 @@ export function PlayerSlotCard({
               aria-hidden="true"
             />
             <span
-              className="text-[11px] font-semibold"
+              className="text-[11px] font-semibold whitespace-nowrap"
               style={{ color: slot.ready ? 'var(--ma-success)' : 'var(--ma-fg-subtle)' }}
             >
-              {slot.ready ? 'Ready' : 'Not ready'}
+              {slot.ready ? t.versusRoom.readyLabel : t.versusRoom.notReady}
             </span>
           </div>
         )}

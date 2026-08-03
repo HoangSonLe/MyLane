@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { EntryPoint } from '@/configs/enum'
+import { DifficultyId, EntryPoint, GameId, ModeId } from '@/configs/enum'
 import { LandingScreen } from '@/pages/landing/LandingScreen'
 import { LoginScreen } from '@/pages/auth/LoginScreen'
 import { HomeScreen } from '@/pages/home/HomeScreen'
@@ -13,6 +13,20 @@ import { ResultScreen } from '@/pages/result/ResultScreen'
 import { ProfileScreen } from '@/pages/profile/ProfileScreen'
 import { LeaderboardScreen } from '@/pages/leaderboard/LeaderboardScreen'
 import { DialogDemoScreen } from '@/pages/dialog/DialogDemoScreen'
+import type { GameResultInput } from '@/services/result/result.interface'
+
+/** Static stand-in session for previewing Result in isolation — a real run always supplies this via App.tsx. */
+const DEMO_RESULT: GameResultInput = {
+  game: GameId.SEQUENCE,
+  mode: ModeId.SOLO_RANKED,
+  difficulty: DifficultyId.MEDIUM,
+  levelReached: 6,
+  roundsCleared: 27,
+  maxConsecutiveItems: 9,
+  bonusSeconds: 140,
+  perfect: false,
+  completedAllLevels: false,
+}
 
 /**
  * DemoApp — prototype/design-review shell only.
@@ -56,6 +70,7 @@ const SCREENS: { id: Screen; label: string; activeColor: string; activeText: str
 
 export function DemoApp() {
   const [screen, setScreen] = useState<Screen>('landing')
+  const [roomTab, setRoomTab] = useState<'create' | 'join'>('create')
 
   return (
     <div className="relative">
@@ -124,7 +139,10 @@ export function DemoApp() {
           onBack={() => setScreen('home')}
           onNavigate={(id) => {
             if (id === 'matchmaking' || id === 'game-select' || id === 'game') setScreen('game-select')
-            else if (id === 'create-room' || id === 'join-room') setScreen('versus-room')
+            else if (id === 'create-room' || id === 'join-room') {
+              setRoomTab(id === 'create-room' ? 'create' : 'join')
+              setScreen('versus-room')
+            }
             else if (id === 'profile') setScreen('profile')
             else if (id === 'leaderboard') setScreen('leaderboard')
             else if (id === 'settings') setScreen('settings')
@@ -135,6 +153,7 @@ export function DemoApp() {
 
       {screen === 'versus-room' && (
         <VersusRoomScreen
+          initialTab={roomTab}
           onBack={() => setScreen('lobby')}
           onNavigate={(id) => {
             if (id === 'game') setScreen('versus-game')
@@ -172,6 +191,7 @@ export function DemoApp() {
 
       {screen === 'result' && (
         <ResultScreen
+          result={DEMO_RESULT}
           entryPoint={EntryPoint.HOME}
           onPlayAgain={() => setScreen('game-select')}
           onHome={() => setScreen('home')}

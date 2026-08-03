@@ -1,5 +1,6 @@
 import { IconUser } from '@/components/ui/icons'
 import { Card } from '@/components/ui/card'
+import { useTranslation } from '@/i18n/useTranslation'
 
 interface EloContextBadgeProps {
   skeleton?: boolean
@@ -8,6 +9,7 @@ interface EloContextBadgeProps {
 }
 
 export function EloContextBadge({ skeleton, elo, name }: EloContextBadgeProps) {
+  const { t } = useTranslation()
   if (skeleton) {
     return (
       <div
@@ -40,7 +42,7 @@ export function EloContextBadge({ skeleton, elo, name }: EloContextBadgeProps) {
             {name}
           </p>
           <p className="mt-0.5 text-[11px]" style={{ color: 'var(--ma-fg-muted)' }}>
-            Versus · Ranked
+            {t.lobby.versusRanked}
           </p>
         </div>
       </div>

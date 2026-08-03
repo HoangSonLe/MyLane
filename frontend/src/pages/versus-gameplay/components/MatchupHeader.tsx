@@ -1,20 +1,6 @@
 import { Phase, GameId, OpponentStatus, RoundMode } from '@/configs/enum'
-
-const GAME_LABELS: Record<GameId, string> = {
-  [GameId.NUMBER]:   'Number Memory',
-  [GameId.ALPHABET]: 'Alphabet Memory',
-  [GameId.GRID]:     'Grid Memory',
-  [GameId.SEQUENCE]: 'Sequence Memory',
-}
-
-const OPP_LABEL: Record<OpponentStatus, string> = {
-  [OpponentStatus.CONNECTED]:    'Connected',
-  [OpponentStatus.DISCONNECTED]: 'Disconnected',
-  [OpponentStatus.ANSWERED]:     'Answered',
-  [OpponentStatus.LOCKED_IN]:    'Locked in',
-  [OpponentStatus.WAITING]:      'Waiting…',
-  [OpponentStatus.RECONNECTING]: 'Reconnecting…',
-}
+import { getGameLabels } from '@/services/gameplay/gameplay-screen.types'
+import { useTranslation } from '@/i18n/useTranslation'
 
 const OPP_COLOR: Record<OpponentStatus, string> = {
   [OpponentStatus.CONNECTED]:    'var(--ma-progress)',
@@ -25,9 +11,46 @@ const OPP_COLOR: Record<OpponentStatus, string> = {
   [OpponentStatus.RECONNECTING]: 'var(--ma-warning)',
 }
 
+function RoundProgress({
+  completed,
+  total,
+  color,
+  label,
+  align = 'start',
+}: {
+  completed: number
+  total: number
+  color: string
+  label: string
+  align?: 'start' | 'end'
+}) {
+  const safeCompleted = Math.min(Math.max(completed, 0), total)
+
+  return (
+    <div className="flex w-full flex-col gap-1" aria-label={label}>
+      <div className="flex w-full gap-1" aria-hidden="true">
+        {Array.from({ length: total }, (_, index) => (
+          <span
+            key={index}
+            className="h-1 flex-1 rounded-full transition-colors"
+            style={{ background: index < safeCompleted ? color : 'var(--ma-border)' }}
+          />
+        ))}
+      </div>
+      <span
+        className={`text-[9px] font-semibold tabular-nums ${align === 'end' ? 'self-end' : 'self-start'}`}
+        style={{ color: 'var(--ma-fg-subtle)' }}
+      >
+        {label}
+      </span>
+    </div>
+  )
+}
+
 export function MatchupHeader({
   playerName, playerScore,
   opponentName, opponentScore,
+  playerRoundsCompleted, opponentRoundsCompleted,
   opponentStatus,
   round, totalRounds,
   timer, maxTimer,
@@ -37,6 +60,7 @@ export function MatchupHeader({
 }: {
   playerName: string; playerScore: number
   opponentName: string; opponentScore: number
+  playerRoundsCompleted: number; opponentRoundsCompleted: number
   opponentStatus: OpponentStatus
   round: number; totalRounds: number
   timer: number; maxTimer: number
@@ -44,6 +68,16 @@ export function MatchupHeader({
   gameType: GameId
   roundMode: RoundMode
 }) {
+  const { t } = useTranslation()
+  const gameLabels = getGameLabels(t)
+  const OPP_LABEL: Record<OpponentStatus, string> = {
+    [OpponentStatus.CONNECTED]:    t.versusGameplay.oppConnected,
+    [OpponentStatus.DISCONNECTED]: t.versusGameplay.oppDisconnected,
+    [OpponentStatus.ANSWERED]:     t.versusGameplay.oppAnswered,
+    [OpponentStatus.LOCKED_IN]:    t.versusGameplay.oppLockedIn,
+    [OpponentStatus.WAITING]:      t.versusGameplay.oppWaiting,
+    [OpponentStatus.RECONNECTING]: t.versusGameplay.oppReconnecting,
+  }
   const timerColor = timer <= 5 ? 'var(--ma-danger)' : 'var(--ma-progress)'
   const r     = 13
   const circ  = 2 * Math.PI * r
@@ -59,7 +93,7 @@ export function MatchupHeader({
     <div
       className="mx-4 mt-2 rounded-2xl overflow-hidden"
       style={{ background: 'var(--ma-surface)', border: '1px solid var(--ma-border)', boxShadow: 'var(--ma-shadow-sm)' }}
-      aria-label="Versus match header"
+      aria-label={t.versusGameplay.matchHeaderAria}
     >
       {/* Top row: game + round label */}
       <div
@@ -67,13 +101,13 @@ export function MatchupHeader({
         style={{ borderColor: 'var(--ma-border)' }}
       >
         <span className="text-[11px] font-semibold tracking-wide" style={{ color: 'var(--ma-fg-muted)' }}>
-          {GAME_LABELS[gameType]}
+          {gameLabels[gameType]}
         </span>
         <span
           className="text-[11px] font-bold tabular-nums"
           style={{ color: 'var(--ma-fg-subtle)' }}
         >
-          Round {round} / {totalRounds}
+          {t.versusGameplay.roundOf(round, totalRounds)}
         </span>
         <span
           className="text-[11px] font-semibold rounded-lg px-2 py-0.5"
@@ -82,32 +116,57 @@ export function MatchupHeader({
             color: roundMode === RoundMode.VERSUS_RANKED ? 'var(--ma-brand)' : 'var(--ma-fg-muted)',
           }}
         >
-          {roundMode === RoundMode.VERSUS_RANKED ? 'Ranked' : 'Unranked'}
+          {roundMode === RoundMode.VERSUS_RANKED ? t.versusGameplay.ranked : t.versusGameplay.unranked}
         </span>
       </div>
 
       {/* Player vs opponent row */}
-      <div className="flex items-center gap-2 px-4 py-3">
+      <div className="flex items-center gap-2 px-3 py-2.5">
         {/* Player */}
-        <div className="flex flex-1 flex-col items-start gap-0.5 min-w-0">
+        <div
+          className="flex flex-1 flex-col items-start gap-0.5 min-w-0 p-2 rounded-xl transition-all"
+          style={{
+            background: isAnswering ? 'oklch(0.76 0.14 74 / 0.12)' : 'transparent',
+            border: isAnswering ? '2px solid var(--ma-brand)' : '1.5px solid transparent',
+            boxShadow: isAnswering ? '0 0 12px oklch(0.76 0.14 74 / 0.20)' : 'none',
+          }}
+        >
+          <div className="flex items-center gap-1.5 w-full">
+            <span
+              className="text-[10px] font-medium uppercase tracking-widest"
+              style={{ color: 'var(--ma-fg-subtle)' }}
+            >
+              {t.versusGameplay.you}
+            </span>
+            {isAnswering && (
+              <span
+                className="flex items-center text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full animate-pulse whitespace-nowrap"
+                style={{ background: 'var(--ma-brand)', color: 'var(--ma-brand-fg)' }}
+              >
+                {t.versusGameplay.yourTurnBadge}
+              </span>
+            )}
+          </div>
           <span
-            className="text-[10px] font-medium uppercase tracking-widest"
-            style={{ color: 'var(--ma-fg-subtle)' }}
-          >
-            You
-          </span>
-          <span
-            className="text-[15px] font-bold truncate max-w-[80px]"
-            style={{ color: 'var(--ma-fg)' }}
+            className="text-[15px] font-extrabold truncate max-w-[90px] transition-colors"
+            style={{ color: isAnswering ? 'var(--ma-brand)' : 'var(--ma-fg)' }}
           >
             {playerName}
           </span>
-          <span
-            className="text-[20px] font-bold tabular-nums leading-none"
-            style={{ color: 'var(--ma-progress)' }}
-          >
-            {playerScore}
-          </span>
+          <div className="flex items-baseline gap-0.5">
+            <span className="text-[20px] font-bold tabular-nums leading-none" style={{ color: 'var(--ma-progress)' }}>
+              {playerScore}
+            </span>
+            <span className="text-[10px] font-semibold tabular-nums" style={{ color: 'var(--ma-fg-subtle)' }}>
+              /{totalRounds}
+            </span>
+          </div>
+          <RoundProgress
+            completed={playerRoundsCompleted}
+            total={totalRounds}
+            color="var(--ma-brand)"
+            label={t.versusGameplay.roundOf(playerRoundsCompleted, totalRounds)}
+          />
         </div>
 
         {/* Centre: timer ring or VS badge */}
@@ -115,7 +174,7 @@ export function MatchupHeader({
           {isAnswering ? (
             <div
               className="relative flex h-12 w-12 items-center justify-center"
-              aria-label={`${timer}s remaining`}
+              aria-label={t.versusGameplay.timerRemainingAria(timer)}
             >
               <svg width="48" height="48" viewBox="0 0 32 32" className="-rotate-90" aria-hidden="true">
                 <circle cx="16" cy="16" r={r} strokeWidth="2.5" fill="none" stroke="var(--ma-border)" />
@@ -144,40 +203,90 @@ export function MatchupHeader({
                 border: '1px solid var(--ma-border)',
               }}
             >
-              VS
+              {t.versusGameplay.vsLabel}
             </div>
           )}
         </div>
 
         {/* Opponent */}
-        <div className="flex flex-1 flex-col items-end gap-0.5 min-w-0">
-          <span
-            className="text-[10px] font-medium uppercase tracking-widest"
-            style={{ color: 'var(--ma-fg-subtle)' }}
-          >
-            Opponent
-          </span>
-          <span
-            className="text-[15px] font-bold truncate max-w-[80px]"
-            style={{ color: isOppGone ? 'var(--ma-fg-muted)' : 'var(--ma-fg)' }}
-          >
-            {opponentName}
-          </span>
-          <div className="flex flex-col items-end gap-0.5">
-            <span
-              className="text-[20px] font-bold tabular-nums leading-none"
-              style={{ color: isOppGone ? 'var(--ma-fg-subtle)' : 'var(--ma-progress)' }}
+        {(() => {
+          const isOppDone = opponentStatus === OpponentStatus.ANSWERED || opponentStatus === OpponentStatus.LOCKED_IN
+          const isOppActive = isAnswering && !isOppDone && !isOppGone
+          const oppNameColor = isOppDone
+            ? 'var(--ma-success)'
+            : isOppActive
+            ? 'var(--ma-brand)'
+            : isOppGone
+            ? 'var(--ma-fg-muted)'
+            : 'var(--ma-fg)'
+
+          return (
+            <div
+              className="flex flex-1 flex-col items-end gap-0.5 min-w-0 p-2 rounded-xl transition-all"
+              style={{
+                background: isOppActive ? 'oklch(0.76 0.14 74 / 0.08)' : isOppDone ? 'oklch(0.70 0.15 145 / 0.08)' : 'transparent',
+                border: isOppActive ? '1.5px solid var(--ma-brand)' : isOppDone ? '1.5px solid var(--ma-success)' : '1.5px solid transparent',
+              }}
             >
-              {opponentScore}
-            </span>
-            <span
-              className="text-[10px] font-semibold"
-              style={{ color: oppColor }}
-            >
-              {oppLabel}
-            </span>
-          </div>
-        </div>
+              <div className="flex items-center gap-1.5 justify-end w-full">
+                {isOppDone && (
+                  <span
+                    className="flex items-center text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full whitespace-nowrap"
+                    style={{ background: 'oklch(0.70 0.15 145 / 0.20)', color: 'var(--ma-success)' }}
+                  >
+                    ✓ Đã nộp
+                  </span>
+                )}
+                {isOppActive && (
+                  <span
+                    className="flex items-center text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full animate-pulse whitespace-nowrap"
+                    style={{ background: 'var(--ma-brand-soft)', color: 'var(--ma-brand)' }}
+                  >
+                    ● Đang nhập
+                  </span>
+                )}
+                <span
+                  className="text-[10px] font-medium uppercase tracking-widest"
+                  style={{ color: 'var(--ma-fg-subtle)' }}
+                >
+                  {t.versusGameplay.opponent}
+                </span>
+              </div>
+              <span
+                className="text-[15px] font-extrabold truncate max-w-[90px] transition-colors"
+                style={{ color: oppNameColor }}
+              >
+                {opponentName}
+              </span>
+              <div className="flex w-full flex-col items-end gap-1">
+                <div className="flex items-baseline gap-0.5">
+                  <span
+                    className="text-[20px] font-bold tabular-nums leading-none"
+                    style={{ color: isOppGone ? 'var(--ma-fg-subtle)' : 'var(--ma-progress)' }}
+                  >
+                    {opponentScore}
+                  </span>
+                  <span className="text-[10px] font-semibold tabular-nums" style={{ color: 'var(--ma-fg-subtle)' }}>
+                    /{totalRounds}
+                  </span>
+                </div>
+                <span
+                  className="text-[10px] font-semibold"
+                  style={{ color: oppColor }}
+                >
+                  {oppLabel}
+                </span>
+                <RoundProgress
+                  completed={opponentRoundsCompleted}
+                  total={totalRounds}
+                  color={isOppGone ? 'var(--ma-fg-subtle)' : 'var(--ma-brand)'}
+                  label={t.versusGameplay.roundOf(opponentRoundsCompleted, totalRounds)}
+                  align="end"
+                />
+              </div>
+            </div>
+          )
+        })()}
       </div>
     </div>
   )

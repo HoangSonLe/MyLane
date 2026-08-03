@@ -1,7 +1,10 @@
 import { useState, useEffect } from 'react'
 import { StatusBanner } from '@/components/ui/StatusBanner'
+import { ScreenShell, ScreenMain } from '@/components/ui/layout'
 import { useNetworkStatus } from '@/lib/hooks/useNetworkStatus'
 import { useAuthStore } from '@/stores/auth.store'
+import { useTranslation } from '@/i18n/useTranslation'
+import type { ResumeState } from '@/lib/utils/session-resume'
 
 // ─── Spinner icon ────────────────────────────────────────────────
 function IconSpinner() {
@@ -31,7 +34,7 @@ function IconSpinner() {
 }
 
 // ─── Brand logo area ─────────────────────────────────────────────
-function BrandArea({ skeleton }: { skeleton?: boolean }) {
+function BrandArea({ skeleton, t }: { skeleton?: boolean; t: ReturnType<typeof useTranslation>['t'] }) {
   return (
     <div className="flex flex-col items-center gap-5">
       {/* Icon container — uses --ma-icon-bg / --ma-brand per system */}
@@ -58,7 +61,7 @@ function BrandArea({ skeleton }: { skeleton?: boolean }) {
             height="36"
             viewBox="0 0 24 24"
             fill="none"
-            aria-label="Memory Arena icon"
+            aria-label="My Lane icon"
             style={{ color: 'var(--ma-brand)' }}
           >
             <path
@@ -90,13 +93,13 @@ function BrandArea({ skeleton }: { skeleton?: boolean }) {
             className="text-[28px] font-bold leading-tight tracking-tight"
             style={{ color: 'var(--ma-fg)' }}
           >
-            Memory Arena
+            My Lane
           </h1>
           <p
             className="mt-1 text-[14px] leading-relaxed"
             style={{ color: 'var(--ma-fg-muted)' }}
           >
-            Train your mind. Beat your best.
+            {t.landing.tagline}
           </p>
         </div>
       )}
@@ -110,11 +113,13 @@ function CtaArea({
   disabled,
   onPlayNow,
   onLogIn,
+  t,
 }: {
   skeleton?: boolean
   disabled?: boolean
   onPlayNow: () => void
   onLogIn: () => void
+  t: ReturnType<typeof useTranslation>['t']
 }) {
   if (skeleton) {
     return (
@@ -158,7 +163,7 @@ function CtaArea({
         }}
       >
         {disabled && <IconSpinner />}
-        {disabled ? 'Initializing…' : 'Play Now'}
+        {disabled ? t.landing.initializing : t.landing.playNow}
       </button>
 
       {/* Secondary — Log In */}
@@ -183,21 +188,54 @@ function CtaArea({
           border: '1px solid var(--ma-border)',
         }}
       >
-        Log In
+        {t.landing.logIn}
       </button>
     </div>
   )
 }
 
+// ─── Language switch — top-right corner, reachable before Play Now/Log In ──
+function LanguageSwitch({
+  locale,
+  setLocale,
+  label,
+}: {
+  locale: 'en' | 'vi'
+  setLocale: (locale: 'en' | 'vi') => void
+  label: string
+}) {
+  return (
+    <button
+      type="button"
+      onClick={() => setLocale(locale === 'en' ? 'vi' : 'en')}
+      aria-label={label}
+      className={[
+        'flex h-8 items-center justify-center gap-1 px-3',
+        'text-[13px] font-semibold',
+        'transition-transform duration-[var(--ma-duration-micro)] active:scale-95',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ma-ring)]',
+      ].join(' ')}
+      style={{
+        borderRadius: 'var(--radius-xl)',
+        background: 'var(--ma-surface-raised)',
+        color: 'var(--ma-fg)',
+        border: '1px solid var(--ma-border)',
+      }}
+    >
+      {locale === 'en' ? 'EN' : 'VI'}
+    </button>
+  )
+}
+
 // ─── Guest footnote ──────────────────────────────────────────────
-function GuestNote() {
+function GuestNote({ t }: { t: ReturnType<typeof useTranslation>['t'] }) {
   return (
     <p
       className="text-center text-[12px] leading-relaxed"
       style={{ color: 'var(--ma-fg-subtle)' }}
     >
-      Guest progress is saved locally.{' '}
-      <span style={{ color: 'var(--ma-fg-muted)' }}>Log in to sync across devices.</span>
+      {t.landing.guestNote}{' '}
+      <span style={{ color: 'var(--ma-fg-muted)' }}>{t.landing.guestNoteSync}</span>
     </p>
   )
 }
@@ -206,30 +244,45 @@ function GuestNote() {
 export function LandingScreen({
   onPlayNow,
   onLogIn,
+  resumeTarget,
+  onResume,
 }: {
   onPlayNow?: () => void
   onLogIn?: () => void
+  /** Screen/session to jump back into after a reload mid Solo/Versus — see App.tsx. */
+  resumeTarget?: ResumeState | null
+  onResume?: (resume: ResumeState) => void
 }) {
   const { isOffline } = useNetworkStatus()
-  const { isLoading, errorMessage, checkSession, loginAsGuest, clearError } = useAuthStore()
+  const user = useAuthStore((s) => s.user)
+  const isLoading = useAuthStore((s) => s.isLoading)
+  const errorMessage = useAuthStore((s) => s.errorMessage)
+  const checkSession = useAuthStore((s) => s.checkSession)
+  const loginAsGuest = useAuthStore((s) => s.loginAsGuest)
+  const clearError = useAuthStore((s) => s.clearError)
   const [isCheckingSession, setIsCheckingSession] = useState(true)
+  const { t, locale, setLocale } = useTranslation()
 
-  // Initial session check via Zustand auth store — this is the only
-  // loading state that should skeleton the hero (avoids a blank screen
-  // while a saved session is restored). Submitting Play Now afterwards
-  // must not re-trigger this skeleton or change the layout.
   useEffect(() => {
     let isMounted = true
     checkSession().then((session) => {
       if (!isMounted) return
       if (session) {
+        // A real (non-guest) session survived the reload — resuming a guest's
+        // in-progress run isn't supported, matching "guest progress has no
+        // server-side save" (docs/technical/known-gaps.md).
+        if (resumeTarget && !session.isGuest) {
+          onResume?.(resumeTarget)
+          return
+        }
         onPlayNow?.()
         return
       }
       setIsCheckingSession(false)
     })
     return () => { isMounted = false }
-  }, [checkSession, onPlayNow])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [checkSession, resumeTarget])
 
   async function handlePlayNow() {
     clearError()
@@ -242,21 +295,24 @@ export function LandingScreen({
   }
 
   return (
-    <div
-      className="relative flex min-h-dvh flex-col"
-      style={{ background: 'var(--ma-bg)' }}
-    >
+    <ScreenShell>
+      {/* ── Language switch — reachable before Play Now / Log In ── */}
+      <div className="absolute top-4 right-4 z-10">
+        <LanguageSwitch locale={locale} setLocale={setLocale} label={t.settings.language} />
+      </div>
+
       {/* ── Main content — vertically centred ── */}
-      <main
-        id="main-content"
-        className="flex flex-1 flex-col items-center justify-center px-6 pt-16"
+      <ScreenMain
+        bottomPadding="pb-0"
+        topPadding="none"
+        className="items-center justify-center px-6 pt-6"
       >
         {/* Offline banner */}
         {isOffline && (
           <div className="mb-6 w-full max-w-xs">
             <StatusBanner
               variant="offline"
-              message="You're offline. Play Now will start a local session."
+              message={t.landing.offlineBanner}
             />
           </div>
         )}
@@ -273,18 +329,19 @@ export function LandingScreen({
         )}
 
         <div className="flex w-full max-w-xs flex-col items-center gap-10">
-          <BrandArea skeleton={isCheckingSession} />
+          <BrandArea skeleton={isCheckingSession} t={t} />
 
           <CtaArea
             skeleton={isCheckingSession}
             disabled={isLoading}
             onPlayNow={handlePlayNow}
             onLogIn={onLogIn ?? (() => {})}
+            t={t}
           />
 
-          {!isCheckingSession && <GuestNote />}
+          {!isCheckingSession && <GuestNote t={t} />}
         </div>
-      </main>
-    </div>
+      </ScreenMain>
+    </ScreenShell>
   )
 }

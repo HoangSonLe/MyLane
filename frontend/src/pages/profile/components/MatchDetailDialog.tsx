@@ -1,5 +1,5 @@
 import { Card, CardButton } from '@/components/ui/card'
-
+import { useTranslation } from '@/i18n/useTranslation'
 import type { MatchEntry } from '@/services/profile/profile.interface'
 
 export function MatchDetailDialog({
@@ -9,6 +9,7 @@ export function MatchDetailDialog({
   match: MatchEntry | null
   onClose: () => void
 }) {
+  const { t } = useTranslation()
   if (!match) return null
 
   const outcomeColor =
@@ -26,7 +27,7 @@ export function MatchDetailDialog({
       : 'var(--ma-surface-raised)'
 
   const outcomeLabel =
-    match.outcome === 'win' ? 'Victory' : match.outcome === 'loss' ? 'Defeat' : 'Draw'
+    match.outcome === 'win' ? t.profile.victory : match.outcome === 'loss' ? t.profile.defeat : t.profile.draw
 
   return (
     <>
@@ -77,7 +78,7 @@ export function MatchDetailDialog({
           </p>
           {match.opponentName && (
             <p className="text-[12px]" style={{ color: 'var(--ma-fg-subtle)' }}>
-              vs {match.opponentName}
+            vs {match.opponentName}
             </p>
           )}
         </div>
@@ -85,13 +86,13 @@ export function MatchDetailDialog({
         {/* Detail rows */}
         <Card className="mx-4 mb-4 overflow-hidden">
           {[
-            { label: 'Category', value: match.categoryLabel },
-            { label: 'Mode', value: match.mode },
-            { label: 'Score', value: match.score.toLocaleString() },
+            { label: t.profile.detailCategory, value: match.categoryLabel },
+            { label: t.profile.detailMode, value: match.mode },
+            { label: t.profile.detailScore, value: match.score.toLocaleString() },
             ...(match.eloChange !== undefined
-              ? [{ label: 'Elo Change', value: `${match.eloChange >= 0 ? '+' : ''}${match.eloChange}` }]
+              ? [{ label: t.profile.detailEloChange, value: `${match.eloChange >= 0 ? '+' : ''}${match.eloChange}` }]
               : []),
-            { label: 'Played', value: match.playedAt },
+            { label: t.profile.detailPlayed, value: match.playedAt },
           ].map((row, i) => (
             <div
               key={row.label}
@@ -105,7 +106,7 @@ export function MatchDetailDialog({
                 className="text-[13px] font-semibold tabular-nums"
                 style={{
                   color:
-                    row.label === 'Elo Change' && match.eloChange !== undefined
+                    row.label === t.profile.detailEloChange && match.eloChange !== undefined
                       ? match.eloChange >= 0 ? 'var(--ma-success)' : 'var(--ma-danger)'
                       : 'var(--ma-fg)',
                 }}
@@ -127,7 +128,7 @@ export function MatchDetailDialog({
           ].join(' ')}
           style={{ color: 'var(--ma-fg-muted)' }}
         >
-          Close
+          {t.profile.close}
         </CardButton>
       </div>
     </>

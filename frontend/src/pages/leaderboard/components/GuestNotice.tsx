@@ -17,7 +17,10 @@ function IconLogIn() {
   )
 }
 
+import { useTranslation } from '@/i18n/useTranslation'
+
 export function GuestNotice({ onLogIn }: { onLogIn?: () => void }) {
+  const { t } = useTranslation()
   return (
     <div
       className="mx-4 flex items-start gap-3 rounded-[var(--radius-xl)] px-4 py-3"
@@ -32,10 +35,10 @@ export function GuestNotice({ onLogIn }: { onLogIn?: () => void }) {
       </span>
       <div className="flex flex-1 flex-col gap-1.5">
         <p className="text-[13px] font-medium leading-snug" style={{ color: 'var(--ma-fg)' }}>
-          You&apos;re browsing as a guest
+          {t.leaderboard.guestTitle}
         </p>
         <p className="text-[12px] leading-relaxed" style={{ color: 'var(--ma-fg-muted)' }}>
-          Your personal rank won&apos;t appear here because guest scores aren&apos;t saved to the leaderboard. Log in to track your position.
+          {t.leaderboard.guestDesc}
         </p>
         {onLogIn && (
           <button
@@ -54,7 +57,7 @@ export function GuestNotice({ onLogIn }: { onLogIn?: () => void }) {
             }}
           >
             <IconLogIn />
-            Log in
+            {t.leaderboard.logIn}
           </button>
         )}
       </div>

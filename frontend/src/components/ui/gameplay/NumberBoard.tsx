@@ -9,7 +9,7 @@ import type { Phase } from './board.types'
  * Versus's exact original values; the default recreates solo's.
  */
 const SIZES = {
-  default: { containerClassName: 'flex flex-col gap-4', minHeight: '72px', fontSize: '36px', letterSpacing: '0.2em' },
+  default: { containerClassName: 'flex w-full flex-col gap-4', minHeight: '72px', fontSize: '36px', letterSpacing: '0.2em' },
   compact: { containerClassName: 'flex w-full flex-col gap-4', minHeight: '64px', fontSize: '34px', letterSpacing: '0.18em' },
 } as const
 
@@ -72,9 +72,11 @@ export function NumberBoard({
         {['1','2','3','4','5','6','7','8','9'].map((k) => (
           <KeypadButton key={k} label={k} disabled={!isAnswering} onPress={() => onKey(k)} />
         ))}
+      </div>
+      <div className="grid grid-cols-3 gap-2">
+        <div />
         <KeypadButton label="⌫" disabled={!isAnswering} onPress={onDelete} isAction ariaLabel="Delete" icon={<IconDelete />} />
-        <KeypadButton label="0" disabled={!isAnswering} onPress={() => onKey('0')} />
-        <div /> {/* spacer */}
+        <div />
       </div>
     </div>
   )

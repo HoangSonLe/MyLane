@@ -1,13 +1,14 @@
 import { useEffect, useRef } from 'react'
 
 interface StatusBannerProps {
-  variant: 'error' | 'offline'
+  variant: 'error' | 'offline' | 'info'
   message: string
   onRetry?: () => void
 }
 
 export function StatusBanner({ variant, message, onRetry }: StatusBannerProps) {
   const isError = variant === 'error'
+  const isInfo = variant === 'info'
   const retryRef = useRef<HTMLButtonElement>(null)
 
   useEffect(() => {
@@ -24,6 +25,8 @@ export function StatusBanner({ variant, message, onRetry }: StatusBannerProps) {
         'mx-4 mb-4 flex items-start gap-3 rounded-2xl px-4 py-3.5',
         isError
           ? 'bg-[var(--ma-danger)]/10 text-[var(--ma-danger)]'
+          : isInfo
+          ? 'bg-[var(--ma-active)]/10 text-[var(--ma-active)]'
           : 'bg-[var(--ma-warning)]/10 text-[var(--ma-warning)]',
       ].join(' ')}
     >
@@ -32,6 +35,10 @@ export function StatusBanner({ variant, message, onRetry }: StatusBannerProps) {
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
             <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.5" />
             <path d="M12 8v5M12 16.01V16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+          </svg>
+        ) : isInfo ? (
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <path d="M13.73 21a2 2 0 01-3.46 0M18.63 13A17.89 17.89 0 0118 8M6.26 6.26A5.86 5.86 0 006 8c0 7-3 9-3 9h14M1 1l22 22" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         ) : (
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none">

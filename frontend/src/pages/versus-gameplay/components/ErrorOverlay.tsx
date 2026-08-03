@@ -1,4 +1,5 @@
 import { IconX } from './icons'
+import { useTranslation } from '@/i18n/useTranslation'
 
 function IconRefresh() {
   return (
@@ -10,13 +11,14 @@ function IconRefresh() {
 }
 
 export function ErrorOverlay({ onRetry, onQuit }: { onRetry: () => void; onQuit: () => void }) {
+  const { t } = useTranslation()
   return (
     <div
       className="fixed inset-0 z-40 flex items-end justify-center"
       style={{ background: 'oklch(0 0 0 / 0.65)', backdropFilter: 'blur(6px)' }}
       role="dialog"
       aria-modal="true"
-      aria-label="Connection error"
+      aria-label={t.versusGameplay.connectionErrorTitle}
     >
       <div
         className="w-full max-w-sm mb-6 mx-4 flex flex-col items-center gap-5 rounded-3xl p-6 text-center"
@@ -32,9 +34,9 @@ export function ErrorOverlay({ onRetry, onQuit }: { onRetry: () => void; onQuit:
           </svg>
         </div>
         <div>
-          <p className="text-[17px] font-bold" style={{ color: 'var(--ma-fg)' }}>Connection error</p>
+          <p className="text-[17px] font-bold" style={{ color: 'var(--ma-fg)' }}>{t.versusGameplay.connectionErrorTitle}</p>
           <p className="mt-1.5 text-[13px] leading-relaxed" style={{ color: 'var(--ma-fg-muted)' }}>
-            The match connection was lost. Reconnect to continue or quit to the lobby.
+            {t.versusGameplay.connectionErrorDesc}
           </p>
         </div>
         <div className="flex w-full flex-col gap-2.5">
@@ -45,7 +47,7 @@ export function ErrorOverlay({ onRetry, onQuit }: { onRetry: () => void; onQuit:
             style={{ background: 'var(--ma-brand)', color: 'var(--ma-brand-fg)', boxShadow: 'var(--ma-shadow-md)' }}
           >
             <IconRefresh />
-            Reconnect
+            {t.versusGameplay.reconnect}
           </button>
           <button
             type="button"
@@ -58,7 +60,7 @@ export function ErrorOverlay({ onRetry, onQuit }: { onRetry: () => void; onQuit:
             }}
           >
             <IconX />
-            Quit match
+            {t.versusGameplay.quitMatch}
           </button>
         </div>
       </div>

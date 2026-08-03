@@ -3,6 +3,7 @@ import { useRef } from 'react'
 import { IconDoorOpen } from '@/components/ui/icons'
 import { IconLoader } from './icons'
 import { SectionLabel } from '@/components/ui/SectionLabel'
+import { useTranslation } from '@/i18n/useTranslation'
 
 export function JoinRoomForm({
   skeleton,
@@ -17,6 +18,7 @@ export function JoinRoomForm({
   onCodeChange: (v: string) => void
   onJoin: () => void
 }) {
+  const { t } = useTranslation()
   const inputRef = useRef<HTMLInputElement>(null)
 
   if (skeleton) {
@@ -33,15 +35,15 @@ export function JoinRoomForm({
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-2">
-        <SectionLabel label="Room Code or Link" />
+        <SectionLabel label={t.versusRoom.roomCodeOrLinkLabel} />
         <div className="px-4">
           <input
             ref={inputRef}
             type="text"
             value={codeValue}
             onChange={(e) => onCodeChange(e.target.value)}
-            placeholder="e.g. MEM-8472"
-            aria-label="Room code or link"
+            placeholder={t.versusRoom.roomCodePlaceholder}
+            aria-label={t.versusRoom.roomCodeOrLinkAria}
             autoComplete="off"
             spellCheck={false}
             className={[
@@ -84,21 +86,21 @@ export function JoinRoomForm({
             color: 'var(--ma-brand-fg)',
             boxShadow: !canJoin ? 'none' : '0 4px 24px oklch(0.78 0.16 75 / 0.28)',
           }}
-          aria-label="Join room"
+          aria-label={t.versusRoom.joinRoomAria}
         >
           {isJoining ? (
             <>
               <span style={{ color: 'var(--ma-brand-fg)' }}>
                 <IconLoader />
               </span>
-              Joining…
+              {t.versusRoom.joining}
             </>
           ) : (
             <>
               <span style={{ color: 'var(--ma-brand-fg)' }}>
                 <IconDoorOpen />
               </span>
-              Join Room
+              {t.versusRoom.joinRoomBtn}
             </>
           )}
         </button>

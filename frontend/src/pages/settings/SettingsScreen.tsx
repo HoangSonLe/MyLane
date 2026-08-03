@@ -1,13 +1,11 @@
-import { useState, useTransition, useCallback, useRef } from 'react'
-import { SettingsSection } from './SettingsSection'
-import { SettingsRow } from './SettingsRow'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { SettingsSection, SettingsRow } from '@/components/ui/settings'
+import { ScreenShell, ScreenOfflineBanner, ScreenMain } from '@/components/ui/layout'
 import { BottomNavBar } from '@/components/ui/BottomNavBar'
 import { StatusBanner } from '@/components/ui/StatusBanner'
-import { StatePill } from '@/components/ui/StatePill'
-import { Toast } from './components/Toast'
+import { Toast } from '@/components/ui/Toast'
 import { ProfileCard } from './components/ProfileCard'
 import { LogOutDialog } from './components/LogOutDialog'
-import { EmptyState } from './components/EmptyState'
 import { LinkedMethodRow } from './components/LinkedMethodRow'
 import {
   IconBell,
@@ -23,54 +21,122 @@ import {
   IconLogOut,
   IconBack,
 } from './components/icons'
-import { MOCK_LINKED_METHODS } from '@/services/settings/settings.mock'
+import { settingsService } from '@/services/settings/settings.service'
+import { isSupabaseConfigured } from '@/services/backend-config'
+import { supabaseService } from '@/services/supabase'
+import type { LinkedMethod } from '@/services/settings/settings.interface'
 import { useAuthStore } from '@/stores/auth.store'
-
-import { ScreenState } from '@/configs/enum'
+import { useThemeStore } from '@/stores/theme.store'
+import { useHapticsStore } from '@/stores/haptics.store'
+import { useSoundsStore } from '@/stores/sounds.store'
+import { useNetworkStatus } from '@/lib/hooks/useNetworkStatus'
+import { useTranslation } from '@/i18n/useTranslation'
 
 // ─── Main component ────────────────────────────────────────────
 export function SettingsScreen({
   onBack,
   onLogOut,
+  onNavigate,
 }: {
-  /** Navigate back to Home. */
+  /** Navigate back to wherever the player came from. */
   onBack?: () => void
   /** Called after log-out is confirmed — navigate to Landing / First Run. */
   onLogOut?: () => void
+  /** Bottom nav tab taps ('home' / 'play' / 'stats' / 'settings'). */
+  onNavigate?: (id: string) => void
 }) {
-  const [screenState, setScreenState] = useState<ScreenState>(ScreenState.NORMAL)
-  const [, startTransition] = useTransition()
+  const { isOffline } = useNetworkStatus()
   const logout = useAuthStore((s) => s.logout)
+  const user = useAuthStore((s) => s.user)
+  const { t, locale, setLocale } = useTranslation()
+  const theme = useThemeStore((s) => s.theme)
+  const toggleTheme = useThemeStore((s) => s.toggleTheme)
+  const hapticEnabled = useHapticsStore((s) => s.enabled)
+  const setHapticEnabled = useHapticsStore((s) => s.setEnabled)
+  const soundsEnabled = useSoundsStore((s) => s.enabled)
+  const setSoundsEnabled = useSoundsStore((s) => s.setEnabled)
 
-  // Settings toggles
+  const [linkedMethods, setLinkedMethods] = useState<LinkedMethod[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [isError, setIsError] = useState(false)
+
+  // Settings toggles — initialized from the server fetch below.
   const [notifications, setNotifications] = useState(true)
   const [sounds, setSounds] = useState(true)
   const [haptics, setHaptics] = useState(false)
-  const [darkMode] = useState(true)
 
-  // Auto-save toast
-  const [toastVisible, setToastVisible] = useState(false)
+  // Shared toast — "Saved" after a real toggle, or a notice for not-yet-built actions.
+  const [toastMessage, setToastMessage] = useState<string | null>(null)
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   // Log-out dialog
   const [logOutDialogVisible, setLogOutDialogVisible] = useState(false)
   const [logOutBusy, setLogOutBusy] = useState(false)
 
-  const triggerSave = useCallback(() => {
+  const showToast = useCallback((message: string) => {
     if (toastTimer.current) clearTimeout(toastTimer.current)
-    setToastVisible(true)
-    toastTimer.current = setTimeout(() => setToastVisible(false), 2000)
+    setToastMessage(message)
+    toastTimer.current = setTimeout(() => setToastMessage(null), 2000)
   }, [])
 
-  function handleToggle<T>(setter: (v: T) => void) {
-    return (v: T) => {
-      setter(v)
-      triggerSave()
+  function toggleLanguage() {
+    const newLocale = locale === 'en' ? 'vi' : 'en'
+    setLocale(newLocale)
+    showToast(t.settings.saved)
+
+    if (isSupabaseConfigured()) {
+      supabaseService.updateSettings({ language: newLocale })
+    } else {
+      const { user } = useAuthStore.getState()
+      if (user && !user.isGuest) {
+        settingsService.saveLocale(newLocale).catch(() => {
+          setLocale(locale)
+          showToast(t.settings.notImplemented)
+        })
+      }
     }
   }
 
-  function handleStateChange(s: ScreenState) {
-    startTransition(() => setScreenState(s))
+  const load = useCallback(async () => {
+    setIsLoading(true)
+    setIsError(false)
+    try {
+      if (isSupabaseConfigured()) {
+        const remote = await supabaseService.getSettings()
+        if (remote) {
+          if (remote.preferred_language) setLocale(remote.preferred_language)
+          if (typeof remote.sounds_enabled === 'boolean') setSoundsEnabled(remote.sounds_enabled)
+          if (typeof remote.haptics_enabled === 'boolean') setHapticEnabled(remote.haptics_enabled)
+          if (typeof remote.notifications_enabled === 'boolean') setNotifications(remote.notifications_enabled)
+        }
+      } else {
+        const settings = await settingsService.getSettings()
+        setLinkedMethods(settings.linkedMethods)
+        setNotifications(settings.notifications)
+        setSounds(settings.sounds)
+        setHaptics(settings.haptics)
+      }
+    } catch {
+      setIsError(true)
+    } finally {
+      setIsLoading(false)
+    }
+  }, [setLocale, setSoundsEnabled, setHapticEnabled])
+
+  useEffect(() => {
+    load()
+  }, [load])
+
+  /** Toggle rows save locally only for now — see docs/technical/known-gaps.md. */
+  function handleToggle<T>(setter: (v: T) => void) {
+    return (v: T) => {
+      setter(v)
+      showToast(t.settings.saved)
+    }
+  }
+
+  function notImplemented() {
+    showToast(t.settings.notImplemented)
   }
 
   async function handleLogOutConfirm() {
@@ -81,18 +147,9 @@ export function SettingsScreen({
     onLogOut?.()
   }
 
-  const isLoading = screenState === ScreenState.LOADING
-  const isError   = screenState === ScreenState.ERROR
-  const isOffline = screenState === ScreenState.OFFLINE
-  const isEmpty   = screenState === ScreenState.EMPTY
-
   return (
-    <div className="relative flex min-h-dvh flex-col bg-[var(--ma-bg)]">
-      {/* Prototype state switcher */}
-      <StatePill current={screenState} onChange={handleStateChange} states={[ScreenState.NORMAL, ScreenState.LOADING, ScreenState.EMPTY, ScreenState.ERROR, ScreenState.OFFLINE]} />
-
-      {/* Auto-save toast */}
-      <Toast visible={toastVisible} />
+    <ScreenShell>
+      <Toast visible={toastMessage !== null} message={toastMessage ?? ''} />
 
       {/* Log-out confirmation */}
       <LogOutDialog
@@ -103,13 +160,12 @@ export function SettingsScreen({
       />
 
       {/* ── HEADER ── */}
-      <header className="px-4 pb-2 pt-16">
+      <header className="px-4 pb-2 pt-6">
         <div className="flex items-center gap-3">
-          {/* Back → Home */}
           <button
             type="button"
             onClick={onBack}
-            aria-label="Back to Home"
+            aria-label={t.common.back}
             className={[
               'flex h-9 w-9 shrink-0 items-center justify-center',
               'transition-colors duration-[var(--ma-duration-micro)]',
@@ -128,15 +184,15 @@ export function SettingsScreen({
 
           <div className="min-w-0 flex-1">
             <h1 className="text-[22px] font-bold tracking-tight text-[var(--ma-fg)]">
-              Settings
+              {t.settings.title}
             </h1>
-            {!isLoading && !isEmpty && (
+            {!isLoading && (
               <p className="mt-0.5 text-[13px] text-[var(--ma-fg-muted)]">
-                Preferences saved automatically
+                {t.settings.subtitle}
               </p>
             )}
           </div>
-          {!isLoading && !isEmpty && (
+          {!isLoading && (
             <span className="shrink-0 rounded-xl bg-[var(--ma-surface)] px-2.5 py-1 text-[11px] font-medium text-[var(--ma-fg-subtle)]">
               v1.1
             </span>
@@ -148,161 +204,164 @@ export function SettingsScreen({
       {isError && (
         <StatusBanner
           variant="error"
-          message="Failed to load settings. Please try again."
-          onRetry={() => handleStateChange(ScreenState.NORMAL)}
+          message={t.settings.loadError}
+          onRetry={load}
         />
       )}
-      {isOffline && (
-        <StatusBanner
-          variant="offline"
-          message="You&apos;re offline. Changes will sync when reconnected."
-        />
-      )}
+      <ScreenOfflineBanner show={isOffline} message={t.settings.offlineBanner} />
 
       {/* ── MAIN CONTENT ── */}
-      <main className="flex-1 overflow-y-auto pb-24" id="main-content">
-        {isEmpty ? (
-          <EmptyState />
-        ) : (
-          <div className="flex flex-col gap-5 px-4 pt-3">
+      <ScreenMain bottomPadding="pb-24" topPadding="none" className="overflow-y-auto">
+        <div className="flex flex-col gap-5 px-4 pt-3">
 
-            {/* Profile card */}
-            <ProfileCard skeleton={isLoading} />
+          {/* Profile card */}
+          <ProfileCard skeleton={isLoading} user={user} />
 
-            {/* Login methods */}
-            <SettingsSection title="Login methods" skeleton={isLoading}>
-              {MOCK_LINKED_METHODS.map((m) => (
-                <LinkedMethodRow key={m.id} method={m} skeleton={isLoading} />
-              ))}
+          {/* Login methods */}
+          <SettingsSection title={t.settings.loginMethods} skeleton={isLoading}>
+            {linkedMethods.map((m) => (
+              <LinkedMethodRow key={m.id} method={m} skeleton={isLoading} />
+            ))}
 
-              {/* Add login method — disabled offline */}
-              {!isLoading && (
-                <SettingsRow
-                  icon={<IconLink />}
-                  label="Add login method"
-                  description={isOffline ? 'Needs a connection' : undefined}
-                  variant="nav"
-                  onClick={isOffline ? undefined : () => {}}
-                  disabled={isOffline}
-                />
-              )}
-            </SettingsSection>
-
-            {/* Game settings */}
-            <SettingsSection title="Game" skeleton={isLoading}>
-              <SettingsRow
-                icon={<IconBell />}
-                label="Notifications"
-                description="Daily reminders and streak alerts"
-                variant="toggle"
-                checked={notifications}
-                onToggle={handleToggle(setNotifications)}
-                skeleton={isLoading}
-              />
-              <SettingsRow
-                icon={<IconVolume />}
-                label="Sound effects"
-                description="Audio feedback during gameplay"
-                variant="toggle"
-                checked={sounds}
-                onToggle={handleToggle(setSounds)}
-                skeleton={isLoading}
-              />
-              <SettingsRow
-                icon={<IconVibrate />}
-                label="Haptic feedback"
-                description="Vibration on interactions"
-                variant="toggle"
-                checked={haptics}
-                onToggle={handleToggle(setHaptics)}
-                skeleton={isLoading}
-              />
-            </SettingsSection>
-
-            {/* Display */}
-            <SettingsSection title="Display" skeleton={isLoading}>
-              <SettingsRow
-                icon={<IconMoon />}
-                label="Dark mode"
-                description="Always on for Memory Arena"
-                variant="toggle"
-                checked={darkMode}
-                onToggle={() => {}}
-                skeleton={isLoading}
-                disabled
-              />
-              <SettingsRow
-                icon={<IconLanguage />}
-                label="Language"
-                variant="value"
-                value="English"
-                onClick={() => {}}
-                skeleton={isLoading}
-              />
-            </SettingsSection>
-
-            {/* About */}
-            <SettingsSection title="About" skeleton={isLoading}>
-              <SettingsRow
-                icon={<IconInfo />}
-                label="App version"
-                variant="value"
-                value="1.1.0"
-                skeleton={isLoading}
-              />
-              <SettingsRow
-                icon={<IconShield />}
-                label="Privacy policy"
-                variant="nav"
-                onClick={() => {}}
-                skeleton={isLoading}
-              />
-              <SettingsRow
-                icon={<IconDocument />}
-                label="Terms of service"
-                variant="nav"
-                onClick={() => {}}
-                skeleton={isLoading}
-              />
-            </SettingsSection>
-
-            {/* Danger zone — only when content is loaded */}
+            {/* Add login method — disabled offline */}
             {!isLoading && (
-              <SettingsSection title="Danger zone">
-                <SettingsRow
-                  icon={<IconTrash />}
-                  label="Reset all progress"
-                  description="This cannot be undone"
-                  variant="danger"
-                  onClick={() => {}}
-                />
-              </SettingsSection>
+              <SettingsRow
+                icon={<IconLink />}
+                label={t.settings.addLoginMethod}
+                description={isOffline ? t.settings.needsConnection : undefined}
+                variant="nav"
+                onClick={isOffline ? undefined : notImplemented}
+                disabled={isOffline}
+              />
             )}
+          </SettingsSection>
 
-            {/* Session / Log out */}
-            {!isLoading && (
-              <SettingsSection title="Session">
-                <SettingsRow
-                  icon={<IconLogOut />}
-                  label="Log out"
-                  variant="danger"
-                  onClick={() => setLogOutDialogVisible(true)}
-                />
-              </SettingsSection>
-            )}
+          {/* Game settings */}
+          <SettingsSection title={t.settings.game} skeleton={isLoading}>
+            <SettingsRow
+              icon={<IconBell />}
+              label={t.settings.notifications}
+              description={t.settings.notificationsDesc}
+              variant="toggle"
+              checked={notifications}
+              onToggle={handleToggle(setNotifications)}
+              skeleton={isLoading}
+            />
+            <SettingsRow
+              icon={<IconVolume />}
+              label={t.settings.soundEffects}
+              description={t.settings.soundEffectsDesc}
+              variant="toggle"
+              checked={soundsEnabled}
+              onToggle={(next) => {
+                setSoundsEnabled(next)
+                showToast(t.settings.saved)
+                if (isSupabaseConfigured()) supabaseService.updateSettings({ sounds: next })
+              }}
+              skeleton={isLoading}
+            />
+            <SettingsRow
+              icon={<IconVibrate />}
+              label={t.settings.hapticFeedback}
+              description={t.settings.hapticFeedbackDesc}
+              variant="toggle"
+              checked={hapticEnabled}
+              onToggle={(next) => {
+                setHapticEnabled(next)
+                showToast(t.settings.saved)
+                if (isSupabaseConfigured()) supabaseService.updateSettings({ haptics: next })
+              }}
+              skeleton={isLoading}
+            />
+          </SettingsSection>
 
-            {isOffline && !isLoading && (
-              <p className="pb-2 text-center text-[11px] text-[var(--ma-fg-subtle)]">
-                Changes saved locally · syncs when back online
-              </p>
-            )}
+          {/* Display */}
+          <SettingsSection title={t.settings.display} skeleton={isLoading}>
+            <SettingsRow
+              icon={<IconMoon />}
+              label={t.settings.darkMode}
+              description={t.settings.darkModeDesc}
+              variant="toggle"
+              checked={theme === 'dark'}
+              onToggle={() => {
+                const nextTheme = theme === 'dark' ? 'light' : 'dark'
+                toggleTheme()
+                showToast(t.settings.saved)
+                settingsService.saveTheme(nextTheme)
+              }}
+              skeleton={isLoading}
+            />
+            <SettingsRow
+              icon={<IconLanguage />}
+              label={t.settings.language}
+              variant="value"
+              value={locale === 'en' ? t.settings.languageEnglish : t.settings.languageVietnamese}
+              onClick={toggleLanguage}
+              skeleton={isLoading}
+            />
+          </SettingsSection>
 
-          </div>
-        )}
-      </main>
+          {/* About */}
+          <SettingsSection title={t.settings.about} skeleton={isLoading}>
+            <SettingsRow
+              icon={<IconInfo />}
+              label={t.settings.appVersion}
+              variant="value"
+              value="1.1.0"
+              skeleton={isLoading}
+            />
+            <SettingsRow
+              icon={<IconShield />}
+              label={t.settings.privacyPolicy}
+              variant="nav"
+              onClick={notImplemented}
+              skeleton={isLoading}
+            />
+            <SettingsRow
+              icon={<IconDocument />}
+              label={t.settings.termsOfService}
+              variant="nav"
+              onClick={notImplemented}
+              skeleton={isLoading}
+            />
+          </SettingsSection>
+
+          {/* Danger zone — only when content is loaded */}
+          {!isLoading && (
+            <SettingsSection title={t.settings.dangerZone}>
+              <SettingsRow
+                icon={<IconTrash />}
+                label={t.settings.resetProgress}
+                description={t.settings.resetProgressDesc}
+                variant="danger"
+                onClick={notImplemented}
+              />
+            </SettingsSection>
+          )}
+
+          {/* Session / Log out */}
+          {!isLoading && (
+            <SettingsSection title={t.settings.session}>
+              <SettingsRow
+                icon={<IconLogOut />}
+                label={t.settings.logOut}
+                variant="danger"
+                onClick={() => setLogOutDialogVisible(true)}
+              />
+            </SettingsSection>
+          )}
+
+          {isOffline && !isLoading && (
+            <p className="pb-2 text-center text-[11px] text-[var(--ma-fg-subtle)]">
+              {t.settings.offlineNote}
+            </p>
+          )}
+
+        </div>
+      </ScreenMain>
 
       {/* ── NAVIGATION ── */}
-      <BottomNavBar active="settings" onNavigate={() => {}} />
-    </div>
+      <BottomNavBar active="settings" onNavigate={onNavigate} />
+    </ScreenShell>
   )
 }

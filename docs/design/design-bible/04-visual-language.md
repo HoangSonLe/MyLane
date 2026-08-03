@@ -2,7 +2,7 @@
 
 ## Design Direction
 
-Memory Arena follows the design language:
+My Lane follows the design language:
 
 Modern Cozy Brain Game
 

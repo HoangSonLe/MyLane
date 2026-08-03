@@ -1,6 +1,6 @@
-# Memory Arena
+# My Lane
 
-Memory Arena is a mobile-first web platform focused on cognitive training through short and engaging memory games.
+My Lane is a mobile-first web platform focused on cognitive training through short and engaging memory games.
 
 The project is designed to be modular, scalable, and AI-assisted during development.
 

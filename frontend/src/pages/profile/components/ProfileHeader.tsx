@@ -1,4 +1,5 @@
 import { ScreenHeaderWithBack, ScreenHeaderAction } from '@/components/ui/layout'
+import { useTranslation } from '@/i18n/useTranslation'
 
 function IconSettings() {
   return (
@@ -21,17 +22,18 @@ export function ProfileHeader({
   onBack?: () => void
   onSettings?: () => void
 }) {
+  const { t } = useTranslation()
   return (
     <ScreenHeaderWithBack
       skeleton={skeleton}
       onBack={onBack}
-      title="Profile"
+      title={t.profile.title}
       titleSkeletonWidth="4rem"
       trailing={
         <ScreenHeaderAction
           skeleton={skeleton}
           onClick={onSettings}
-          ariaLabel="Go to Settings"
+          ariaLabel={t.profile.settings}
           icon={<IconSettings />}
         />
       }

@@ -1,20 +1,21 @@
 import { Phase, GameId } from '@/configs/enum'
-import { IconPlay, IconSpinner } from './icons'
+import { IconSpinner } from './icons'
+import { useTranslation } from '@/i18n/useTranslation'
 
 export function PromptBar({
-  phase, onStart, gameType,
-}: { phase: Phase; onStart: () => void; gameType: GameId }) {
+  phase, gameType,
+}: { phase: Phase; gameType: GameId }) {
+  const { t } = useTranslation()
   if (phase === Phase.IDLE) {
     return (
-      <button
-        type="button"
-        onClick={onStart}
-        className="flex w-full items-center justify-center gap-2 rounded-2xl py-4 text-[15px] font-semibold transition-all active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ma-ring)]"
-        style={{ background: 'var(--ma-brand)', color: 'var(--ma-brand-fg)', boxShadow: 'var(--ma-shadow-md)' }}
+      <div
+        className="flex w-full items-center justify-center gap-2 rounded-2xl py-4 text-[15px] font-semibold"
+        style={{ background: 'var(--ma-surface)', border: '1px solid var(--ma-border)', color: 'var(--ma-fg-muted)' }}
+        aria-live="polite"
       >
-        <IconPlay />
-        Start round
-      </button>
+        <IconSpinner />
+        {t.versusGameplay.roundBanner.idleLabel}
+      </div>
     )
   }
   if (phase === Phase.VIEWING) {
@@ -25,16 +26,17 @@ export function PromptBar({
         aria-live="polite"
       >
         <IconSpinner />
-        <span>Memorise the pattern…</span>
+        <span>{t.promptBar.memorise}</span>
       </div>
     )
   }
   if (phase === Phase.ANSWERING) {
     const hint: Record<GameId, string> = {
-      [GameId.NUMBER]:   'Type the number sequence',
-      [GameId.ALPHABET]: 'Type the letter sequence',
-      [GameId.GRID]:     'Tap tiles in ascending order',
-      [GameId.SEQUENCE]: 'Tap tiles in the order they flashed',
+      [GameId.NUMBER]:   t.promptBar.hintNumber,
+      [GameId.ALPHABET]: t.promptBar.hintAlphabet,
+      [GameId.GRID]:     t.promptBar.hintGrid,
+      [GameId.SEQUENCE]: t.promptBar.hintSequence,
+      [GameId.COLOR]:    t.promptBar.hintColor,
     }
     return (
       <div
@@ -57,7 +59,7 @@ export function PromptBar({
         style={{ background: 'oklch(0.70 0.15 145 / 0.12)', border: '1px solid oklch(0.70 0.15 145 / 0.25)', color: 'var(--ma-success)' }}
         aria-live="polite"
       >
-        Point scored — waiting for opponent…
+        {t.versusGameplay.correctWaitingOpponent}
       </div>
     )
   }
@@ -68,7 +70,7 @@ export function PromptBar({
         style={{ background: 'oklch(0.62 0.19 22 / 0.10)', border: '1px solid oklch(0.62 0.19 22 / 0.25)', color: 'var(--ma-danger)' }}
         aria-live="polite"
       >
-        Wrong — opponent still answering…
+        {t.versusGameplay.wrongOpponentAnswering}
       </div>
     )
   }

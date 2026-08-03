@@ -1,4 +1,5 @@
 import type { ResultData } from '@/services/result/result.interface'
+import { useTranslation } from '@/i18n/useTranslation'
 
 function IconStar() {
   return (
@@ -9,6 +10,7 @@ function IconStar() {
 }
 
 export function NewRecordBadge({ data }: { data: ResultData }) {
+  const { t } = useTranslation()
   if (!data.isNewRecord) return null
 
   const beatScore =
@@ -18,42 +20,42 @@ export function NewRecordBadge({ data }: { data: ResultData }) {
 
   const lines: string[] = []
   if (beatScore && data.previousBestScore !== null)
-    lines.push(`Score: ${data.previousBestScore.toLocaleString()} → ${data.score.toLocaleString()}`)
+    lines.push(t.result.scoreChangeLine(data.previousBestScore.toLocaleString(), data.score.toLocaleString()))
   if (beatLevel && data.previousBestLevel !== null)
-    lines.push(`Level: ${data.previousBestLevel} → ${data.levelReached}`)
+    lines.push(t.result.levelChangeLine(data.previousBestLevel, data.levelReached))
 
   return (
     <div
-      className="mx-4 flex items-center gap-3 px-4 py-3.5"
+      className="mx-4 flex items-center gap-3 px-4 py-3.5 animate-in zoom-in-95 fade-in duration-300"
       style={{
         borderRadius: 'var(--radius-2xl)',
-        background: 'oklch(0.76 0.14 74 / 0.10)',
-        border: '1px solid oklch(0.76 0.14 74 / 0.30)',
-        boxShadow: '0 0 0 0 transparent',
+        background: 'oklch(0.76 0.16 75 / 0.14)',
+        border: '1px solid oklch(0.76 0.16 75 / 0.40)',
+        boxShadow: '0 4px 16px -2px oklch(0.76 0.16 75 / 0.20)',
       }}
       role="status"
-      aria-label="New personal record"
+      aria-label={t.result.newRecordAria}
     >
       <div
-        className="shrink-0 flex items-center justify-center"
+        className="shrink-0 flex items-center justify-center animate-bounce duration-1000"
         style={{
-          height: '2.25rem',
-          width: '2.25rem',
+          height: '2.5rem',
+          width: '2.5rem',
           borderRadius: 'var(--radius-xl)',
-          background: 'var(--ma-brand)',
+          background: 'oklch(0.76 0.18 75)',
+          color: '#1a1000',
+          boxShadow: '0 2px 8px oklch(0.76 0.18 75 / 0.4)',
         }}
         aria-hidden="true"
       >
-        <span style={{ color: 'var(--ma-brand-fg)' }}>
-          <IconStar />
-        </span>
+        <IconStar />
       </div>
       <div className="flex flex-col gap-0.5 min-w-0">
-        <p className="text-[13px] font-bold" style={{ color: 'var(--ma-brand)' }}>
-          New Personal Record
+        <p className="text-[14px] font-extrabold uppercase tracking-wide" style={{ color: 'oklch(0.76 0.18 75)' }}>
+          🏆 {t.result.newRecord}
         </p>
         {lines.map((line) => (
-          <p key={line} className="text-[12px]" style={{ color: 'var(--ma-fg-muted)' }}>
+          <p key={line} className="text-[12px] font-medium" style={{ color: 'var(--ma-fg)' }}>
             {line}
           </p>
         ))}

@@ -2,9 +2,9 @@
 
 ## Purpose
 
-This directory contains architecture and implementation decisions for Memory Arena's backend and platform.
+This directory contains architecture and implementation decisions for My Lane's backend and platform.
 
-**Primary source:** [`MEMORY_ARENA_GAME_DESIGN.md`](../../MEMORY_ARENA_GAME_DESIGN.md) §16–18 (repo root). This document restructures that section into the dedicated technical-docs location `AGENTS.md`/`CLAUDE.md` expect.
+**Primary source:** [`MY_LANE_GAME_DESIGN.md`](../../MY_LANE_GAME_DESIGN.md) §16–18 (repo root). This document restructures that section into the dedicated technical-docs location `AGENTS.md`/`CLAUDE.md` expect.
 
 Per [`AGENTS.md`](../../AGENTS.md): never change this architecture, replace a library, or migrate database technology without permission.
 
@@ -24,6 +24,7 @@ Zero-cost start · mobile-first web game · fast to build · easy to scale later
 - [v0 Screen Prompts](v0-screen-prompts.md) — per-screen, content-only prompts for v0
 - [Screen Display Data Models](screen-display-data-models.md) — screen-level view models for rendering UI
 - [Mock Auth API](mock-auth-api.md) — how login is faked (MSW + standalone mock server) until the ASP.NET Core API exists
+- [Known Gaps](known-gaps.md) — logic that's still mock/local/prototype despite the UI looking real; track here before implementing
 
 ---
 
@@ -42,11 +43,12 @@ Zero-cost start · mobile-first web game · fast to build · easy to scale later
 | Animation | Motion (Framer Motion) |
 | Icons | Lucide React |
 | PWA | vite-plugin-pwa |
-| Backend framework | ASP.NET Core 9 Web API |
-| Realtime | SignalR |
-| ORM | Entity Framework Core |
+| Backend provider (Primary) | ASP.NET Core 9 Web API + SignalR |
+| Backend provider (Cloud/BaaS) | Supabase (PostgreSQL + Auth + Realtime WebSockets) |
+| Backend provider (Dev/Offline) | MSW (Mock Service Worker) + Node mock-server |
+| ORM | Entity Framework Core / Supabase Client |
 | Validation | FluentValidation |
-| Authentication | Google OAuth + JWT |
+| Authentication | Google OAuth + JWT / Supabase Auth |
 | Logging | Serilog |
 | Database | PostgreSQL |
 | Cache | Redis |
@@ -205,4 +207,4 @@ React → Load Balancer → ASP.NET Core API (login/user/profile/history/ranking
 11. PWA + mobile polish.
 12. Bug fixing, demo prep.
 
-Source: [`MEMORY_ARENA_GAME_DESIGN.md`](../../MEMORY_ARENA_GAME_DESIGN.md) §§11, 12, 16–18.
+Source: [`MY_LANE_GAME_DESIGN.md`](../../MY_LANE_GAME_DESIGN.md) §§11, 12, 16–18.

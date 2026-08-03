@@ -26,7 +26,7 @@ export function StatCell({
   value,
   valueColor = 'var(--ma-fg)',
   ariaLabel,
-  className = 'flex flex-col gap-0.5',
+  className = 'flex flex-col items-center justify-center gap-0.5 text-center',
   style,
   labelClassName = 'text-[10px] font-semibold uppercase tracking-widest',
   valueClassName = 'text-[13px] font-semibold',
@@ -34,7 +34,12 @@ export function StatCell({
   return (
     <div className={className} style={style}>
       <span
-        className={[icon ? 'flex items-center gap-1' : '', labelClassName].filter(Boolean).join(' ')}
+        className={[
+          icon ? 'flex items-center justify-center gap-1' : '',
+          labelClassName,
+        ]
+          .filter(Boolean)
+          .join(' ')}
         style={{ color: 'var(--ma-fg-subtle)' }}
       >
         {icon}

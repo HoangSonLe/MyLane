@@ -1,4 +1,5 @@
 import { useId } from 'react'
+import { useTranslation } from '@/i18n/useTranslation'
 import { IconLogOut, IconSpinner } from './icons'
 
 interface LogOutDialogProps {
@@ -10,6 +11,7 @@ interface LogOutDialogProps {
 
 export function LogOutDialog({ visible, busy, onConfirm, onCancel }: LogOutDialogProps) {
   const titleId = useId()
+  const { t } = useTranslation()
   if (!visible) return null
 
   return (
@@ -49,23 +51,23 @@ export function LogOutDialog({ visible, busy, onConfirm, onCancel }: LogOutDialo
           className="mb-1 text-center text-[17px] font-bold leading-snug"
           style={{ color: 'var(--ma-fg)' }}
         >
-          Log out?
+          {t.settings.logOutTitle}
         </h2>
         <p
           className="mb-6 text-center text-[13px] leading-relaxed"
           style={{ color: 'var(--ma-fg-muted)' }}
         >
-          You&apos;ll need to log in again to access Versus, Elo, and your saved scores.
+          {t.settings.logOutDesc}
         </p>
 
-        <div className="flex flex-col gap-3">
+        <div className="flex items-center gap-3">
           <button
             type="button"
             onClick={onConfirm}
             disabled={busy}
             className={[
-              'flex h-12 w-full items-center justify-center gap-2',
-              'text-[15px] font-semibold',
+              'flex h-11 flex-1 items-center justify-center gap-2',
+              'text-[14px] font-semibold',
               'transition-transform duration-[var(--ma-duration-micro)]',
               'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ma-ring)]',
               busy ? 'opacity-60 cursor-not-allowed' : 'active:scale-[0.97]',
@@ -77,7 +79,7 @@ export function LogOutDialog({ visible, busy, onConfirm, onCancel }: LogOutDialo
             }}
           >
             {busy && <IconSpinner />}
-            {busy ? 'Logging out…' : 'Log out'}
+            {busy ? t.settings.logOutBusy : t.settings.logOutConfirm}
           </button>
 
           <button
@@ -85,8 +87,8 @@ export function LogOutDialog({ visible, busy, onConfirm, onCancel }: LogOutDialo
             onClick={onCancel}
             disabled={busy}
             className={[
-              'flex h-12 w-full items-center justify-center',
-              'text-[15px] font-semibold',
+              'flex h-11 flex-1 items-center justify-center',
+              'text-[14px] font-semibold',
               'transition-transform duration-[var(--ma-duration-micro)]',
               'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ma-ring)]',
               busy ? 'opacity-60 cursor-not-allowed' : 'active:scale-[0.97]',
@@ -98,7 +100,7 @@ export function LogOutDialog({ visible, busy, onConfirm, onCancel }: LogOutDialo
               border: '1px solid var(--ma-border)',
             }}
           >
-            Cancel
+            {t.settings.logOutCancel}
           </button>
         </div>
       </div>

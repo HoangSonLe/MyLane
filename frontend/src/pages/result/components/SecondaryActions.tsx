@@ -2,6 +2,7 @@ import { IconChevronRight14 as IconChevronRight } from '@/components/ui/icons'
 import { CardButton } from '@/components/ui/card'
 
 import type { EntryPoint } from '@/services/result/result.interface'
+import { useTranslation } from '@/i18n/useTranslation'
 
 function IconHome() {
   return (
@@ -21,7 +22,8 @@ export function SecondaryActions({
   onHome?: () => void
   onViewDetail?: () => void
 }) {
-  const homeLabel = entryPoint === 'lobby' ? 'Back to Lobby' : 'Back to Home'
+  const { t } = useTranslation()
+  const homeLabel = entryPoint === 'lobby' ? t.result.backToLobby : t.result.backToHome
 
   return (
     <div className="mx-4 flex gap-3">
@@ -51,9 +53,9 @@ export function SecondaryActions({
           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ma-ring)]',
         ].join(' ')}
         style={{ color: 'var(--ma-fg-muted)' }}
-        aria-label="View match detail"
+        aria-label={t.result.viewDetailAria}
       >
-        Detail
+        {t.result.detail}
         <IconChevronRight />
       </CardButton>
     </div>

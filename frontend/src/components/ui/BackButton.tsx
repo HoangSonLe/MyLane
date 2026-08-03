@@ -1,4 +1,5 @@
 import { IconChevronLeft } from '@/components/ui/icons'
+import { useTranslation } from '@/i18n/useTranslation'
 
 /**
  * BackButton — extracted from 3 byte-identical inline definitions
@@ -8,17 +9,18 @@ import { IconChevronLeft } from '@/components/ui/icons'
 export function BackButton({
   onBack,
   skeleton,
-  ariaLabel = 'Back to Home',
+  ariaLabel,
 }: {
   onBack?: () => void
   skeleton?: boolean
   ariaLabel?: string
 }) {
+  const { t } = useTranslation()
   return (
     <button
       type="button"
       onClick={onBack}
-      aria-label={ariaLabel}
+      aria-label={ariaLabel ?? t.common.back}
       className={[
         'flex items-center gap-1.5 px-3 py-1.5',
         'text-[13px] font-medium',
@@ -35,7 +37,7 @@ export function BackButton({
       }}
     >
       <IconChevronLeft />
-      <span>Home</span>
+      <span>{t.common.home}</span>
     </button>
   )
 }

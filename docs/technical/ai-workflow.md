@@ -2,7 +2,7 @@
 
 Version: 1.0
 
-This document defines how AI tools should be used throughout the development of Memory Arena.
+This document defines how AI tools should be used throughout the development of My Lane.
 
 The objective is to ensure every generated screen, component and feature remains consistent with the project architecture and Design System.
 

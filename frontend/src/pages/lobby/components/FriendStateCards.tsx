@@ -1,10 +1,12 @@
 import { EmptyStateCard, ErrorStateCard, OfflineStateCard } from '@/components/ui/card'
 import { IconLock } from '@/components/ui/icons'
 import { IconUserPlus, IconAlertCircle } from './icons'
+import { useTranslation } from '@/i18n/useTranslation'
 
 // ─── EmptyFriends ─────────────────────────────────────────────────
 
 export function EmptyFriends() {
+  const { t } = useTranslation()
   return (
     <EmptyStateCard
       gapClassName="gap-3"
@@ -18,12 +20,10 @@ export function EmptyFriends() {
         borderRadius: 'var(--radius-xl)',
         background: 'var(--ma-brand-soft)',
       }}
-      title="No friends yet"
+      title={t.lobby.noFriendsTitle}
       description={
         <>
-          Invite friends with the{' '}
-          <span style={{ color: 'var(--ma-fg)' }}>+ button</span> above to
-          see them here and challenge them to a match.
+          {t.lobby.noFriendsDesc}
         </>
       }
     />
@@ -37,6 +37,7 @@ interface FriendsErrorProps {
 }
 
 export function FriendsError({ onRetry }: FriendsErrorProps) {
+  const { t } = useTranslation()
   return (
     <ErrorStateCard
       gapClassName="gap-4"
@@ -49,8 +50,8 @@ export function FriendsError({ onRetry }: FriendsErrorProps) {
         borderRadius: 'var(--radius-xl)',
         background: 'var(--ma-icon-bg)',
       }}
-      title="Could not load friends"
-      description="Something went wrong fetching your friends list. Check your connection and try again."
+      title={t.lobby.friendsErrorTitle}
+      description={t.lobby.friendsErrorDesc}
       action={
         <button
           type="button"
@@ -68,20 +69,24 @@ export function FriendsError({ onRetry }: FriendsErrorProps) {
             color: 'var(--ma-fg)',
           }}
         >
-          Try again
+          {t.common.retry}
         </button>
       }
     />
   )
 }
 
-// ─── OfflineWall ──────────────────────────────────────────────────
+// ─── GuestWall ────────────────────────────────────────────────────
+// Shown when signed in as guest — Lobby/Versus require a real account
+// (docs/product/README.md: "Guest mode ... no Versus"). Not network-offline;
+// that has its own separate ScreenOfflineBanner in LobbyScreen.
 
-interface OfflineWallProps {
+interface GuestWallProps {
   onLogIn?: () => void
 }
 
-export function OfflineWall({ onLogIn }: OfflineWallProps) {
+export function GuestWall({ onLogIn }: GuestWallProps) {
+  const { t } = useTranslation()
   return (
     <OfflineStateCard
       gapClassName="gap-4"
@@ -94,8 +99,8 @@ export function OfflineWall({ onLogIn }: OfflineWallProps) {
         borderRadius: 'var(--radius-xl)',
         background: 'var(--ma-icon-bg)',
       }}
-      title="Account required"
-      description="The Lobby and Versus mode require a free account. Log in to challenge friends and join ranked matches."
+      title={t.lobby.guestWallTitle}
+      description={t.lobby.guestWallDesc}
       action={
         <button
           type="button"
@@ -112,7 +117,7 @@ export function OfflineWall({ onLogIn }: OfflineWallProps) {
             color: 'var(--ma-brand-fg)',
           }}
         >
-          Log In / Sign Up
+          {t.lobby.logInSignUp}
         </button>
       }
     />

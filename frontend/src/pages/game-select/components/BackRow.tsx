@@ -1,6 +1,7 @@
 import { IconChevronLeft } from '@/components/ui/icons'
 
 import type { EntryPoint } from '@/services/game-select/game-select.interface'
+import { useTranslation } from '@/i18n/useTranslation'
 
 export function BackRow({
   skeleton,
@@ -11,6 +12,7 @@ export function BackRow({
   entryPoint: EntryPoint
   onBack?: () => void
 }) {
+  const { t } = useTranslation()
   if (skeleton) {
     return (
       <div className="flex items-center gap-3 px-4 pb-1 pt-6">
@@ -25,7 +27,7 @@ export function BackRow({
       <button
         type="button"
         onClick={onBack}
-        aria-label={`Back to ${entryPoint === 'lobby' ? 'Lobby' : 'Home'}`}
+        aria-label={entryPoint === 'lobby' ? t.gameSelect.backToLobby : t.gameSelect.backToHome}
         className={[
           'flex h-9 w-9 shrink-0 items-center justify-center',
           'transition-transform duration-[var(--ma-duration-micro)] active:scale-95',
@@ -42,7 +44,7 @@ export function BackRow({
         </span>
       </button>
       <h1 className="text-[20px] font-bold leading-tight" style={{ color: 'var(--ma-fg)' }}>
-        Select Game
+        {t.gameSelect.title}
       </h1>
     </div>
   )

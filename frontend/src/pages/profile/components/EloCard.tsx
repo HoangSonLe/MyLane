@@ -1,7 +1,7 @@
 import { IconTrophy16 as IconTrophy } from '@/components/ui/icons'
-import { Card } from '@/components/ui/card'
-
+import { Card, CollapsibleCard } from '@/components/ui/card'
 import type { ProfileData } from '@/services/profile/profile.interface'
+import { useTranslation } from '@/i18n/useTranslation'
 
 export function EloCard({
   skeleton,
@@ -10,6 +10,8 @@ export function EloCard({
   skeleton?: boolean
   data: ProfileData
 }) {
+  const { t } = useTranslation()
+
   if (skeleton) {
     return (
       <Card className="mx-4 overflow-hidden" shadow="sm">
@@ -27,17 +29,7 @@ export function EloCard({
   }
 
   return (
-    <Card className="mx-4 overflow-hidden" shadow="sm">
-      {/* Header row */}
-      <div
-        className="px-4 py-3"
-        style={{ borderBottom: '1px solid var(--ma-border-subtle)' }}
-      >
-        <p className="text-[11px] font-semibold uppercase tracking-widest" style={{ color: 'var(--ma-fg-subtle)' }}>
-          Elo Rating
-        </p>
-      </div>
-
+    <CollapsibleCard title={t.profile.eloRatingTitle}>
       {/* Overall Elo */}
       <div
         className="flex items-center justify-between px-4 py-3"
@@ -59,13 +51,13 @@ export function EloCard({
             </span>
           </div>
           <span className="text-[14px] font-semibold" style={{ color: 'var(--ma-fg)' }}>
-            Overall
+            {t.profile.overall}
           </span>
         </div>
         <span
           className="text-[16px] font-bold tabular-nums"
           style={{ color: 'var(--ma-brand)' }}
-          aria-label={`Overall Elo: ${data.overallElo}`}
+          aria-label={t.profile.overallEloAria(data.overallElo)}
         >
           {data.overallElo}
         </span>
@@ -86,7 +78,7 @@ export function EloCard({
               <span
                 className="text-[11px] font-semibold tabular-nums"
                 style={{ color: cat.delta > 0 ? 'var(--ma-success)' : 'var(--ma-danger)' }}
-                aria-label={`Last match change: ${cat.delta > 0 ? '+' : ''}${cat.delta}`}
+                aria-label={t.profile.lastMatchChangeAria(`${cat.delta > 0 ? '+' : ''}${cat.delta}`)}
               >
                 {cat.delta > 0 ? '+' : ''}{cat.delta}
               </span>
@@ -100,6 +92,6 @@ export function EloCard({
           </div>
         </div>
       ))}
-    </Card>
+    </CollapsibleCard>
   )
 }

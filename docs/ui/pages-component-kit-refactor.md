@@ -631,6 +631,16 @@ frontend/src/
 				index.ts
 ```
 
+### Component Card Dùng Chung (`components/ui/card/`)
+- `Card.tsx`: Generic surface container với border, shadow, và padding configurable.
+- `CollapsibleCard.tsx`: Wrapper dùng chung cho tất cả các Card có tiêu đề thu gọn/mở rộng. Quản lý trạng thái `isCollapsed`, animation xoay **Icon Chevron SVG (`IconChevronDown`)** 90°, và hỗ trợ linh hoạt các props `title`, `subtitle`, `action`. Được áp dụng đồng bộ cho:
+  - `EloCard` (Profile)
+  - `BestScoresCard` (Profile)
+  - `RecordStatsCard` (Profile)
+  - `FriendsCard` (Profile)
+  - `MatchHistoryCard` (Profile)
+  - `AvailableRoomsCard` (Lobby)
+
 ### Quy ước thực tế
 
 - Page file (`<Page>Screen.tsx`) chỉ nên giữ logic state, data fetching, and composition.

@@ -1,6 +1,6 @@
 # AI Coding Rules
 
-Short checklist for AI-assisted refactors and new code in Memory Arena.
+Short checklist for AI-assisted refactors and new code in My Lane.
 
 ## Core Rules
 

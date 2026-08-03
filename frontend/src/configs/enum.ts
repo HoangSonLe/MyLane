@@ -27,6 +27,7 @@ export enum GameId {
   ALPHABET = 'alphabet',
   GRID = 'grid',
   SEQUENCE = 'sequence',
+  COLOR = 'color',
 }
 
 export enum ModeId {
@@ -63,6 +64,13 @@ export enum Phase {
 export enum RoundMode {
   VERSUS_RANKED = 'versus-ranked',
   VERSUS_UNRANKED = 'versus-unranked',
+}
+
+export enum RoomEntrySource {
+  QUICK_MATCH = 'quick-match',
+  QUICK_JOIN = 'quick-join',
+  CUSTOM = 'custom',
+  CHALLENGE = 'challenge',
 }
 
 export enum OpponentStatus {

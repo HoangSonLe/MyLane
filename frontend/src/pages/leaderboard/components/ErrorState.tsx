@@ -1,5 +1,6 @@
 import { IconAlertCircle } from '@/components/ui/icons'
 import { ErrorStateCard } from '@/components/ui/card'
+import { useTranslation } from '@/i18n/useTranslation'
 
 function IconRefreshCcw() {
   return (
@@ -11,6 +12,7 @@ function IconRefreshCcw() {
 }
 
 export function ErrorState({ onRetry }: { onRetry?: () => void }) {
+  const { t } = useTranslation()
   return (
     <ErrorStateCard
       wrapper="plain"
@@ -24,10 +26,9 @@ export function ErrorState({ onRetry }: { onRetry?: () => void }) {
         borderRadius: 'var(--radius-2xl)',
         background: 'oklch(0.62 0.19 22 / 0.12)',
       }}
-      titleClassName="text-[15px] font-semibold"
-      title="Failed to load leaderboard"
+      title={t.leaderboard.errorTitle}
       descriptionClassName="text-[13px]"
-      description="Check your connection and try again."
+      description={t.leaderboard.errorDesc}
       action={
         <button
           type="button"
@@ -46,7 +47,7 @@ export function ErrorState({ onRetry }: { onRetry?: () => void }) {
           }}
         >
           <IconRefreshCcw />
-          Try again
+          {t.common.retry}
         </button>
       }
     />

@@ -1,6 +1,6 @@
-import { Card } from '@/components/ui/card'
-
+import { Card, CollapsibleCard } from '@/components/ui/card'
 import type { ProfileData } from '@/services/profile/profile.interface'
+import { useTranslation } from '@/i18n/useTranslation'
 
 export function BestScoresCard({
   skeleton,
@@ -9,6 +9,8 @@ export function BestScoresCard({
   skeleton?: boolean
   data: ProfileData
 }) {
+  const { t } = useTranslation()
+
   if (skeleton) {
     return (
       <Card className="mx-4 overflow-hidden" shadow="sm">
@@ -29,16 +31,7 @@ export function BestScoresCard({
   }
 
   return (
-    <Card className="mx-4 overflow-hidden" shadow="sm">
-      <div
-        className="px-4 py-3"
-        style={{ borderBottom: '1px solid var(--ma-border-subtle)' }}
-      >
-        <p className="text-[11px] font-semibold uppercase tracking-widest" style={{ color: 'var(--ma-fg-subtle)' }}>
-          Personal Bests
-        </p>
-      </div>
-
+    <CollapsibleCard title={t.profile.bestScoresTitle}>
       {data.categoryBests.map((cat, i) => (
         <div
           key={cat.category}
@@ -53,7 +46,7 @@ export function BestScoresCard({
               className="text-[11px] font-semibold"
               style={{ color: 'var(--ma-fg-subtle)' }}
             >
-              Lvl {cat.highestLevel} peak
+              {t.profile.peakLevel(cat.highestLevel)}
             </span>
           </div>
           <div className="flex gap-2">
@@ -67,13 +60,13 @@ export function BestScoresCard({
               }}
             >
               <span className="text-[10px] font-semibold uppercase tracking-widest" style={{ color: 'var(--ma-fg-subtle)' }}>
-                Practice
+                {t.profile.practice}
               </span>
               <span className="text-[15px] font-bold tabular-nums" style={{ color: 'var(--ma-fg)' }}>
                 {cat.practiceScore.toLocaleString()}
               </span>
               <span className="text-[11px]" style={{ color: 'var(--ma-fg-muted)' }}>
-                Lvl {cat.practiceLevel}
+                {t.profile.levelPrefix(cat.practiceLevel)}
               </span>
             </div>
             {/* Ranked best */}
@@ -86,18 +79,18 @@ export function BestScoresCard({
               }}
             >
               <span className="text-[10px] font-semibold uppercase tracking-widest" style={{ color: 'var(--ma-fg-subtle)' }}>
-                Ranked
+                {t.profile.ranked}
               </span>
               <span className="text-[15px] font-bold tabular-nums" style={{ color: 'var(--ma-fg)' }}>
                 {cat.rankedScore.toLocaleString()}
               </span>
               <span className="text-[11px]" style={{ color: 'var(--ma-fg-muted)' }}>
-                Lvl {cat.rankedLevel}
+                {t.profile.levelPrefix(cat.rankedLevel)}
               </span>
             </div>
           </div>
         </div>
       ))}
-    </Card>
+    </CollapsibleCard>
   )
 }

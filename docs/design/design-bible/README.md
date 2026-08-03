@@ -1,8 +1,8 @@
-# Memory Arena Design Bible
+# My Lane Design Bible
 
 ## Overview
 
-This directory contains the official UI/UX design documentation for Memory Arena.
+This directory contains the official UI/UX design documentation for My Lane.
 
 Every screen, component, interaction and future feature must follow this Design Bible.
 
@@ -12,7 +12,7 @@ The purpose is to keep the entire product visually and functionally consistent e
 
 ## Design Goal
 
-Memory Arena is a gamified brain training platform.
+My Lane is a gamified brain training platform.
 
 It is NOT:
 

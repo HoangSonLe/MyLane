@@ -1,0 +1,104 @@
+# Color Memory
+
+Route: `/games/color`
+
+> **Status: original Version 1 game, authored by explicit request.** Like
+> [Sequence Memory](sequence-memory.md), this has no entry in
+> [`MY_LANE_GAME_DESIGN.md`](../../MY_LANE_GAME_DESIGN.md). It
+> started as the original visual design for Sequence Memory's board (4
+> colored tiles) before that game's board was corrected to match its actual
+> spec (a 3×3 grid of blank, identical tiles). Rather than discard the
+> colored-tile design, it was kept as its own game — rules below were
+> authored to close the gap, the same way sequence-memory.md was. This file
+> is the canonical rules source for Color Memory.
+
+Shared systems (scoring, Elo, modes) live in [`README.md`](README.md).
+
+---
+
+## Goal
+
+Watch a sequence of colored tiles flash one at a time, then tap them back
+in the same order — a classic "Simon"-style memory game.
+
+This differs from [Sequence Memory](sequence-memory.md): tiles are
+**distinct colors**, not identical/blank, and the board itself grows (more
+colors, not just a longer sequence) as levels increase.
+
+## Board
+
+Grid of colored, square tiles — `colorCount` tiles (4 to 6, depending on
+level), laid out as close to a square grid as the count allows. Six colors
+are defined: amber, teal, rose, violet, lime, sky; only the first
+`colorCount` are shown.
+
+## Round Flow
+
+1. **Viewing phase** — tiles flash one at a time in sequence: each tile
+   lights up for `flashDuration` (0.6s, same pace as Sequence Memory), with
+   a `gapDuration` (0.3s) pause before the next flashes. The same color can
+   repeat within one sequence. Player may only watch.
+2. **Answering phase** — all tiles return to their dim/inactive state.
+   Player must tap the tiles in the exact order they flashed, within
+   `answerTime` seconds.
+3. The round resolves as soon as the player has tapped as many tiles as the
+   sequence length, or when `answerTime` runs out.
+
+## Win/Lose (per round)
+
+- **Win**: every tile tapped in the exact order flashed, within the time
+  limit.
+- **Lose**: any wrong tile tapped (round ends immediately on first
+  mistake, same convention as Sequence Memory), or time runs out before the
+  sequence is completed.
+
+## Level System
+
+- 10 levels, **two independent axes** grow together (same spirit as [Grid
+  Memory](grid-memory.md)'s 2-axis progression): sequence length, and the
+  number of distinct colors on the board.
+- Each level requires **5** consecutive round wins to advance (same
+  convention as Number/Alphabet/Sequence Memory).
+- Losing 5 rounds within the same level → **Game Over**.
+
+| Level | Colors | Sequence length | Rounds to win |
+|---|---|---|---|
+| 1 | 4 | 5 | 5 |
+| 2 | 4 | 6 | 5 |
+| 3 | 4 | 7 | 5 |
+| 4 | 5 | 7 | 5 |
+| 5 | 5 | 8 | 5 |
+| 6 | 5 | 9 | 5 |
+| 7 | 6 | 9 | 5 |
+| 8 | 6 | 10 | 5 |
+| 9 | 6 | 11 | 5 |
+| 10 | 6 | 12 | 5 |
+
+## Difficulty Modes
+
+Added to `answerTime`, same pattern as the other games:
+
+| Mode | Seconds added |
+|---|---|
+| Easy | +5s |
+| Medium | +4s |
+| Hard | +3s |
+| Super Hard | +2s |
+
+## Controls
+
+Pause/Resume at the exact same state, or Reset the round at any time —
+same as the other games.
+
+## Scoring
+
+Uses the shared [scoring formula](README.md#scoring-formula-ranked-games-only).
+Speed Bonus coefficient: **9 points/second** (same as Sequence Memory —
+no stronger basis to pick a different value; not yet wired into any
+scoring pipeline, see [`docs/technical/known-gaps.md`](../technical/known-gaps.md)).
+
+## Endless Mode
+
+Not defined yet for this game — the other 4 games' Endless Mode formulas
+come from the GDD or an earlier confirmed decision; Color Memory has
+neither. Leave unimplemented until a starting length/growth rate is chosen.

@@ -204,7 +204,7 @@ User goal: pick which game to play and under which mode, then start.
 Primary action: select a game, confirm mode, start.
 
 Required components:
-- 4 game cards: Number Memory, Alphabet Memory, Grid Memory, Sequence Memory
+- 5 game cards: Number Memory, Alphabet Memory, Grid Memory, Sequence Memory, Color Memory
 - Mode selector: Solo Practice, Solo Ranked, Versus Ranked, Versus Unranked
 - Difficulty selector: Easy, Medium, Hard, Super Hard
 - Back navigation to Home or Lobby (depending on entry point)
@@ -225,7 +225,7 @@ Navigation:
 ## 6. Gameplay
 
 ```text
-Build the Gameplay screen for a mobile-first memory training web app. This is a single shared template that hosts 4 game sub-types — build the shared shell plus the 4 input variants below.
+Build the Gameplay screen for a mobile-first memory training web app. This is a single shared template that hosts 5 game sub-types — build the shared shell plus the 5 input variants below.
 
 Reuse the existing components and layout patterns already in this project. Do not introduce new colors, typography, spacing, or button/card styles — content and structure only.
 
@@ -249,6 +249,7 @@ Game-specific input areas (same shell, different board/input):
 - Alphabet Memory: QWERTY keyboard, 4-row layout
 - Grid Memory: grid of numbered tiles; player taps them back in ascending order
 - Sequence Memory: 3x3 grid of blank tiles that flash one at a time in the Viewing phase; player taps them back in the order they flashed
+- Color Memory: a growing set of colored tiles that flash one at a time; player taps the colors back in order
 
 Versus-specific shell notes:
 - Show both players' names or avatars in a compact top bar or side-by-side header.

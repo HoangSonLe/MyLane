@@ -1,5 +1,6 @@
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import { useTranslation } from '@/i18n/useTranslation'
 
 interface MergeDialogProps {
   visible: boolean
@@ -8,6 +9,7 @@ interface MergeDialogProps {
 }
 
 export function MergeDialog({ visible, onMerge, onSkip }: MergeDialogProps) {
+  const { t } = useTranslation()
   if (!visible) return null
   return (
     <div
@@ -39,13 +41,13 @@ export function MergeDialog({ visible, onMerge, onSkip }: MergeDialogProps) {
           className="mb-1 text-center text-[17px] font-bold leading-snug"
           style={{ color: 'var(--ma-fg)' }}
         >
-          Merge guest progress?
+          {t.auth.mergeTitle}
         </h2>
         <p
           className="mb-6 text-center text-[13px] leading-relaxed"
           style={{ color: 'var(--ma-fg-muted)' }}
         >
-          Your local best scores and level will be compared with this account&apos;s — the higher value is kept.
+          {t.auth.mergeBody}
         </p>
 
         <div className="flex flex-col gap-3">
@@ -55,7 +57,7 @@ export function MergeDialog({ visible, onMerge, onSkip }: MergeDialogProps) {
             onClick={onMerge}
             className="w-full transition-transform duration-[var(--ma-duration-micro)] active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ma-ring)]"
           >
-            Merge progress
+            {t.auth.mergeConfirm}
           </Button>
           <Button
             variant="surface"
@@ -63,7 +65,7 @@ export function MergeDialog({ visible, onMerge, onSkip }: MergeDialogProps) {
             onClick={onSkip}
             className="w-full transition-transform duration-[var(--ma-duration-micro)] active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ma-ring)]"
           >
-            Start fresh
+            {t.auth.mergeFresh}
           </Button>
         </div>
       </Card>

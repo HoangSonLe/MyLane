@@ -2,6 +2,7 @@ import { Card, StatCell } from '@/components/ui/card'
 
 import { IconTrophy } from './icons'
 import type { ResultData } from '@/services/result/result.interface'
+import { useTranslation } from '@/i18n/useTranslation'
 
 export function ScoreHero({
   skeleton,
@@ -10,6 +11,7 @@ export function ScoreHero({
   skeleton?: boolean
   data: ResultData
 }) {
+  const { t } = useTranslation()
   const isRanked =
     data.mode === 'solo-ranked' || data.mode === 'versus-ranked'
 
@@ -60,12 +62,12 @@ export function ScoreHero({
           className="text-[11px] font-semibold uppercase tracking-widest"
           style={{ color: 'var(--ma-fg-subtle)' }}
         >
-          Final Score
+          {t.result.finalScore}
         </p>
         <p
           className="text-[56px] font-bold tabular-nums leading-none"
           style={{ color: 'var(--ma-fg)' }}
-          aria-label={`Final score: ${data.score.toLocaleString()}`}
+          aria-label={t.result.finalScoreAria(data.score.toLocaleString())}
         >
           {data.score.toLocaleString()}
         </p>
@@ -78,7 +80,7 @@ export function ScoreHero({
           <StatCell
             className="flex flex-col items-center gap-0.5"
             valueClassName="text-[18px] font-bold tabular-nums leading-snug"
-            label="Level"
+            label={t.result.level}
             value={data.levelReached}
           />
         </Card>
@@ -88,7 +90,7 @@ export function ScoreHero({
             <StatCell
               className="flex flex-col items-center gap-0.5"
               valueClassName="text-[18px] font-bold tabular-nums leading-snug"
-              label="Prev. Best"
+              label={t.result.prevBest}
               value={data.previousBestScore.toLocaleString()}
               valueColor="var(--ma-fg-muted)"
             />

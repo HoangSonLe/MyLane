@@ -1,12 +1,14 @@
 import { Card } from '@/components/ui/card'
 
 import { IconLock } from './icons'
+import { useTranslation } from '@/i18n/useTranslation'
 
 export function GuestNudge({
   onLogIn,
 }: {
   onLogIn?: () => void
 }) {
+  const { t } = useTranslation()
   return (
     <Card className="mx-4 flex items-center justify-between gap-3" border="subtle" padding="0.875rem 1rem">
       <div className="flex items-center gap-2.5 min-w-0">
@@ -14,7 +16,7 @@ export function GuestNudge({
           <IconLock />
         </span>
         <p className="text-[12px] leading-snug" style={{ color: 'var(--ma-fg-muted)' }}>
-          Sign in to unlock Ranked and Versus modes, and track your stats.
+          {t.gameSelect.guestNudge}
         </p>
       </div>
       <button
@@ -32,7 +34,7 @@ export function GuestNudge({
           color: 'var(--ma-fg)',
         }}
       >
-        Log In
+        {t.common.logIn}
       </button>
     </Card>
   )

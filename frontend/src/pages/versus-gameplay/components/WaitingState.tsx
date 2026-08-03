@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react'
 
 import { IconSpinner, IconX } from './icons'
+import { useTranslation } from '@/i18n/useTranslation'
 
 export function WaitingState({ opponentName, onQuit }: { opponentName: string; onQuit: () => void }) {
+  const { t } = useTranslation()
   const [dots, setDots] = useState(0)
   useEffect(() => {
     const id = setInterval(() => setDots((d) => (d + 1) % 4), 500)
@@ -21,10 +23,10 @@ export function WaitingState({ opponentName, onQuit }: { opponentName: string; o
       </div>
       <div>
         <p className="text-[16px] font-bold" style={{ color: 'var(--ma-fg)' }}>
-          Waiting for {opponentName}{dotStr}
+          {t.versusGameplay.waitingForOpponentName(opponentName)}{dotStr}
         </p>
         <p className="mt-1 text-[13px] leading-relaxed" style={{ color: 'var(--ma-fg-muted)' }}>
-          Both players must be ready before the round begins
+          {t.versusGameplay.bothPlayersReady}
         </p>
       </div>
       <button
@@ -38,7 +40,7 @@ export function WaitingState({ opponentName, onQuit }: { opponentName: string; o
         }}
       >
         <IconX />
-        Cancel
+        {t.versusGameplay.cancel}
       </button>
     </div>
   )

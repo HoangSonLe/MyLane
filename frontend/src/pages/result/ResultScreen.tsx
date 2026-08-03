@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
-import { StatePill } from './components/StatePill'
+import { ScreenShell, ScreenMain } from '@/components/ui/layout'
 import { ScoreHero } from './components/ScoreHero'
 import { NewRecordBadge } from './components/NewRecordBadge'
 import { EloChangeCard } from './components/EloChangeCard'
@@ -11,60 +11,123 @@ import { SavingOverlay } from './components/SavingOverlay'
 import { SaveErrorCard } from './components/SaveErrorCard'
 import { PrimaryButton } from './components/PrimaryButton'
 import { SecondaryActions } from './components/SecondaryActions'
-import { MOCK_RESULTS, MOCK_VERSUS } from '@/services/result/result.mock'
-import { ScreenState, EntryPoint, ModeId } from '@/configs/enum'
-import type { ResultData } from '@/services/result/result.interface'
+import { VersusComparisonCard } from './components/VersusComparisonCard'
+import { Toast } from '@/components/ui/Toast'
+import { resultService } from '@/services/result/result.service'
+import { computeScore } from '@/services/gameplay/game-rules'
+import { getGameLabels, getModeLabels } from '@/services/gameplay/gameplay-screen.types'
+import { EntryPoint, ModeId } from '@/configs/enum'
+import type { GameResultInput, ResultData } from '@/services/result/result.interface'
+import { useAuthStore } from '@/stores/auth.store'
+import { useTranslation } from '@/i18n/useTranslation'
 
 interface Props {
+  /** Raw tallies from the just-finished Gameplay session — null shouldn't happen via real navigation. */
+  result: GameResultInput | null
   entryPoint?: EntryPoint
   onPlayAgain?: () => void
   onHome?: () => void
   onViewDetail?: () => void
+  onLogIn?: () => void
+  onNavigate?: (screen: string) => void
+}
+
+const PLACEHOLDER: ResultData = {
+  game: '', mode: ModeId.SOLO_PRACTICE, modeLabel: '', score: 0, levelReached: 0,
+  previousBestScore: null, previousBestLevel: null, isNewRecord: false,
 }
 
 // ─── Main component ───────────────────────────────────────────────
 export function ResultScreen({
+  result,
   entryPoint = EntryPoint.HOME,
   onPlayAgain,
   onHome,
   onViewDetail,
+  onLogIn,
+  onNavigate,
 }: Props) {
-  const [screenState, setScreenState] = useState<ScreenState>(ScreenState.NORMAL)
-  const [showVersus, setShowVersus] = useState(false)
-  const [retrying, setRetrying] = useState(false)
+  const user = useAuthStore((s) => s.user)
+  const isGuest = user?.isGuest ?? true
+  const { t } = useTranslation()
+  const gameLabels = getGameLabels(t)
+  const modeLabels = getModeLabels(t)
 
-  const data: ResultData =
-    showVersus
-      ? MOCK_VERSUS
-      : MOCK_RESULTS[screenState]
+  const [data, setData] = useState<ResultData | null>(null)
+  const [isSubmitting, setIsSubmitting] = useState(result !== null)
+  const [syncError, setSyncError] = useState(false)
+  const opponentForfeited = result?.finishReason === 'forfeit' && result.outcome === 'win'
+  const [showForfeitToast, setShowForfeitToast] = useState(opponentForfeited)
 
-  const isLoading = screenState === ScreenState.LOADING
-  const isError   = screenState === ScreenState.ERROR
-  const isGuest   = screenState === ScreenState.GUEST
-  const isVersus  = data.mode === ModeId.VERSUS_RANKED || data.mode === ModeId.VERSUS_UNRANKED
+  // Submitting mutates server-side stats (bestScore/highestLevel), so unlike
+  // a plain fetch it can't just tolerate StrictMode's double-invoke of
+  // mount effects — a second POST would compute "previous best" against
+  // the first POST's already-updated value. This ref makes the automatic
+  // first submission per `result` instance fire exactly once; the retry
+  // button below still calls `submit` directly, bypassing this guard.
+  const submittedForRef = useRef<GameResultInput | null>(null)
 
+  const submit = useCallback(async () => {
+    if (!result) { setIsSubmitting(false); return }
+    setIsSubmitting(true)
+    setSyncError(false)
+    try {
+      setData(await resultService.submitResult(result))
+    } catch {
+      // docs/ui/screen-interface-spec.md § Result Error: "vẫn hiện điểm số
+      // local" — fall back to the same formula, computed client-side.
+      const isRanked = result.mode === ModeId.SOLO_RANKED || result.mode === ModeId.VERSUS_RANKED
+      const breakdown = computeScore({ ...result, isRanked })
+      setData({
+        game: gameLabels[result.game],
+        mode: result.mode,
+        modeLabel: modeLabels[result.mode],
+        score: breakdown.score,
+        levelReached: result.levelReached,
+        previousBestScore: null,
+        previousBestLevel: null,
+        isNewRecord: false,
+        rankedBreakdown: isRanked ? breakdown : undefined,
+      })
+      setSyncError(true)
+    } finally {
+      setIsSubmitting(false)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [result])
+
+  useEffect(() => {
+    if (!result) {
+      setData(null)
+      setIsSubmitting(false)
+      return
+    }
+    if (submittedForRef.current === result) return
+    submittedForRef.current = result
+    submit()
+  }, [result, submit])
+
+  useEffect(() => {
+    setShowForfeitToast(opponentForfeited)
+    if (!opponentForfeited) return
+    const timer = window.setTimeout(() => setShowForfeitToast(false), 4500)
+    return () => window.clearTimeout(timer)
+  }, [opponentForfeited])
+
+  const isVersus = data?.mode === ModeId.VERSUS_RANKED || data?.mode === ModeId.VERSUS_UNRANKED
   const effectiveEntryPoint: EntryPoint = isVersus ? EntryPoint.LOBBY : entryPoint
 
-  function handleRetry() {
-    setRetrying(true)
-    // Simulate retry — resets to normal after 1.5 s
-    setTimeout(() => {
-      setRetrying(false)
-      setScreenState(ScreenState.NORMAL)
-    }, 1500)
-  }
-
   return (
-    <div
-      className="relative flex min-h-dvh flex-col"
-      style={{ background: 'var(--ma-bg)' }}
-    >
-      <main
-        id="main-content"
-        className="flex flex-1 flex-col gap-5 pb-28 pt-20"
-      >
+    <ScreenShell>
+      <Toast
+        visible={showForfeitToast}
+        variant="success"
+        message={t.result.opponentForfeited}
+        onClose={() => setShowForfeitToast(false)}
+      />
+      <ScreenMain bottomPadding="pb-28" topPadding="none" className="pt-20">
         {/* Score hero */}
-        <ScoreHero skeleton={false} data={data} />
+        <ScoreHero skeleton={isSubmitting} data={data ?? PLACEHOLDER} />
 
         {/* Divider */}
         <div
@@ -73,49 +136,46 @@ export function ResultScreen({
           aria-hidden="true"
         />
 
-        {/* ── Conditional status blocks ── */}
-
-        {/* Guest notice */}
-        {isGuest && <GuestNotice />}
-
-        {/* Saving indicator */}
-        {isLoading && <SavingOverlay />}
-
-        {/* Save error */}
-        {(isError || retrying) && (
-          <SaveErrorCard onRetry={retrying ? undefined : handleRetry} />
+        {result?.versusComparison && (
+          <VersusComparisonCard
+            comparison={result.versusComparison}
+            outcome={result.outcome}
+            finishReason={result.finishReason}
+          />
         )}
 
-        {/* New record badge */}
-        {!isGuest && data.isNewRecord && <NewRecordBadge data={data} />}
+        {/* ── Conditional status blocks ── */}
 
-        {/* Elo change — Versus Ranked only */}
-        {!isGuest && <EloChangeCard data={data} />}
+        {/* Saving indicator */}
+        {isSubmitting && <SavingOverlay />}
 
-        {/* Score breakdown — Ranked modes only */}
-        {!isGuest && <RankedBreakdownCard data={data} />}
+        {/* Save error — score above is still the local fallback, not blocked */}
+        {!isSubmitting && syncError && <SaveErrorCard onRetry={submit} />}
 
-        {/* Previous best comparison */}
-        {!isGuest && <BestComparison data={data} />}
+        {/* Guest notice — nothing is being saved */}
+        {!isSubmitting && isGuest && (
+          <GuestNotice onLogIn={onLogIn ?? (() => onNavigate?.('login'))} />
+        )}
+
+        {!isSubmitting && data && !isGuest && (
+          <>
+            {data.isNewRecord && <NewRecordBadge data={data} />}
+            <EloChangeCard data={data} />
+            <RankedBreakdownCard data={data} />
+            <BestComparison data={data} />
+          </>
+        )}
 
         {/* ── Actions ── */}
         <div className="flex flex-col gap-3 mt-auto">
-          <PrimaryButton onClick={onPlayAgain} isVersus={isVersus} />
+          <PrimaryButton onClick={onPlayAgain} isVersus={!!isVersus} />
           <SecondaryActions
             entryPoint={effectiveEntryPoint}
             onHome={onHome}
             onViewDetail={onViewDetail}
           />
         </div>
-      </main>
-
-      {/* Prototype state pill */}
-      <StatePill
-        current={screenState}
-        onChange={setScreenState}
-        showVersus={showVersus}
-        onToggleVersus={() => setShowVersus((v) => !v)}
-      />
-    </div>
+      </ScreenMain>
+    </ScreenShell>
   )
 }

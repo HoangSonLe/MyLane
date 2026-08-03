@@ -1,8 +1,10 @@
-import { useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { BottomNavBar } from '@/components/ui/BottomNavBar'
 import { SectionLabel } from '@/components/ui/SectionLabel'
-import { StatePill } from '@/components/ui/StatePill'
+import { Toast } from '@/components/ui/Toast'
+import { EmptyStateCard } from '@/components/ui/card'
+import { IconPlay } from '@/components/ui/icons'
 import {
   ScreenShell,
   ScreenMain,
@@ -19,10 +21,16 @@ import { GuestWall } from './components/GuestWall'
 import { LoadingIndicator } from './components/LoadingIndicator'
 import { ErrorState } from './components/ErrorState'
 import { MatchDetailDialog } from './components/MatchDetailDialog'
-import { MOCK_PROFILE } from '@/services/profile/profile.mock'
-import type { MatchEntry } from '@/services/profile/profile.interface'
+import { FriendProfileModal } from '@/pages/lobby/components/FriendProfileModal'
+import { profileService } from '@/services/profile/profile.service'
+import { lobbyService } from '@/services/lobby/lobby.service'
+import type { ProfileData, MatchEntry } from '@/services/profile/profile.interface'
+import type { Friend } from '@/services/lobby/lobby.interface'
+import { useNetworkStatus } from '@/lib/hooks/useNetworkStatus'
+import { useAuthStore } from '@/stores/auth.store'
+import { useTranslation } from '@/i18n/useTranslation'
 
-import { ScreenState } from '@/configs/enum'
+import { AddFriendModal } from '@/components/ui/modal/AddFriendModal'
 
 interface Props {
   onBack?: () => void
@@ -31,34 +39,91 @@ interface Props {
   onNavigate?: (screen: string) => void
 }
 
-// ─── Main component ───────────────────────────────────────────────
 export function ProfileScreen({
   onBack,
   onEditProfile,
   onSettings,
   onNavigate,
 }: Props) {
-  const [screenState, setScreenState] = useState<ScreenState>(ScreenState.NORMAL)
+  const { isOffline } = useNetworkStatus()
+  const user = useAuthStore((s) => s.user)
+  const isGuest = user?.isGuest ?? true
+  const { t } = useTranslation()
+
+  const [data, setData] = useState<ProfileData | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [isError, setIsError] = useState(false)
   const [selectedMatch, setSelectedMatch] = useState<MatchEntry | null>(null)
+  const [selectedFriendForProfile, setSelectedFriendForProfile] = useState<Friend | null>(null)
+  const [addFriendModalVisible, setAddFriendModalVisible] = useState(false)
 
-  const isLoading = screenState === ScreenState.LOADING
-  const isEmpty   = screenState === ScreenState.EMPTY   // guest
-  const isError   = screenState === ScreenState.ERROR
-  const isOffline = screenState === ScreenState.OFFLINE
+  const [noticeVisible, setNoticeVisible] = useState(false)
+  const noticeTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  const data = MOCK_PROFILE
+  function showComingSoon() {
+    if (noticeTimer.current) clearTimeout(noticeTimer.current)
+    setNoticeVisible(true)
+    noticeTimer.current = setTimeout(() => setNoticeVisible(false), 2000)
+    onEditProfile?.()
+  }
+
+  const load = useCallback(async () => {
+    if (isGuest) {
+      setIsLoading(false)
+      return
+    }
+    setIsLoading(true)
+    setIsError(false)
+    try {
+      const [profile, friends] = await Promise.all([
+        profileService.getProfile(),
+        lobbyService.getFriends(),
+      ])
+      setData({ ...profile, friends })
+    } catch {
+      setIsError(true)
+    } finally {
+      setIsLoading(false)
+    }
+  }, [isGuest])
+
+  const loadSilent = useCallback(async () => {
+    if (isGuest) return
+    try {
+      const [profile, friends] = await Promise.all([
+        profileService.getProfile(),
+        lobbyService.getFriends(),
+      ])
+      setData({ ...profile, friends })
+    } catch {
+      // Keep existing state on silent refresh
+    }
+  }, [isGuest])
+
+  useEffect(() => {
+    load()
+
+    // Silent background auto-refresh every 10 seconds
+    const interval = setInterval(() => {
+      loadSilent()
+    }, 10 * 1000)
+
+    return () => clearInterval(interval)
+  }, [load, loadSilent])
 
   return (
     <ScreenShell>
       <ScreenOfflineBanner
         show={isOffline}
-        message="You're offline. Profile data may be out of date."
+        message={t.profile.offlineBanner}
       />
+
+      <Toast visible={noticeVisible} message={t.profile.editingNotAvailable} />
 
       <ScreenMain bottomPadding="pb-32" offline={isOffline} ariaBusy={isLoading}>
         {/* Header */}
         <ProfileHeader
-          skeleton={isLoading}
+          skeleton={isLoading && !isGuest}
           onBack={onBack}
           onSettings={onSettings}
         />
@@ -70,23 +135,9 @@ export function ProfileScreen({
           aria-hidden="true"
         />
 
-        {/* ── Loading ── */}
-        {isLoading && (
+        {/* ── Guest ── */}
+        {isGuest && (
           <>
-            <LoadingIndicator />
-            <AvatarHero skeleton data={data} />
-            <EloCard skeleton data={data} />
-            <BestScoresCard skeleton data={data} />
-            <RecordStatsCard skeleton data={data} />
-            <FriendsCard skeleton data={data} />
-            <MatchHistoryCard skeleton data={data} onOpenMatch={() => {}} />
-          </>
-        )}
-
-        {/* ── Guest / empty ── */}
-        {isEmpty && (
-          <>
-            {/* Still show an anonymous avatar hero */}
             <div className="flex flex-col items-center gap-3 px-4 py-4">
               <div
                 className="flex items-center justify-center"
@@ -98,55 +149,90 @@ export function ProfileScreen({
                   border: '2px solid var(--ma-border)',
                   boxShadow: 'var(--ma-shadow-md)',
                 }}
-                aria-label="Guest avatar"
+                aria-label={t.profile.guestAvatarAria}
               >
                 <span className="text-[28px] font-bold" style={{ color: 'var(--ma-fg-subtle)' }}>
                   ?
                 </span>
               </div>
               <div className="flex flex-col items-center gap-0.5">
-                <p className="text-[19px] font-bold" style={{ color: 'var(--ma-fg)' }}>Guest</p>
-                <p className="text-[13px]" style={{ color: 'var(--ma-fg-subtle)' }}>Not signed in</p>
+                <p className="text-[19px] font-bold" style={{ color: 'var(--ma-fg)' }}>{t.profile.guestLabel}</p>
+                <p className="text-[13px]" style={{ color: 'var(--ma-fg-subtle)' }}>{t.profile.notSignedIn}</p>
               </div>
             </div>
             <GuestWall onLogIn={() => onNavigate?.('login')} />
           </>
         )}
 
-        {/* ── Error ── */}
-        {isError && (
-          <ErrorState onRetry={() => setScreenState(ScreenState.NORMAL)} />
+        {/* ── Loading (signed-in) ── */}
+        {!isGuest && isLoading && data === null && (
+          <>
+            <LoadingIndicator />
+            <AvatarHero skeleton data={PLACEHOLDER} />
+            <EloCard skeleton data={PLACEHOLDER} />
+            <BestScoresCard skeleton data={PLACEHOLDER} />
+            <RecordStatsCard skeleton data={PLACEHOLDER} />
+            <FriendsCard skeleton data={PLACEHOLDER} />
+            <MatchHistoryCard skeleton data={PLACEHOLDER} onOpenMatch={() => {}} />
+          </>
         )}
 
-        {/* ── Normal (and offline with cached data) ── */}
-        {(screenState === ScreenState.NORMAL || isOffline) && (
+        {/* ── Error ── */}
+        {!isGuest && isError && data === null && (
+          <ErrorState onRetry={load} />
+        )}
+
+        {/* ── Profile Content ── */}
+        {!isGuest && data && (
           <>
-            <AvatarHero data={data} onEdit={onEditProfile} />
+            <AvatarHero data={data} onEdit={showComingSoon} />
 
             <div className="flex flex-col gap-5">
               <div className="flex flex-col gap-3">
-                <SectionLabel label="Elo" />
+                <SectionLabel label={t.profile.eloSection} />
                 <EloCard data={data} />
               </div>
 
               <div className="flex flex-col gap-3">
-                <SectionLabel label="Best Scores" />
+                <SectionLabel label={t.profile.bestScoresSection} />
                 <BestScoresCard data={data} />
               </div>
 
               <div className="flex flex-col gap-3">
-                <SectionLabel label="Record" />
+                <SectionLabel label={t.profile.recordSection} />
                 <RecordStatsCard data={data} />
               </div>
 
               <div className="flex flex-col gap-3">
-                <SectionLabel label="Friends" />
-                <FriendsCard data={data} />
+                <SectionLabel label={t.profile.friendsSection} />
+                <FriendsCard
+                  data={data}
+                  onAddFriend={() => setAddFriendModalVisible(true)}
+                  onSelectFriend={setSelectedFriendForProfile}
+                />
               </div>
 
               <div className="flex flex-col gap-3">
-                <SectionLabel label="History" />
-                <MatchHistoryCard data={data} onOpenMatch={setSelectedMatch} />
+                <SectionLabel label={t.profile.historySection} />
+                {data.matchHistory.length === 0 ? (
+                  <EmptyStateCard
+                    gapClassName="gap-3"
+                    cardBorder="subtle"
+                    cardPadding="2rem 1.5rem"
+                    icon={<IconPlay />}
+                    iconColor="var(--ma-brand)"
+                    iconWrapperStyle={{
+                      height: '2.75rem',
+                      width: '2.75rem',
+                      borderRadius: 'var(--radius-xl)',
+                      background: 'var(--ma-brand-soft)',
+                    }}
+                    title={t.profile.noGamesTitle}
+                    description={t.profile.noGamesDesc}
+                  />
+                ) : (
+                  <MatchHistoryCard data={data} onOpenMatch={setSelectedMatch} />
+                )}
               </div>
             </div>
           </>
@@ -156,18 +242,32 @@ export function ProfileScreen({
       {/* Bottom nav */}
       <BottomNavBar active="stats" onNavigate={onNavigate} />
 
-      {/* Prototype state pill */}
-      <StatePill
-        current={screenState}
-        onChange={setScreenState}
-        states={[ScreenState.NORMAL, ScreenState.LOADING, ScreenState.EMPTY, ScreenState.ERROR, ScreenState.OFFLINE]}
-      />
-
       {/* Match detail dialog */}
       <MatchDetailDialog
         match={selectedMatch}
         onClose={() => setSelectedMatch(null)}
       />
+
+      {/* Friend profile modal */}
+      <FriendProfileModal
+        friend={selectedFriendForProfile}
+        show={!!selectedFriendForProfile}
+        onClose={() => setSelectedFriendForProfile(null)}
+        onChallenge={() => onNavigate?.('matchmaking')}
+      />
+
+      {/* Add friend modal */}
+      <AddFriendModal
+        visible={addFriendModalVisible}
+        onClose={() => setAddFriendModalVisible(false)}
+        onFriendAdded={load}
+      />
     </ScreenShell>
   )
+}
+
+const PLACEHOLDER: ProfileData = {
+  username: '', handle: '', joinedLabel: '', overallElo: 0,
+  categoryElo: [], categoryBests: [], totalGames: 0, wins: 0, losses: 0, draws: 0,
+  friends: [], matchHistory: [],
 }

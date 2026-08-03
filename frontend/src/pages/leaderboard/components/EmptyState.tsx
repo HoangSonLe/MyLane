@@ -1,5 +1,5 @@
 import { EmptyStateCard } from '@/components/ui/card'
-
+import { useTranslation } from '@/i18n/useTranslation'
 import type { BoardType, Category } from '@/services/leaderboard/leaderboard.interface'
 import { CATEGORIES } from '@/services/leaderboard/leaderboard.mock'
 
@@ -13,6 +13,7 @@ function IconMedalEmpty() {
 }
 
 export function EmptyState({ boardType, category }: { boardType: BoardType; category: Category }) {
+  const { t } = useTranslation()
   const catLabel = CATEGORIES.find((c) => c.id === category)?.label ?? category
   return (
     <EmptyStateCard
@@ -27,13 +28,12 @@ export function EmptyState({ boardType, category }: { boardType: BoardType; cate
         borderRadius: 'var(--radius-2xl)',
         background: 'var(--ma-surface-raised)',
       }}
-      titleClassName="text-[15px] font-semibold"
-      title="No entries yet"
+      title={t.leaderboard.noEntriesTitle}
       descriptionClassName="max-w-[18rem] text-[13px] leading-relaxed"
       description={
         boardType === 'friends'
-          ? 'None of your friends have played a ranked game on this board yet.'
-          : `No ranked ${catLabel} games have been played on this board yet. Be the first!`
+          ? t.leaderboard.noEntriesFriends
+          : t.leaderboard.noEntriesGeneric(catLabel)
       }
       textGroupClassName="flex flex-col gap-3"
     />

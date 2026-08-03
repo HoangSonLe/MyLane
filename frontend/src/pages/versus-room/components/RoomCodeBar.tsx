@@ -2,6 +2,7 @@ import { useState } from 'react'
 
 import { IconCheck } from './icons'
 import { Card } from '@/components/ui/card'
+import { useTranslation } from '@/i18n/useTranslation'
 
 function IconCopy() {
   return (
@@ -27,11 +28,14 @@ export function RoomCodeBar({
   skeleton,
   code,
   link,
+  embedded = false,
 }: {
   skeleton?: boolean
   code: string
   link: string
+  embedded?: boolean
 }) {
+  const { t } = useTranslation()
   const [copied, setCopied] = useState<'code' | 'link' | null>(null)
 
   function handleCopy(type: 'code' | 'link') {
@@ -50,8 +54,8 @@ export function RoomCodeBar({
     )
   }
 
-  return (
-    <Card className="mx-4 flex items-center justify-between gap-3" padding="0.875rem 1rem">
+  const content = (
+    <div className="flex items-center justify-between gap-3">
       <div className="flex flex-col min-w-0">
         <span
           className="text-[16px] font-bold tracking-widest tabular-nums"
@@ -64,15 +68,15 @@ export function RoomCodeBar({
         </span>
       </div>
 
-      <div className="flex shrink-0 gap-2">
+      <div className="flex shrink-0 gap-1.5 sm:gap-2">
         {/* Copy code */}
         <button
           type="button"
           onClick={() => handleCopy('code')}
-          aria-label={copied === 'code' ? 'Code copied' : 'Copy room code'}
+          aria-label={copied === 'code' ? t.versusRoom.codeCopiedAria : t.versusRoom.copyRoomCodeAria}
           className={[
-            'flex h-9 items-center gap-1.5 px-3',
-            'text-[12px] font-semibold',
+            'flex h-9 items-center gap-1 px-2.5 sm:px-3',
+            'text-[12px] font-semibold whitespace-nowrap',
             'transition-all duration-[var(--ma-duration-micro)] active:scale-95',
             'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ma-ring)]',
           ].join(' ')}
@@ -84,17 +88,17 @@ export function RoomCodeBar({
           }}
         >
           {copied === 'code' ? <IconCheck /> : <IconCopy />}
-          {copied === 'code' ? 'Copied' : 'Copy'}
+          <span className="whitespace-nowrap">{copied === 'code' ? t.versusRoom.codeCopied : t.versusRoom.copyCode}</span>
         </button>
 
         {/* Share link */}
         <button
           type="button"
           onClick={() => handleCopy('link')}
-          aria-label={copied === 'link' ? 'Link copied' : 'Share room link'}
+          aria-label={copied === 'link' ? t.versusRoom.linkCopiedAria : t.versusRoom.shareRoomLinkAria}
           className={[
-            'flex h-9 items-center gap-1.5 px-3',
-            'text-[12px] font-semibold',
+            'flex h-9 items-center gap-1 px-2.5 sm:px-3',
+            'text-[12px] font-semibold whitespace-nowrap',
             'transition-all duration-[var(--ma-duration-micro)] active:scale-95',
             'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ma-ring)]',
           ].join(' ')}
@@ -106,9 +110,15 @@ export function RoomCodeBar({
           }}
         >
           {copied === 'link' ? <IconCheck /> : <IconShare />}
-          Share
+          <span className="whitespace-nowrap">{t.versusRoom.share}</span>
         </button>
       </div>
+    </div>
+  )
+
+  return embedded ? content : (
+    <Card className="mx-4" padding="0.875rem 1rem">
+      {content}
     </Card>
   )
 }

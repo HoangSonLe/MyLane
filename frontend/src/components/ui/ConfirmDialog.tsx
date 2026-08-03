@@ -29,6 +29,7 @@
  */
 
 import { useId, useEffect, useRef } from 'react'
+import { ModalBackdrop } from '@/components/ui/ModalBackdrop'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -179,16 +180,7 @@ export function ConfirmDialog({
   const cfg = VARIANT_CONFIG[variant]
 
   return (
-    /* ── Backdrop ─────────────────────────────────────────────────────────── */
-    <div
-      className="fixed inset-0 z-50 flex items-end justify-center px-4 pb-8 sm:items-center"
-      style={{ background: 'oklch(0 0 0 / 0.60)' }}
-      role="presentation"
-      // Clicking outside = cancel (unless busy)
-      onPointerDown={(e) => {
-        if (e.target === e.currentTarget && !busy) onCancel()
-      }}
-    >
+    <ModalBackdrop show={open} onClose={() => { if (!busy) onCancel() }} className="items-end pb-8 sm:items-center">
       {/* ── Panel ────────────────────────────────────────────────────────── */}
       <div
         ref={panelRef}
@@ -203,8 +195,6 @@ export function ConfirmDialog({
           boxShadow:     'var(--ma-shadow-lg)',
           padding:       '1.5rem',
         }}
-        // Stop backdrop click from firing when clicking inside the panel
-        onPointerDown={(e) => e.stopPropagation()}
       >
 
         {/* ── Icon slot (optional) ─────────────────────────────────────── */}
@@ -295,6 +285,6 @@ export function ConfirmDialog({
           </button>
         </div>
       </div>
-    </div>
+    </ModalBackdrop>
   )
 }

@@ -5,7 +5,7 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  /* ─── Memory Arena Design Tokens ─── */
+  /* ─── My Lane Design Tokens ─── */
   --font-sans: 'Inter', 'Inter Fallback', sans-serif;
 
   /* Radius scale */
@@ -67,7 +67,7 @@
   --color-chart-5: oklch(0.65 0.18 280);
 }
 
-/* ─── Memory Arena: always dark theme ─── */
+/* ─── My Lane: always dark theme ─── */
 :root {
   color-scheme: dark;
 
@@ -117,6 +117,10 @@
   --ma-shadow-md:      0 4px 16px oklch(0 0 0 / 0.28);
   --ma-shadow-lg:      0 8px 32px oklch(0 0 0 / 0.40);
 
+  /* Skeleton colors */
+  --ma-skeleton-bg:      oklch(0.22 0.014 260);
+  --ma-skeleton-shimmer: oklch(0.26 0.014 260);
+
   /* Motion scale (I8) */
   --ma-duration-micro:   100ms;
   --ma-duration-base:    200ms;
@@ -126,6 +130,61 @@
 
   /* radius default used by shadcn */
   --radius: 1rem;
+}
+
+/* ─── My Lane: Light Theme Overrides ─── */
+[data-theme="light"] {
+  color-scheme: light;
+
+  /* Core palette — crisp, soft light grey background */
+  --ma-bg:             oklch(0.97 0.005 260);   /* soft light surface */
+  --ma-surface:        oklch(1 0 0);            /* card surface (pure white) */
+  --ma-surface-raised: oklch(0.94 0.008 260);  /* hovered / active surface */
+
+  /* Foreground — deep charcoal/navy text */
+  --ma-fg:             oklch(0.18 0.015 260);   /* primary text */
+  --ma-fg-muted:       oklch(0.48 0.012 260);   /* secondary text */
+  --ma-fg-subtle:      oklch(0.68 0.010 260);   /* placeholder / disabled */
+
+  /* Brand accent: amber adjusted for light mode contrast */
+  --ma-brand:          oklch(0.66 0.16 74);     /* richer amber */
+  --ma-brand-fg:       oklch(0.99 0.005 74);    /* crisp light text on brand */
+  --ma-brand-soft:     oklch(0.66 0.16 74 / 0.12); /* subtle tint bg */
+
+  /* Icon container neutral */
+  --ma-icon-bg:        oklch(0.94 0.008 260);   /* neutral surface-raised */
+  --ma-icon-fg:        oklch(0.48 0.012 260);   /* icon color neutral */
+
+  /* Semantic */
+  --ma-success:        oklch(0.58 0.16 145);
+  --ma-warning:        oklch(0.66 0.17 65);
+  --ma-danger:         oklch(0.55 0.20 22);
+
+  /* Borders — subtle dark borders */
+  --ma-border:         oklch(0 0 0 / 0.09);
+  --ma-border-subtle:  oklch(0 0 0 / 0.05);
+  --ma-ring:           oklch(0.66 0.16 74 / 0.40);
+
+  /* Interaction state — toggle on, selected chips */
+  --ma-active:         oklch(0.52 0.14 230);
+  --ma-active-soft:    oklch(0.52 0.14 230 / 0.12);
+
+  /* Progress / XP */
+  --ma-progress:       oklch(0.55 0.14 200);
+  --ma-progress-soft:  oklch(0.55 0.14 200 / 0.15);
+
+  /* Toggle track colors */
+  --ma-toggle-off:     oklch(0.85 0.01 260);   /* light neutral off-state */
+  --ma-toggle-on:      var(--ma-active);       /* blue on-state */
+
+  /* Named elevation shadows */
+  --ma-shadow-sm:      0 1px 4px oklch(0 0 0 / 0.06);
+  --ma-shadow-md:      0 4px 16px oklch(0 0 0 / 0.09);
+  --ma-shadow-lg:      0 8px 32px oklch(0 0 0 / 0.14);
+
+  /* Skeleton colors */
+  --ma-skeleton-bg:      oklch(0.90 0.008 260);
+  --ma-skeleton-shimmer: oklch(0.96 0.005 260);
 }
 
 @layer base {
@@ -143,10 +202,44 @@
   }
 }
 
+/* Registered so browsers can smoothly interpolate it frame-by-frame instead
+   of snapping — powers the PhaseBanner countdown ring's continuous sweep
+   (see .phase-ring below). */
+@property --ring-pct {
+  syntax: '<number>';
+  inherits: false;
+  initial-value: 1;
+}
+
 /* ─── Utility: thumb-friendly focus ring ─── */
 @layer utilities {
+  /* PhaseBanner countdown ring — conic-gradient masked to just the border
+     area (see PhaseBanner.tsx). --ring-pct/--ring-color are set inline per
+     tick; the @property registration above is what lets --ring-pct tween
+     smoothly across the 1s transition instead of jumping each second. */
+  .phase-ring {
+    background: conic-gradient(var(--ring-color, var(--ma-progress)) calc(var(--ring-pct, 1) * 1turn), transparent 0deg);
+    transition: --ring-pct 1s linear, background-color 0.3s;
+  }
+
+
   .ring-brand {
     --tw-ring-color: var(--ma-ring);
+  }
+
+  /* Wrong-answer popup entrance (WrongToast.tsx) — fade + scale only, no
+     shake/wobble (design bible: gentle correction). Disabled entirely under
+     reduced motion instead of relying on Tailwind's motion-reduce variant,
+     so it can't lose a specificity/order tie with it. */
+  @keyframes wrong-pop {
+    from { opacity: 0; transform: scale(0.92); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+  .wrong-pop {
+    animation: wrong-pop 220ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .wrong-pop { animation: none; }
   }
 
   /* Skeleton shimmer */
@@ -158,9 +251,9 @@
   .skeleton {
     background: linear-gradient(
       90deg,
-      oklch(0.22 0.014 260) 25%,
-      oklch(0.26 0.014 260) 50%,
-      oklch(0.22 0.014 260) 75%
+      var(--ma-skeleton-bg) 25%,
+      var(--ma-skeleton-shimmer) 50%,
+      var(--ma-skeleton-bg) 75%
     );
     background-size: 200% 100%;
     animation: shimmer 1.6s ease-in-out infinite;

@@ -1,10 +1,12 @@
 import { StatusBanner } from '@/components/ui/StatusBanner'
+import { useTranslation } from '@/i18n/useTranslation'
 
 export function SaveErrorCard({ onRetry }: { onRetry?: () => void }) {
+  const { t } = useTranslation()
   return (
     <StatusBanner
       variant="error"
-      message="We couldn't save your score. Your result is safe — tap Retry to try again."
+      message={t.result.saveErrorMessage}
       onRetry={onRetry}
     />
   )

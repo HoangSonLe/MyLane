@@ -39,13 +39,13 @@ export function ScreenHeaderTitle({
   if (skeleton) {
     return (
       <div
-        className="skeleton"
+        className="skeleton justify-self-center"
         style={{ height: '1.375rem', width: skeletonWidth, borderRadius: 'var(--radius-sm)' }}
       />
     )
   }
   return (
-    <h1 className="text-[17px] font-bold" style={{ color: 'var(--ma-fg)' }}>
+    <h1 className="text-center text-[17px] font-bold" style={{ color: 'var(--ma-fg)' }}>
       {children}
     </h1>
   )
@@ -93,7 +93,7 @@ export function ScreenHeaderAction({
   )
 }
 
-/** ScreenHeaderWithBack — composes BackButton + ScreenHeaderTitle inside ScreenHeader, for the 3 screens that share this exact shape (Lobby/Leaderboard/Profile). `trailing` can be a ScreenHeaderAction or a plain spacer div (Leaderboard). */
+/** ScreenHeaderWithBack — composes BackButton + ScreenHeaderTitle inside a centered CSS Grid, for Lobby/Leaderboard/Profile. Title is mathematically centered 50% regardless of left/right item widths. */
 export function ScreenHeaderWithBack({
   skeleton,
   onBack,
@@ -101,6 +101,7 @@ export function ScreenHeaderWithBack({
   title,
   titleSkeletonWidth,
   trailing,
+  className = '',
 }: {
   skeleton?: boolean
   onBack?: () => void
@@ -108,14 +109,23 @@ export function ScreenHeaderWithBack({
   title: ReactNode
   titleSkeletonWidth?: string
   trailing?: ReactNode
+  className?: string
 }) {
   return (
-    <ScreenHeader>
-      <BackButton onBack={onBack} skeleton={skeleton} {...(ariaLabel ? { ariaLabel } : {})} />
+    <header
+      className={['grid grid-cols-[1fr_auto_1fr] items-center px-4 pb-2 pt-6', className]
+        .filter(Boolean)
+        .join(' ')}
+    >
+      <div className="flex justify-start">
+        <BackButton onBack={onBack} skeleton={skeleton} {...(ariaLabel ? { ariaLabel } : {})} />
+      </div>
       <ScreenHeaderTitle skeleton={skeleton} skeletonWidth={titleSkeletonWidth}>
         {title}
       </ScreenHeaderTitle>
-      {trailing}
-    </ScreenHeader>
+      <div className="flex justify-end">
+        {trailing ?? <div className="h-9 w-9 shrink-0" />}
+      </div>
+    </header>
   )
 }

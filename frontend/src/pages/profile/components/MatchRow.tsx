@@ -1,5 +1,5 @@
 import { IconChevronRight14 as IconChevronRight } from '@/components/ui/icons'
-
+import { useTranslation } from '@/i18n/useTranslation'
 import type { MatchEntry } from '@/services/profile/profile.interface'
 
 export function MatchRow({
@@ -9,6 +9,7 @@ export function MatchRow({
   match: MatchEntry
   onOpen: (match: MatchEntry) => void
 }) {
+  const { t } = useTranslation()
   const outcomeColor =
     match.outcome === 'win'
       ? 'var(--ma-success)'
@@ -24,7 +25,11 @@ export function MatchRow({
       : 'var(--ma-surface-raised)'
 
   const outcomeLabel =
-    match.outcome === 'win' ? 'W' : match.outcome === 'loss' ? 'L' : 'D'
+    match.outcome === 'win'
+      ? t.profile.victory[0]
+      : match.outcome === 'loss'
+      ? t.profile.defeat[0]
+      : t.profile.draw[0]
 
   return (
     <button
@@ -61,7 +66,7 @@ export function MatchRow({
           </span>
           {match.opponentName && (
             <>
-              <span style={{ color: 'var(--ma-border)', fontSize: '10px' }} aria-hidden="true">vs</span>
+              <span style={{ color: 'var(--ma-border)', fontSize: '10px' }} aria-hidden="true">{t.profile.vs}</span>
               <span className="truncate text-[12px]" style={{ color: 'var(--ma-fg-muted)' }}>
                 {match.opponentName}
               </span>

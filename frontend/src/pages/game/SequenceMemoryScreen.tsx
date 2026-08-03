@@ -13,6 +13,7 @@ import { GameTile } from './components/GameTile'
 import { LoadingSkeleton } from './components/LoadingSkeleton'
 import { ResultChip } from './components/ResultChip'
 import type { GamePhase, Tile } from '@/services/game/game-screen.types'
+import { hapticFeedback } from '@/lib/utils/haptics'
 
 // ─── Constants ─────────────────────────────────────────────────
 const TILES: Tile[] = [
@@ -103,10 +104,12 @@ export function SequenceMemoryScreen() {
 
   function handleTilePress(id: number) {
     if (phase !== 'input') return
+    hapticFeedback.light()
     const next = [...inputQueue, id]
     const pos = next.length - 1
 
     if (next[pos] !== sequence[pos]) {
+      hapticFeedback.error()
       setPhase('fail')
       setLitTile(id)
       timeoutRef.current = setTimeout(() => {
@@ -123,6 +126,7 @@ export function SequenceMemoryScreen() {
     timeoutRef.current = setTimeout(() => setLitTile(null), 180)
 
     if (next.length === sequence.length) {
+      hapticFeedback.success()
       const newScore = score + sequence.length * 10
       setScore(newScore)
       if (newScore > best) setBest(newScore)
@@ -151,7 +155,7 @@ export function SequenceMemoryScreen() {
 
       {/* ── HEADER ── */}
       {!isLoading && !isEmpty && !isError && (
-        <header className="flex items-center justify-between px-4 pb-2 pt-16">
+        <header className="flex items-center justify-between px-4 pb-2 pt-6">
           <button
             type="button"
             aria-label="Back"
@@ -181,7 +185,7 @@ export function SequenceMemoryScreen() {
 
       {/* Loading header placeholder */}
       {isLoading && (
-        <header className="flex items-center justify-between px-4 pb-2 pt-16">
+        <header className="flex items-center justify-between px-4 pb-2 pt-6">
           <div className="skeleton h-10 w-10 rounded-xl" />
           <div className="skeleton h-10 w-32 rounded-xl" />
           <div className="skeleton h-10 w-10 rounded-xl" />

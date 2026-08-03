@@ -2,7 +2,7 @@
 
 Route: `/games/grid` · a.k.a. "Chimpanzee Memory"
 
-Source: [`MEMORY_ARENA_GAME_DESIGN.md`](../../MEMORY_ARENA_GAME_DESIGN.md) §2.3. Shared systems (scoring, Elo, modes) live in [`README.md`](README.md).
+Source: [`MY_LANE_GAME_DESIGN.md`](../../MY_LANE_GAME_DESIGN.md) §2.3. Shared systems (scoring, Elo, modes) live in [`README.md`](README.md).
 
 ---
 
@@ -14,7 +14,7 @@ Remember the positions of numbered cells on a grid, then tap them back in ascend
 
 - Rectangular grid, size `x_Axis × y_Axis`.
 - Some cells contain numbers 1 through `beginCount` (the count to remember); the rest are empty.
-- **Viewing phase**: numbers are shown in their cells for `viewTimeSeconds` (default **18s**).
+- **Viewing phase**: numbers are shown in their cells for `viewTimeSeconds` (default **18s**). Player may **Skip** the remainder of this phase to move straight to Answering; skipping does not change `answerTimeSeconds` or scoring, it only ends the viewing wait early.
 - **Answering phase**: numbers are hidden. Player taps cells in order 1, 2, 3… within `answerTimeSeconds` (default **40s**).
 
 ## Wrong-Tap Handling
@@ -58,7 +58,7 @@ Player can open a quick settings panel to change the level (grid size) and the m
 - **Simple**: only cells with numbers are shown.
 - **Full**: the entire grid is shown, including empty cells.
 
-Supports Pause and Reset, same as the other games.
+Supports Pause and Reset, same as the other games. Also supports **Skip** during the Viewing phase (see Mechanics).
 
 ## Endless Mode
 

@@ -10,7 +10,10 @@ function IconWifi() {
   )
 }
 
+import { useTranslation } from '@/i18n/useTranslation'
+
 export function OfflineNotice() {
+  const { t } = useTranslation()
   return (
     <div
       className="mx-4 flex items-start gap-3 rounded-[var(--radius-xl)] px-4 py-3"
@@ -24,7 +27,7 @@ export function OfflineNotice() {
         <IconWifi />
       </span>
       <p className="text-[13px] leading-relaxed" style={{ color: 'var(--ma-fg-muted)' }}>
-        You&apos;re offline. Showing the last cached rankings. Live standings may have changed.
+        {t.leaderboard.offlineNotice}
       </p>
     </div>
   )

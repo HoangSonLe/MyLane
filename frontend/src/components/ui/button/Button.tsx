@@ -18,7 +18,7 @@ const buttonVariants = cva(
         destructive:
           'bg-destructive/10 text-destructive hover:bg-destructive/20 focus-visible:border-destructive/40 focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:hover:bg-destructive/30 dark:focus-visible:ring-destructive/40',
         link: 'text-primary underline-offset-4 hover:underline',
-        // ── App variants — match Memory Arena's real --ma-* tokens, not the shadcn defaults above.
+        // ── App variants — match My Lane's real --ma-* tokens, not the shadcn defaults above.
         // Deliberately no active:scale here — the app uses both scale-95 and scale-[0.97]
         // inconsistently per screen, so press-scale stays part of each call site's own
         // className (passed through and merged), not baked into the variant.
@@ -39,7 +39,7 @@ const buttonVariants = cva(
         'icon-sm':
           'size-7 rounded-[min(var(--radius-md),12px)] in-data-[slot=button-group]:rounded-lg',
         'icon-lg': 'size-9',
-        // ── App sizes — the real heights used across Memory Arena screens (h-9 to h-14).
+        // ── App sizes — the real heights used across My Lane screens (h-9 to h-14).
         // No forced icon sizing here (unlike the shadcn sizes above): icons already set
         // their own width/height, and those vary per call site — let them keep it.
         'app-9': 'h-9 rounded-[var(--radius-xl)] gap-1.5 px-3 text-[13px] font-semibold',

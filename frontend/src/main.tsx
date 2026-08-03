@@ -2,6 +2,7 @@ import { StrictMode, Suspense, lazy } from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './App'
 import './index.css'
+import '@/stores/theme.store'
 
 // Design-review switcher (jump to any screen) — dev-only, opt-in via ?demo=1.
 // Never reachable in a production build: see pages/demo/DemoApp.tsx.
@@ -28,7 +29,9 @@ function render() {
 // answered by a fake backend in dev. Default is MSW, intercepting requests
 // in-browser; set VITE_MOCK_MODE=server to use the standalone Node process
 // in mock-server/ instead. See mock-server/README.md.
-const useMsw = import.meta.env.DEV && import.meta.env.VITE_MOCK_MODE !== 'server'
+import { isSupabaseConfigured } from '@/services/backend-config'
+
+const useMsw = import.meta.env.DEV && import.meta.env.VITE_MOCK_MODE !== 'server' && !isSupabaseConfigured()
 if (useMsw) {
   import('./mocks/browser').then(({ worker }) =>
     worker.start({ onUnhandledRequest: 'bypass' }),

@@ -1,4 +1,5 @@
 import { IconPlay } from '@/components/ui/icons'
+import { useTranslation } from '@/i18n/useTranslation'
 
 interface PlayCtaProps {
   skeleton?: boolean
@@ -7,6 +8,7 @@ interface PlayCtaProps {
 }
 
 export function PlayCta({ skeleton, hasLastPlayed, onPlay }: PlayCtaProps) {
+  const { t } = useTranslation()
   if (skeleton) {
     return (
       <div
@@ -36,7 +38,7 @@ export function PlayCta({ skeleton, hasLastPlayed, onPlay }: PlayCtaProps) {
       <span style={{ color: 'var(--ma-brand-fg)' }}>
         <IconPlay />
       </span>
-      {hasLastPlayed ? 'Play Again' : 'Play Now'}
+      {hasLastPlayed ? t.home.playAgain : t.home.playNow}
     </button>
   )
 }

@@ -2,6 +2,7 @@ import { IconSwords } from '@/components/ui/icons'
 import { Avatar } from '@/components/ui/Avatar'
 import { Card } from '@/components/ui/card'
 import type { Friend } from '@/services/lobby/lobby.interface'
+import { useTranslation } from '@/i18n/useTranslation'
 
 // ─── Sub-components ───────────────────────────────────────────────
 
@@ -16,13 +17,18 @@ function EloBadge({ elo }: { elo: number }) {
 function PresenceDot({ status }: { status: Friend['status'] }) {
   return (
     <span
-      aria-label={status === 'in-game' ? 'In game' : 'Online'}
+      aria-label={status === 'in-game' ? 'In game' : status === 'offline' ? 'Offline' : 'Online'}
       className="inline-block shrink-0"
       style={{
         height: '8px',
         width: '8px',
         borderRadius: '50%',
-        background: status === 'in-game' ? 'var(--ma-warning)' : 'var(--ma-success)',
+        background:
+          status === 'in-game'
+            ? 'var(--ma-warning)'
+            : status === 'offline'
+            ? 'var(--ma-fg-subtle)'
+            : 'var(--ma-success)',
       }}
     />
   )
@@ -33,11 +39,18 @@ function PresenceDot({ status }: { status: Friend['status'] }) {
 interface FriendRowProps {
   friend: Friend
   onChallenge?: (id: string) => void
+  onSelect?: (friend: Friend) => void
 }
 
-export function FriendRow({ friend, onChallenge }: FriendRowProps) {
+export function FriendRow({ friend, onChallenge, onSelect }: FriendRowProps) {
+  const { t } = useTranslation()
   return (
-    <Card className="mx-4 flex items-center gap-3" shadow="sm" padding="0.875rem 1rem">
+    <Card
+      className="mx-4 flex items-center gap-3 cursor-pointer transition-transform active:scale-[0.99] hover:opacity-90"
+      shadow="sm"
+      padding="0.875rem 1rem"
+      onClick={() => onSelect?.(friend)}
+    >
       {/* Avatar */}
       <Avatar name={friend.name} size="2.5rem" fontSize="13px">
         {/* Presence dot — bottom-right corner */}
@@ -47,7 +60,12 @@ export function FriendRow({ friend, onChallenge }: FriendRowProps) {
             height: '10px',
             width: '10px',
             borderRadius: '50%',
-            background: friend.status === 'in-game' ? 'var(--ma-warning)' : 'var(--ma-success)',
+            background:
+              friend.status === 'in-game'
+                ? 'var(--ma-warning)'
+                : friend.status === 'offline'
+                ? 'var(--ma-fg-subtle)'
+                : 'var(--ma-success)',
             border: '2px solid var(--ma-bg)',
           }}
           aria-hidden="true"
@@ -74,7 +92,10 @@ export function FriendRow({ friend, onChallenge }: FriendRowProps) {
       {/* Challenge button */}
       <button
         type="button"
-        onClick={() => onChallenge?.(friend.id)}
+        onClick={(e) => {
+          e.stopPropagation()
+          onChallenge?.(friend.id)
+        }}
         disabled={friend.status === 'in-game'}
         aria-label={
           friend.status === 'in-game'
@@ -82,8 +103,8 @@ export function FriendRow({ friend, onChallenge }: FriendRowProps) {
             : `Challenge ${friend.name}`
         }
         className={[
-          'shrink-0 flex items-center gap-1.5 px-3 py-1.5',
-          'text-[12px] font-semibold',
+          'shrink-0 flex items-center justify-center gap-1.5 px-3 py-1.5',
+          'text-[12px] font-semibold leading-none',
           'transition-all duration-[var(--ma-duration-micro)]',
           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ma-ring)]',
           friend.status === 'in-game'
@@ -98,7 +119,7 @@ export function FriendRow({ friend, onChallenge }: FriendRowProps) {
         }}
       >
         <IconSwords />
-        {friend.status === 'in-game' ? 'In game' : 'Challenge'}
+        <span>{friend.status === 'in-game' ? t.lobby.inGame : t.lobby.challenge}</span>
       </button>
     </Card>
   )

@@ -2,6 +2,7 @@ import { getInitials } from '@/lib/utils'
 import { CardButton } from '@/components/ui/card'
 
 import type { ProfileData } from '@/services/profile/profile.interface'
+import { useTranslation } from '@/i18n/useTranslation'
 
 function IconEdit() {
   return (
@@ -21,6 +22,7 @@ export function AvatarHero({
   data: ProfileData
   onEdit?: () => void
 }) {
+  const { t } = useTranslation()
   const initials = getInitials(data.username)
 
   if (skeleton) {
@@ -49,7 +51,7 @@ export function AvatarHero({
           border: '2px solid var(--ma-border)',
           boxShadow: 'var(--ma-shadow-md)',
         }}
-        aria-label={`Avatar for ${data.username}`}
+        aria-label={t.profile.avatarFor(data.username)}
       >
         <span className="text-[28px] font-bold" style={{ color: 'var(--ma-fg-muted)' }}>
           {initials}
@@ -69,7 +71,7 @@ export function AvatarHero({
       {/* Edit profile button */}
       <CardButton
         onClick={onEdit}
-        aria-label="Edit profile"
+        aria-label={t.profile.editAriaLabel}
         className={[
           'flex h-10 items-center justify-center gap-2 px-5',
           'text-[13px] font-semibold',
@@ -80,7 +82,7 @@ export function AvatarHero({
         style={{ color: 'var(--ma-fg-muted)' }}
       >
         <IconEdit />
-        Edit Profile
+        {t.profile.editProfile}
       </CardButton>
     </div>
   )

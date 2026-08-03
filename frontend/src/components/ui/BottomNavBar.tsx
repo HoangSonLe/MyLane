@@ -1,13 +1,15 @@
+import { useTranslation } from '@/i18n/useTranslation'
+
 interface NavItem {
   id: string
-  label: string
+  labelKey: 'home' | 'play' | 'stats' | 'settings'
   icon: (active: boolean) => React.ReactNode
 }
 
 const navItems: NavItem[] = [
   {
     id: 'home',
-    label: 'Home',
+    labelKey: 'home',
     icon: (active) => (
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
         <path
@@ -29,7 +31,7 @@ const navItems: NavItem[] = [
   },
   {
     id: 'play',
-    label: 'Play',
+    labelKey: 'play',
     icon: (active) => (
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
         <circle
@@ -47,7 +49,7 @@ const navItems: NavItem[] = [
   },
   {
     id: 'stats',
-    label: 'Stats',
+    labelKey: 'stats',
     icon: (active) => (
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
         <rect x="4" y="14" width="4" height="6" rx="1"
@@ -64,7 +66,7 @@ const navItems: NavItem[] = [
   },
   {
     id: 'settings',
-    label: 'Settings',
+    labelKey: 'settings',
     icon: (active) => (
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
         <circle cx="12" cy="12" r="3"
@@ -88,6 +90,8 @@ interface BottomNavBarProps {
 }
 
 export function BottomNavBar({ active = 'settings', onNavigate }: BottomNavBarProps) {
+  const { t } = useTranslation()
+
   return (
     <nav
       aria-label="Main navigation"
@@ -101,12 +105,13 @@ export function BottomNavBar({ active = 'settings', onNavigate }: BottomNavBarPr
       <div className="flex items-center justify-around px-2 py-1">
         {navItems.map((item) => {
           const isActive = item.id === active
+          const label = t.common[item.labelKey]
           return (
             <button
               key={item.id}
               type="button"
               onClick={() => onNavigate?.(item.id)}
-              aria-label={item.label}
+              aria-label={label}
               aria-current={isActive ? 'page' : undefined}
               className={[
                 'flex min-h-[52px] flex-1 flex-col items-center justify-center gap-1 rounded-xl',
@@ -133,7 +138,7 @@ export function BottomNavBar({ active = 'settings', onNavigate }: BottomNavBarPr
                   isActive ? 'font-semibold text-[var(--ma-fg)]' : 'font-medium',
                 ].join(' ')}
               >
-                {item.label}
+                {label}
               </span>
             </button>
           )

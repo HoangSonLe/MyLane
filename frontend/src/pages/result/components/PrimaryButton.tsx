@@ -1,4 +1,5 @@
 import { IconPlay, IconSwords } from '@/components/ui/icons'
+import { useTranslation } from '@/i18n/useTranslation'
 
 export function PrimaryButton({
   onClick,
@@ -7,6 +8,7 @@ export function PrimaryButton({
   onClick?: () => void
   isVersus: boolean
 }) {
+  const { t } = useTranslation()
   return (
     <button
       type="button"
@@ -27,7 +29,7 @@ export function PrimaryButton({
       <span style={{ color: 'var(--ma-brand-fg)' }}>
         {isVersus ? <IconSwords /> : <IconPlay />}
       </span>
-      Play Again
+      {t.result.playAgain}
     </button>
   )
 }

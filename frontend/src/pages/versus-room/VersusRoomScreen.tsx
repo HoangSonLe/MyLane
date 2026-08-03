@@ -1,120 +1,222 @@
-import { useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { BottomNavBar } from '@/components/ui/BottomNavBar'
 import { StatusBanner } from '@/components/ui/StatusBanner'
-import { StatePill } from '@/components/ui/StatePill'
 import { RoomHeader } from './components/RoomHeader'
 import { ModeSummaryCard } from './components/ModeSummaryCard'
 import { InlineError } from './components/InlineError'
 import { CreateRoomForm } from './components/CreateRoomForm'
 import { JoinRoomForm } from './components/JoinRoomForm'
 import { ReadyRoomView } from './components/ReadyRoomView'
-import { EmptyChoiceView } from './components/EmptyChoiceView'
-import { OfflineWall } from './components/OfflineWall'
-import {
-  GAME_CATEGORIES,
-  MOCK_HOST,
-  MOCK_OPPONENT,
-  ROOM_CODE,
-  ROOM_LINK,
-} from '@/services/versus-room/versus-room.mock'
-import { ScreenState, RoundMode } from '@/configs/enum'
+import { AccountWall } from './components/AccountWall'
+import { HostLeaveModal } from './components/HostLeaveModal'
+import { GAME_CATEGORIES } from '@/services/versus-room/versus-room.mock'
+import { versusRoomService, RoomNotFoundError, RoomFullError } from '@/services/versus-room/versus-room.service'
+import { RoundMode, DifficultyId, RoomEntrySource, GameId } from '@/configs/enum'
+import { useNetworkStatus } from '@/lib/hooks/useNetworkStatus'
+import { useAuthStore } from '@/stores/auth.store'
 import type {
   GameCategoryId,
   ErrorKind,
+  Room,
 } from '@/services/versus-room/versus-room.interface'
+import { useTranslation } from '@/i18n/useTranslation'
 
 // ─── Main component ──────────────────────────────────────────────
 export function VersusRoomScreen({
   onBack,
   onNavigate,
   initialTab = 'create',
+  initialRoom = null,
+  initialEntrySource = RoomEntrySource.CUSTOM,
+  initialJoinCode = '',
+  onRoomLinkConsumed,
 }: {
   onBack?: () => void
-  onNavigate?: (screen: string) => void
+  onNavigate?: (screen: string, room?: Room) => void
   initialTab?: 'create' | 'join'
+  initialRoom?: Room | null
+  initialEntrySource?: RoomEntrySource
+  initialJoinCode?: string
+  onRoomLinkConsumed?: () => void
 }) {
-  const [screenState, setScreenState] = useState<ScreenState>(ScreenState.EMPTY)
-  const [activeTab, setActiveTab] = useState<'create' | 'join'>(initialTab)
-  const [selectedCategory, setSelectedCategory] = useState<GameCategoryId | null>(null)
+  const { isOffline } = useNetworkStatus()
+  const { t } = useTranslation()
+  const user = useAuthStore((s) => s.user)
+  const isGuest = user?.isGuest ?? true
+
+  const [selectedCategory, setSelectedCategory] = useState<GameCategoryId | null>(GameId.NUMBER)
   const [selectedMode, setSelectedMode] = useState<RoundMode>(RoundMode.VERSUS_RANKED)
+  const [selectedDifficulty, setSelectedDifficulty] = useState<DifficultyId>(DifficultyId.MEDIUM)
   const [roomName, setRoomName] = useState('')
-  const [joinCode, setJoinCode] = useState('')
+  const [isPrivate, setIsPrivate] = useState(false)
+  const [joinCode, setJoinCode] = useState(initialJoinCode)
   const [isCreating, setIsCreating] = useState(false)
   const [isJoining, setIsJoining] = useState(false)
   const [inlineError, setInlineError] = useState<ErrorKind | null>(null)
-  // In the ready room, track whether opponent has joined (for prototype toggle)
-  const [opponentJoined, setOpponentJoined] = useState(true)
+  const [showHostLeaveModal, setShowHostLeaveModal] = useState(false)
+  const [isUpdatingReady, setIsUpdatingReady] = useState(false)
 
-  const isLoading = screenState === ScreenState.LOADING
-  const isReady   = screenState === ScreenState.READY
-  const isError   = screenState === ScreenState.ERROR
-  const isOffline = screenState === ScreenState.OFFLINE
+  // Room the player is hosting or has joined — set to initialRoom if matched via Matchmaking/QuickJoin
+  const [room, setRoom] = useState<Room | null>(initialRoom)
+  const isHost = !!room && (room.host.id ? room.host.id === user?.id : room.host.name === user?.name)
+  const isQuickMatch = initialEntrySource === RoomEntrySource.QUICK_MATCH || room?.entrySource === RoomEntrySource.QUICK_MATCH
+  const currentPlayerReady = isHost ? !!room?.host.ready : !!room?.opponent?.ready
 
-  const activeCategory = GAME_CATEGORIES.find((c) => c.id === selectedCategory) ?? null
-
-  // Simulate create
-  function handleCreate() {
-    if (!selectedCategory) return
+  async function handleCreate() {
+    if (!selectedCategory || isCreating) return
     setIsCreating(true)
     setInlineError(null)
-    setTimeout(() => {
+    try {
+      const created = await versusRoomService.createRoom({
+        category: selectedCategory,
+        mode: selectedMode,
+        difficulty: selectedDifficulty,
+        roomName,
+        isPrivate,
+        entrySource: RoomEntrySource.CUSTOM,
+      })
+      setRoom(created)
+    } catch {
+      setInlineError('connection')
+    } finally {
       setIsCreating(false)
-      setScreenState(ScreenState.READY)
-    }, 1200)
+    }
   }
 
-  // Simulate join
-  function handleJoin() {
-    if (!joinCode.trim()) return
+  async function handleJoin() {
+    if (!joinCode.trim() || isJoining) return
     setIsJoining(true)
     setInlineError(null)
-    setTimeout(() => {
-      setIsJoining(false)
-      // Simulate invalid code for prototype error state demo
-      if (joinCode.trim().toUpperCase() === 'ERR') {
+    try {
+      const joined = await versusRoomService.joinRoom(joinCode.trim())
+      setRoom(joined)
+      onRoomLinkConsumed?.()
+    } catch (err) {
+      if (err instanceof RoomNotFoundError) {
         setInlineError('invalid-code')
+      } else if (err instanceof RoomFullError) {
+        setInlineError('room-full')
       } else {
-        setScreenState(ScreenState.READY)
+        setInlineError('connection')
       }
-    }, 1200)
+    } finally {
+      setIsJoining(false)
+    }
   }
+
+  const handleHeaderBack = () => {
+    if (room && isHost && (!!room.opponent || room.opponentJoined)) {
+      setShowHostLeaveModal(true)
+    } else if (room) {
+      void versusRoomService.leaveRoom(room.code).catch(() => {})
+      setRoom(null)
+      onBack?.()
+    } else {
+      onBack?.()
+    }
+  }
+
+  const confirmHostLeave = async () => {
+    if (room) {
+      await versusRoomService.leaveRoom(room.code)
+      setRoom(null)
+    }
+    setShowHostLeaveModal(false)
+    onBack?.()
+  }
+
+  const roomCode = room?.code
+  const handleStartMatch = useCallback(async () => {
+    if (!roomCode) return
+    try {
+      const startedRoom = await versusRoomService.startRoom(roomCode)
+      setRoom(startedRoom)
+    } catch {
+      setInlineError('connection')
+      throw new Error('Room start failed')
+    }
+  }, [roomCode])
+
+  const handleToggleReady = async () => {
+    if (!room || isUpdatingReady) return
+    setIsUpdatingReady(true)
+    setInlineError(null)
+    try {
+      setRoom(await versusRoomService.setRoomReady(room.code, !currentPlayerReady))
+    } catch {
+      setInlineError('connection')
+    } finally {
+      setIsUpdatingReady(false)
+    }
+  }
+
+  // Fix (E): Stable ref for onNavigate so polling effect doesn't restart on every render.
+  // Without this, onNavigate (arrow fn recreated each render) is in the dep array →
+  // interval is cleared and recreated on every render = constant rapid polling.
+  const onNavigateRef = useRef(onNavigate)
+  onNavigateRef.current = onNavigate
+  const roomRef = useRef(room)
+  roomRef.current = room
+  const navigatedToGameRef = useRef(false)
+
+  // Poll room membership/readiness. Navigation is handled separately so both
+  // clients honor the same server-issued start_at timestamp.
+  useEffect(() => {
+    if (!roomCode) return
+    const id = setInterval(async () => {
+      try {
+        const latest = await versusRoomService.getRoom(roomCode)
+        setRoom(latest)
+      } catch {
+        // ignore
+      }
+    }, 800)
+    return () => clearInterval(id)
+  }, [roomCode])
+
+  useEffect(() => {
+    if (room?.status !== 'in_progress' || navigatedToGameRef.current) return
+    const targetTime = room.startAt ? new Date(room.startAt).getTime() : Date.now()
+    const timeout = setTimeout(() => {
+      if (navigatedToGameRef.current || !roomRef.current) return
+      navigatedToGameRef.current = true
+      onNavigateRef.current?.('game', roomRef.current)
+    }, Math.max(0, targetTime - Date.now()))
+    return () => clearTimeout(timeout)
+  }, [room?.startAt, room?.status])
+
+  const activeCategory = GAME_CATEGORIES.find((c) => c.id === (room?.category ?? selectedCategory)) ?? null
 
   return (
     <div
       className="relative flex min-h-dvh flex-col"
       style={{ background: 'var(--ma-bg)' }}
     >
+      {/* Host Leave Confirmation Modal */}
+      <HostLeaveModal
+        show={showHostLeaveModal}
+        hasOpponent={!!room?.opponent}
+        onConfirm={confirmHostLeave}
+        onCancel={() => setShowHostLeaveModal(false)}
+      />
+
       {/* Offline banner */}
       {isOffline && (
-        <div className="pt-16">
+        <div className="pt-6">
           <StatusBanner
             variant="offline"
-            message="You're offline. Versus Room requires an active connection."
-          />
-        </div>
-      )}
-
-      {/* Error banner */}
-      {isError && (
-        <div className="pt-16">
-          <StatusBanner
-            variant="error"
-            message="Could not connect to the room. Check your connection."
-            onRetry={() => setScreenState(ScreenState.EMPTY)}
+            message={t.versusRoom.offlineBanner}
           />
         </div>
       )}
 
       <main
         id="main-content"
-        className={[
-          'flex flex-1 flex-col gap-5 pb-36',
-          isOffline || isError ? '' : 'pt-16',
-        ].join(' ')}
+        className="flex flex-1 flex-col gap-5 pb-36"
       >
         {/* Header */}
-        <RoomHeader skeleton={isLoading} onBack={onBack} />
+        <RoomHeader onBack={handleHeaderBack} />
 
         {/* Divider */}
         <div
@@ -123,89 +225,78 @@ export function VersusRoomScreen({
           aria-hidden="true"
         />
 
-        {/* Mode summary card — always visible unless offline */}
-        {!isOffline && (
-          <ModeSummaryCard
-            skeleton={isLoading}
-            mode={selectedMode}
-            category={isReady ? activeCategory : null}
-          />
-        )}
-
-        {/* Inline error (form-level) */}
-        {inlineError && !isLoading && (
-          <InlineError kind={inlineError} onDismiss={() => setInlineError(null)} />
-        )}
-
-        {/* Main content area */}
-        {isOffline ? (
-          <OfflineWall onLogIn={() => onNavigate?.('login')} />
-        ) : isReady ? (
-          <ReadyRoomView
-            skeleton={isLoading}
-            host={MOCK_HOST}
-            opponent={opponentJoined ? MOCK_OPPONENT : null}
-            isHost
-            opponentJoined={opponentJoined}
-            onStart={() => onNavigate?.('game')}
-            code={ROOM_CODE}
-            link={ROOM_LINK}
-          />
+        {isGuest ? (
+          <AccountWall onLogIn={() => onNavigate?.('login')} />
         ) : (
-          <div className="flex flex-col gap-5">
-            {/* Create / Join tab toggle */}
-            {!isLoading && (
-              <EmptyChoiceView activeTab={activeTab} onSetTab={setActiveTab} />
+          <>
+            {/* Create-room preview or active room summary */}
+            {(room || initialTab === 'create') && (
+              <ModeSummaryCard
+                mode={room?.mode ?? selectedMode}
+                category={activeCategory}
+                difficulty={room?.difficulty ?? selectedDifficulty}
+                isPrivate={room ? room.isPrivate : isPrivate}
+                code={room?.code}
+                link={room?.link}
+                showPreviewTitle={!room && initialTab === 'create'}
+              />
             )}
 
-            {/* Tab content */}
-            {activeTab === 'create' ? (
-              <CreateRoomForm
-                skeleton={isLoading}
-                selectedCategory={selectedCategory}
-                selectedMode={selectedMode}
-                roomName={roomName}
-                isCreating={isCreating}
-                onSelectCategory={setSelectedCategory}
-                onSelectMode={setSelectedMode}
-                onRoomNameChange={setRoomName}
-                onCreate={handleCreate}
+            {/* Inline error (form-level) */}
+            {inlineError && (
+              <InlineError kind={inlineError} onDismiss={() => setInlineError(null)} />
+            )}
+
+            {/* Main content area */}
+            {room ? (
+              <ReadyRoomView
+                host={room.host}
+                opponent={room.opponent}
+                isHost={isHost}
+                opponentJoined={room.opponentJoined}
+                onStart={handleStartMatch}
+                onToggleReady={handleToggleReady}
+                currentPlayerReady={currentPlayerReady}
+                isUpdatingReady={isUpdatingReady}
+                isQuickMatch={isQuickMatch}
+                roomStatus={room.status}
+                startAt={room.startAt}
               />
             ) : (
-              <JoinRoomForm
-                skeleton={isLoading}
-                codeValue={joinCode}
-                isJoining={isJoining}
-                onCodeChange={setJoinCode}
-                onJoin={handleJoin}
-              />
+              <div className="flex flex-col gap-5">
+                {/* Lobby already chooses the room-entry intent. Keep this screen
+                    focused on the selected form and its single primary action. */}
+                {initialTab === 'create' ? (
+                  <CreateRoomForm
+                    selectedCategory={selectedCategory}
+                    selectedMode={selectedMode}
+                    selectedDifficulty={selectedDifficulty}
+                    roomName={roomName}
+                    isPrivate={isPrivate}
+                    isCreating={isCreating}
+                    onSelectCategory={setSelectedCategory}
+                    onSelectMode={setSelectedMode}
+                    onSelectDifficulty={setSelectedDifficulty}
+                    onRoomNameChange={setRoomName}
+                    onTogglePrivacy={setIsPrivate}
+                    onCreate={handleCreate}
+                  />
+                ) : (
+                  <JoinRoomForm
+                    codeValue={joinCode}
+                    isJoining={isJoining}
+                    onCodeChange={setJoinCode}
+                    onJoin={handleJoin}
+                  />
+                )}
+              </div>
             )}
-          </div>
-        )}
-
-        {/* Opponent toggle in ready state — prototype only */}
-        {isReady && (
-          <div className="flex items-center justify-center gap-2 px-4">
-            <button
-              type="button"
-              onClick={() => setOpponentJoined((v) => !v)}
-              className="text-[11px] font-semibold text-[var(--ma-fg-subtle)] underline underline-offset-2 focus-visible:outline-none"
-            >
-              {opponentJoined ? 'Prototype: remove opponent' : 'Prototype: add opponent'}
-            </button>
-          </div>
+          </>
         )}
       </main>
 
       {/* Bottom nav */}
       <BottomNavBar active="play" onNavigate={onNavigate} />
-
-      {/* State switcher — prototype only */}
-      <StatePill
-        current={screenState}
-        onChange={setScreenState}
-        states={[ScreenState.EMPTY, ScreenState.LOADING, ScreenState.READY, ScreenState.ERROR, ScreenState.OFFLINE]}
-      />
     </div>
   )
 }

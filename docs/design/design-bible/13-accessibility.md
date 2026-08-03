@@ -2,7 +2,7 @@
 
 ## Philosophy
 
-Memory Arena should be playable by everyone.
+My Lane should be playable by everyone.
 
 Accessibility is a requirement.
 

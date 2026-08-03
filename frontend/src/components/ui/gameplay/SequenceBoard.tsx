@@ -1,33 +1,14 @@
 import type { Phase } from './board.types'
+import { hapticFeedback } from '@/lib/utils/haptics'
+import { soundEffects } from '@/lib/utils/audio'
 
-const SEQ_COLORS = ['amber', 'teal', 'rose', 'violet'] as const
-type SeqColor = typeof SEQ_COLORS[number]
-
-const SEQ_BASE: Record<SeqColor, string> = {
-  amber:  'oklch(0.78 0.16 75)',
-  teal:   'oklch(0.72 0.16 175)',
-  rose:   'oklch(0.72 0.18 10)',
-  violet: 'oklch(0.70 0.18 280)',
-}
-const SEQ_DIM: Record<SeqColor, string> = {
-  amber:  'oklch(0.78 0.16 75 / 0.14)',
-  teal:   'oklch(0.72 0.16 175 / 0.14)',
-  rose:   'oklch(0.72 0.18 10 / 0.14)',
-  violet: 'oklch(0.70 0.18 280 / 0.14)',
-}
-const SEQ_GLOW: Record<SeqColor, string> = {
-  amber:  '0 0 28px oklch(0.78 0.16 75 / 0.5)',
-  teal:   '0 0 28px oklch(0.72 0.16 175 / 0.5)',
-  rose:   '0 0 28px oklch(0.72 0.18 10 / 0.5)',
-  violet: '0 0 28px oklch(0.70 0.18 280 / 0.5)',
-}
-
-const SEQ_TILES: { id: number; color: SeqColor }[] = [
-  { id: 0, color: 'amber' },
-  { id: 1, color: 'teal' },
-  { id: 2, color: 'rose' },
-  { id: 3, color: 'violet' },
-]
+/**
+ * docs/gameplay/sequence-memory.md: "3×3 grid of blank, identical tiles (no
+ * numbers or labels)". Previously this was 4 tiles, each a distinct color —
+ * a different game (remembering which of 4 colors) than the documented one
+ * (remembering positions among 9 visually-identical tiles).
+ */
+const TILE_COUNT = 9
 
 export function SequenceBoard({
   litTile,
@@ -43,21 +24,27 @@ export function SequenceBoard({
   const isAnswering = phase === 'answering'
   return (
     <div
-      className="grid grid-cols-2 gap-4 w-full"
+      className="grid grid-cols-3 gap-3 w-full max-w-xs"
       role="group"
       aria-label="Sequence memory board"
     >
-      {SEQ_TILES.map((tile) => {
-        const isLit     = litTile === tile.id
-        const isPressed = pressedTile === tile.id
-        const lit = isLit || isPressed
+      {Array.from({ length: TILE_COUNT }, (_, id) => {
+        const isLit = litTile === id
+        const isPressed = pressedTile === id
+        const active = isLit || isPressed
         return (
           <button
-            key={tile.id}
+            key={id}
             type="button"
             disabled={!isAnswering}
-            onClick={() => isAnswering && onTap(tile.id)}
-            aria-label={`${tile.color} tile`}
+            onClick={() => {
+              if (isAnswering) {
+                hapticFeedback.light()
+                soundEffects.tap()
+                onTap(id)
+              }
+            }}
+            aria-label={`Tile ${id + 1}`}
             className={[
               'aspect-square w-full rounded-2xl',
               'transition-all duration-150',
@@ -65,10 +52,9 @@ export function SequenceBoard({
               isAnswering ? 'cursor-pointer active:scale-[0.93]' : 'cursor-default',
             ].join(' ')}
             style={{
-              background: lit ? SEQ_BASE[tile.color] : SEQ_DIM[tile.color],
-              border: `2px solid ${lit ? SEQ_BASE[tile.color] : 'transparent'}`,
-              boxShadow: lit ? SEQ_GLOW[tile.color] : '0 2px 8px oklch(0 0 0 / 0.3)',
-              transform: isLit && !isAnswering ? 'scale(1.04)' : undefined,
+              background: active ? 'var(--ma-brand)' : 'var(--ma-surface-raised)',
+              border: `2px solid ${active ? 'var(--ma-brand)' : 'var(--ma-border)'}`,
+              boxShadow: active ? '0 0 24px oklch(0.78 0.16 75 / 0.5)' : '0 2px 8px oklch(0 0 0 / 0.25)',
               borderRadius: 'var(--radius-2xl)',
             }}
           />

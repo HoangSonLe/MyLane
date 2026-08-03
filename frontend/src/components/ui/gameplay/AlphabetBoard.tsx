@@ -1,7 +1,12 @@
 import { IconDelete } from './icons'
 import type { Phase } from './board.types'
+import { hapticFeedback } from '@/lib/utils/haptics'
+import { soundEffects } from '@/lib/utils/audio'
 
+// docs/gameplay/alphabet-memory.md "Answer Input" — 4 rows including a digit row,
+// since the character set is digits 0-9 + A-Z.
 const QWERTY_ROWS = [
+  ['1','2','3','4','5','6','7','8','9','0'],
   ['Q','W','E','R','T','Y','U','I','O','P'],
   ['A','S','D','F','G','H','J','K','L'],
   ['Z','X','C','V','B','N','M'],
@@ -14,7 +19,7 @@ const QWERTY_ROWS = [
  * recreates Versus's exact original values; the default recreates solo's.
  */
 const SIZES = {
-  default: { containerClassName: 'flex flex-col gap-3', minHeight: '60px', letterSpacing: '0.25em' },
+  default: { containerClassName: 'flex w-full flex-col gap-3', minHeight: '60px', letterSpacing: '0.25em' },
   compact: { containerClassName: 'flex w-full flex-col gap-3', minHeight: '56px', letterSpacing: '0.22em' },
 } as const
 
@@ -66,16 +71,20 @@ export function AlphabetBoard({
       {/* QWERTY keyboard */}
       <div className="flex flex-col items-center gap-1.5" role="group" aria-label="Alphabet keyboard">
         {QWERTY_ROWS.map((row, ri) => (
-          <div key={ri} className="flex gap-1">
+          <div key={ri} className="flex w-full justify-center gap-1">
             {row.map((k) => (
               <button
                 key={k}
                 type="button"
                 disabled={!isAnswering}
-                onClick={() => onKey(k)}
+                onClick={() => {
+                  hapticFeedback.light()
+                  soundEffects.tap()
+                  onKey(k)
+                }}
                 aria-label={k}
                 className={[
-                  'flex h-11 w-9 items-center justify-center rounded-lg text-[13px] font-semibold',
+                  'flex h-11 flex-1 min-w-0 max-w-9 items-center justify-center rounded-lg text-[13px] font-semibold',
                   'transition-all duration-[var(--ma-duration-micro)] active:scale-[0.90]',
                   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ma-ring)]',
                   !isAnswering ? 'opacity-40 cursor-default' : 'cursor-pointer',
@@ -90,14 +99,18 @@ export function AlphabetBoard({
                 {k}
               </button>
             ))}
-            {ri === 2 && (
+            {ri === QWERTY_ROWS.length - 1 && (
               <button
                 type="button"
                 disabled={!isAnswering}
-                onClick={onDelete}
+                onClick={() => {
+                  hapticFeedback.light()
+                  soundEffects.tap()
+                  onDelete()
+                }}
                 aria-label="Delete"
                 className={[
-                  'flex h-11 w-12 items-center justify-center rounded-lg',
+                  'flex h-11 flex-[1.3_1_0%] min-w-0 max-w-12 items-center justify-center rounded-lg',
                   'transition-all duration-[var(--ma-duration-micro)] active:scale-[0.90]',
                   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ma-ring)]',
                   !isAnswering ? 'opacity-40 cursor-default' : 'cursor-pointer text-[var(--ma-fg-muted)]',

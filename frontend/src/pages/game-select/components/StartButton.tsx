@@ -1,6 +1,7 @@
 import { IconPlay, IconSwords } from '@/components/ui/icons'
 
 import type { ModeMeta } from '@/services/game-select/game-select.interface'
+import { useTranslation } from '@/i18n/useTranslation'
 
 export function StartButton({
   skeleton,
@@ -13,6 +14,7 @@ export function StartButton({
   disabled?: boolean
   onClick?: () => void
 }) {
+  const { t } = useTranslation()
   if (skeleton) {
     return (
       <div
@@ -42,11 +44,7 @@ export function StartButton({
         color: 'var(--ma-brand-fg)',
         boxShadow: disabled ? 'none' : '0 4px 24px oklch(0.78 0.16 75 / 0.28)',
       }}
-      aria-label={
-        isVersus
-          ? `Find a match — ${selectedMode?.label}`
-          : `Start ${selectedMode?.label ?? ''}`
-      }
+      aria-label={`${isVersus ? t.gameSelect.findMatch : t.gameSelect.start} — ${selectedMode?.label ?? ''}`}
     >
       {isVersus ? (
         <span style={{ color: 'var(--ma-brand-fg)' }}>
@@ -57,7 +55,7 @@ export function StartButton({
           <IconPlay />
         </span>
       )}
-      {isVersus ? 'Find Match' : 'Start'}
+      {isVersus ? t.gameSelect.findMatch : t.gameSelect.start}
     </button>
   )
 }

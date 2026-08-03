@@ -1,8 +1,10 @@
 import { Card } from '@/components/ui/card'
 
 import type { ResultData } from '@/services/result/result.interface'
+import { useTranslation } from '@/i18n/useTranslation'
 
 export function BestComparison({ data }: { data: ResultData }) {
+  const { t } = useTranslation()
   if (data.previousBestScore === null && data.previousBestLevel === null) return null
 
   const scoreImproved = data.previousBestScore !== null && data.score > data.previousBestScore
@@ -16,7 +18,7 @@ export function BestComparison({ data }: { data: ResultData }) {
           style={{ borderBottom: '1px solid var(--ma-border-subtle)' }}
         >
           <p className="text-[11px] font-semibold uppercase tracking-widest" style={{ color: 'var(--ma-fg-subtle)' }}>
-            Personal Best
+            {t.result.personalBest}
           </p>
         </div>
 
@@ -30,10 +32,10 @@ export function BestComparison({ data }: { data: ResultData }) {
               }}
             >
               <p className="text-[10px] font-semibold uppercase tracking-widest" style={{ color: 'var(--ma-fg-subtle)' }}>
-                Score
+                {t.result.scoreCol}
               </p>
               <p className="text-[11px]" style={{ color: 'var(--ma-fg-subtle)' }}>
-                was {data.previousBestScore.toLocaleString()}
+                {t.result.was} {data.previousBestScore.toLocaleString()}
               </p>
               <p
                 className="text-[20px] font-bold tabular-nums"
@@ -56,10 +58,10 @@ export function BestComparison({ data }: { data: ResultData }) {
           {data.previousBestLevel !== null && (
             <div className="flex flex-1 flex-col items-center gap-1 py-4">
               <p className="text-[10px] font-semibold uppercase tracking-widest" style={{ color: 'var(--ma-fg-subtle)' }}>
-                Level
+                {t.result.levelCol}
               </p>
               <p className="text-[11px]" style={{ color: 'var(--ma-fg-subtle)' }}>
-                was {data.previousBestLevel}
+                {t.result.was} {data.previousBestLevel}
               </p>
               <p
                 className="text-[20px] font-bold tabular-nums"

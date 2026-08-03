@@ -1,10 +1,27 @@
 import { Card } from '@/components/ui/card'
+import { useTranslation } from '@/i18n/useTranslation'
 
-export function StatRow({ level, streak, elo }: { level: number; streak: number; elo: number }) {
+export function StatRow({
+  level,
+  streak,
+  elo,
+  bestLevel,
+}: {
+  level: number
+  streak: number
+  elo: number
+  /** Player's highest level reached in this game before today (docs/gameplay/README.md "Per-account data").
+   *  `undefined` hides the cell entirely — guest, offline, or still loading (same "don't show stale numbers"
+   *  rule as GameCard's stats). `null` means the fetch succeeded but there's no record yet — shown as "—",
+   *  same as GameCard does for `bestScore`/`highestLevel`. */
+  bestLevel?: number | null
+}) {
+  const { t } = useTranslation()
   const items = [
-    { label: 'Level', value: String(level) },
-    { label: 'Streak', value: `${streak}x` },
-    { label: 'Elo', value: String(elo) },
+    { label: t.statRow.level, value: String(level) },
+    { label: t.statRow.streak, value: `${streak}x` },
+    { label: t.statRow.elo, value: String(elo) },
+    ...(bestLevel !== undefined ? [{ label: t.statRow.best, value: bestLevel === null ? '—' : String(bestLevel) }] : []),
   ]
   return (
     <Card className="flex items-center justify-around py-2.5" shadow="sm">

@@ -2,7 +2,7 @@
 
 Route: `/games/alphabet`
 
-Source: [`MEMORY_ARENA_GAME_DESIGN.md`](../../MEMORY_ARENA_GAME_DESIGN.md) §2.2. Shared systems (scoring, Elo, modes) live in [`README.md`](README.md).
+Source: [`MY_LANE_GAME_DESIGN.md`](../../MY_LANE_GAME_DESIGN.md) §2.2. Shared systems (scoring, Elo, modes) live in [`README.md`](README.md).
 
 ---
 
@@ -27,6 +27,6 @@ ZXCVBNM
 
 ## Everything else
 
-Identical to [Number Memory](number-memory.md): Viewing → Answering flow, 10-level table (6→15 characters, 5 wins/level), difficulty mode time bonuses, Pause/Resume/Reset, Endless Mode (starts at 16, +1 per 3 wins).
+Identical to [Number Memory](number-memory.md): Viewing → Answering flow (including the **Skip** control to end Viewing early), 10-level table (6→15 characters, 5 wins/level), difficulty mode time bonuses, Pause/Resume/Reset, Endless Mode (starts at 16, +1 per 3 wins).
 
 Speed Bonus coefficient differs — see [scoring formula](README.md#scoring-formula-ranked-games-only): Alphabet Memory uses **10 points/second** (vs. 8 for Number Memory).

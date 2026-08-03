@@ -1,4 +1,5 @@
 import { ScreenHeaderWithBack } from '@/components/ui/layout'
+import { useTranslation } from '@/i18n/useTranslation'
 
 export function LeaderboardHeader({
   skeleton,
@@ -7,14 +8,14 @@ export function LeaderboardHeader({
   skeleton?: boolean
   onBack?: () => void
 }) {
+  const { t } = useTranslation()
   return (
     <ScreenHeaderWithBack
       skeleton={skeleton}
       onBack={onBack}
-      ariaLabel="Back"
-      title="Leaderboard"
+      ariaLabel={t.common.back}
+      title={t.leaderboard.title}
       titleSkeletonWidth="7rem"
-      trailing={<div style={{ width: '5.5rem' }} aria-hidden="true" />}
     />
   )
 }

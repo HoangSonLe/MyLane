@@ -1,6 +1,6 @@
 # Screen Display Data Models
 
-Tài liệu này định nghĩa các model dữ liệu dùng để hiển thị cho từng màn hình của Memory Arena.
+Tài liệu này định nghĩa các model dữ liệu dùng để hiển thị cho từng màn hình của My Lane.
 
 Mục tiêu là tách rõ:
 - dữ liệu miền nghiệp vụ (backend / game state)
@@ -61,7 +61,7 @@ Nếu bạn chỉ muốn review rất nhanh, đọc cột “Dùng cho màn nào
 ```ts
 const landingScreenModel: LandingScreenModel = {
   status: { state: 'ready' },
-  brandTitle: 'Memory Arena',
+  brandTitle: 'My Lane',
   primaryActionLabel: 'Play Now',
   secondaryActionLabel: 'Log In',
   guestNote: 'Guest chỉ được chơi Solo Practice.'
@@ -155,7 +155,7 @@ const versusRoomScreenModel: VersusRoomScreenModel = {
   },
   joinRoomForm: {
     roomCode: 'A7K2Q',
-    roomLink: 'https://gameboard.app/room/A7K2Q',
+    roomLink: 'https://gameboard.app/?room=A7K2Q',
     submitLabel: 'Join Room',
   },
   readyRoom: {
@@ -198,7 +198,7 @@ const gameSelectScreenModel: GameSelectScreenModel = {
     { id: 'number', title: 'Number Memory', description: 'Recall digit sequences.', unlocked: true, stats: { bestScore: 1240, highestLevel: 9, currentElo: 1220 } },
     { id: 'alphabet', title: 'Alphabet Memory', description: 'Recall letter sequences.', unlocked: true, stats: { bestScore: 1180, highestLevel: 8, currentElo: 1190 } },
     { id: 'grid', title: 'Grid Memory', description: 'Recall tile positions in order.', unlocked: true, stats: { bestScore: 1310, highestLevel: 10, currentElo: 1305 } },
-    { id: 'sequence', title: 'Sequence Memory', description: 'Recall the flashing order.', unlocked: true, stats: { bestScore: 1420, highestLevel: 11, currentElo: 1410 } },
+    { id: 'sequence', title: 'Sequence Memory', description: 'Recall the flashing order.', unlocked: true, stats: { bestScore: 1420, highestLevel: 10, currentElo: 1410 } },
   ],
   selectedGameId: 'sequence',
   selectedModeId: 'solo-ranked',
@@ -253,7 +253,13 @@ const versusGameplayScreenModel: VersusGameplayScreenModel = {
   sharedSeed: 'seed-xyz-1001',
   opponentState: 'answered',
   reconnectCountdownMs: undefined,
-  matchProgress: { currentRound: 5, totalRounds: 10, sharedTimerLabel: '08.2s left' },
+  matchProgress: {
+    currentRound: 5,
+    totalRounds: 10,
+    playerRoundsCompleted: 4,
+    opponentRoundsCompleted: 3,
+    sharedTimerLabel: '08.2s left',
+  },
 }
 ```
 
@@ -699,6 +705,8 @@ interface VersusGameplayScreenModel extends GameplayScreenModel {
   matchProgress?: {
     currentRound: number
     totalRounds?: number
+    playerRoundsCompleted?: number
+    opponentRoundsCompleted?: number
     sharedTimerLabel?: string
   }
 }
@@ -721,6 +729,15 @@ interface ResultScreenModel {
   finalScore?: number
   scoreBreakdown?: ResultBreakdownItem[]
   eloDelta?: number
+  outcome?: 'win' | 'loss' | 'draw'
+  finishReason?: 'completed' | 'forfeit' | 'disconnect'
+  versusComparison?: {
+    playerName: string
+    opponentName: string
+    playerScore: number
+    opponentScore: number
+    totalRounds: number
+  }
   newRecord?: {
     type: 'best-score' | 'highest-level'
     label: string
@@ -734,6 +751,7 @@ Data source:
 - Submitted round result.
 - Ranked formula breakdown.
 - Best score / highest level comparison.
+- Server-finalized Versus room (`winner_id`, `finish_reason`, host/guest score) for opponent-forfeit notification and the head-to-head comparison.
 
 ### Profile
 
@@ -903,7 +921,7 @@ Data source:
 - `entryPoint`: cho UI biết người chơi đến từ Home hay Lobby, từ đó quyết định back target và copy phù hợp.
 - `modeOptions`: selector mode, gồm cả lock state và lý do bị khóa.
 - `difficultyOptions`: selector độ khó, tách riêng để không trộn với mode.
-- `games`: 4 game card chính với stats và trạng thái mở khóa.
+- `games`: 5 game card chính với stats và trạng thái mở khóa.
 - `selectedGameId` / `selectedModeId` / `selectedDifficultyId`: state tạm để UI giữ lựa chọn hiện tại trước khi start.
 
 ### Gameplay
@@ -925,7 +943,7 @@ Data source:
 - `sharedSeed`: key hiển thị/diagnostic cho biết cả hai đang chơi cùng một đề.
 - `opponentState`: giúp UI phản hồi ngay trạng thái đối thủ mà không cần suy luận từ timer.
 - `reconnectCountdownMs`: cho trạng thái mất kết nối trong cửa sổ reconnect.
-- `matchProgress`: gom tiến độ nhiều round để UI biết đang ở round nào và còn bao nhiêu round.
+- `matchProgress`: gom tiến độ nhiều round để UI biết đang ở round nào, hai người chơi đã hoàn thành bao nhiêu round và còn bao nhiêu round.
 
 ### Result
 
@@ -933,7 +951,9 @@ Data source:
 - `resultTitle`: tiêu đề lớn của kết quả, có thể là win/lose/complete tùy mode.
 - `finalScore`: điểm cuối cùng để render hero score.
 - `scoreBreakdown`: breakdown chi tiết cho ranked games; không cần cho mode không xếp hạng.
-- `eloDelta`: chỉ xuất hiện cho Versus Ranked — theo `MEMORY_ARENA_GAME_DESIGN.md` §8 và `docs/gameplay/README.md` (đã đồng bộ), chỉ Versus Ranked mới ảnh hưởng Elo. Solo Ranked có best score/leaderboard riêng nhưng không có Elo.
+- `eloDelta`: chỉ xuất hiện cho Versus Ranked — theo `MY_LANE_GAME_DESIGN.md` §8 và `docs/gameplay/README.md` (đã đồng bộ), chỉ Versus Ranked mới ảnh hưởng Elo. Solo Ranked có best score/leaderboard riêng nhưng không có Elo.
+- `outcome` / `finishReason`: outcome và lý do kết thúc do server chốt; `forfeit` trên máy người còn lại kích hoạt thông báo và điều hướng tự động tới Result.
+- `versusComparison`: snapshot gọn của hai người chơi và tỷ số round, dùng cho card so sánh trong kết quả Versus; không thay thế score breakdown cá nhân.
 - `newRecord`: thông báo nếu vừa phá best score hoặc highest level.
 - `nextPrimaryActionLabel`: giúp màn Result linh hoạt giữa Play Again và các CTA khác mà không sửa layout.
 - `detailLinkLabel`: nhãn ngắn cho link xem chi tiết trận.
@@ -997,8 +1017,8 @@ These items are still not fully specified in the source docs and should remain o
 - Exact room schema for share code vs share link if both are supported.
 - Exact visual treatment of tutorial progress data.
 - Exact match-detail screen model, if a dedicated route is added later.
-- Room `visibility` (`public` / `private` / `invite-only`): `docs/gameplay/README.md` and `MEMORY_ARENA_GAME_DESIGN.md` only describe sharing a room by code/link — no public/private room concept is confirmed. `VisibilityState` and `createRoomForm.visibility` here are provisional examples, not a confirmed requirement.
+- Room `visibility` (`public` / `private` / `invite-only`): `docs/gameplay/README.md` and `MY_LANE_GAME_DESIGN.md` only describe sharing a room by code/link — no public/private room concept is confirmed. `VisibilityState` and `createRoomForm.visibility` here are provisional examples, not a confirmed requirement.
 
 ## Resolved source-doc conflicts
 
-- **Solo Ranked và Elo** (đã fix 2026-07-31): `docs/gameplay/README.md` bảng Game Modes từng ghi Solo Ranked "Affects Elo? Yes (Solo Elo)", mâu thuẫn với chính mục Elo System của file đó và với nguồn canonical `MEMORY_ARENA_GAME_DESIGN.md` §8 (chỉ Versus Ranked mới ảnh hưởng Elo — Elo cần đối thủ có rating để tính, solo không có đối thủ). Đã sửa bảng Game Modes thành "No" cho Solo Ranked; các ví dụ trong file này (`ResultScreenModel`, `ProfileScreenModel.matchHistory`) đã bỏ `eloDelta` khỏi các match/result `solo-ranked`, chỉ giữ `eloDelta` cho `versus-ranked`.
+- **Solo Ranked và Elo** (đã fix 2026-07-31): `docs/gameplay/README.md` bảng Game Modes từng ghi Solo Ranked "Affects Elo? Yes (Solo Elo)", mâu thuẫn với chính mục Elo System của file đó và với nguồn canonical `MY_LANE_GAME_DESIGN.md` §8 (chỉ Versus Ranked mới ảnh hưởng Elo — Elo cần đối thủ có rating để tính, solo không có đối thủ). Đã sửa bảng Game Modes thành "No" cho Solo Ranked; các ví dụ trong file này (`ResultScreenModel`, `ProfileScreenModel.matchHistory`) đã bỏ `eloDelta` khỏi các match/result `solo-ranked`, chỉ giữ `eloDelta` cho `versus-ranked`.

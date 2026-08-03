@@ -2,12 +2,14 @@ import { Card } from '@/components/ui/card'
 
 import { IconTrophy } from './icons'
 import type { ResultData } from '@/services/result/result.interface'
+import { useTranslation } from '@/i18n/useTranslation'
 
 export function EloChangeCard({ data }: { data: ResultData }) {
+  const { t } = useTranslation()
   if (data.mode !== 'versus-ranked' || data.eloChange === undefined) return null
 
   const gained = data.eloChange >= 0
-  const prevElo = data.previousElo ?? 1200
+  const prevElo = data.previousElo ?? 1000
   const newElo = prevElo + data.eloChange
 
   return (
@@ -30,7 +32,7 @@ export function EloChangeCard({ data }: { data: ResultData }) {
         </div>
         <div className="flex flex-col gap-0.5">
           <p className="text-[13px] font-semibold" style={{ color: 'var(--ma-fg)' }}>
-            Elo Rating
+            {t.result.eloRating}
           </p>
           <p className="text-[11px]" style={{ color: 'var(--ma-fg-muted)' }}>
             {prevElo} → {newElo}
@@ -42,7 +44,7 @@ export function EloChangeCard({ data }: { data: ResultData }) {
       <span
         className="text-[17px] font-bold tabular-nums"
         style={{ color: gained ? 'var(--ma-success)' : 'var(--ma-danger)' }}
-        aria-label={`Elo change: ${gained ? '+' : ''}${data.eloChange}`}
+        aria-label={t.result.eloChangeAria(`${gained ? '+' : ''}${data.eloChange}`)}
       >
         {gained ? '+' : ''}{data.eloChange}
       </span>

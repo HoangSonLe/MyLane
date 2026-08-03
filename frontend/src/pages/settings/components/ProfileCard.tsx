@@ -1,27 +1,35 @@
-// ProfileCard — intentionally keeps XP/Level/progress bar per owner decision.
-// Known Design Bible violation (01-design-philosophy / 11-screen-guidelines):
-// "Settings is config-only, never mix gameplay stats." Kept by explicit owner request.
+import { useTranslation } from '@/i18n/useTranslation'
+import type { UserSession } from '@/services/auth/auth.service'
 
 interface ProfileCardProps {
   skeleton?: boolean
+  user?: UserSession | null
 }
 
-export function ProfileCard({ skeleton }: ProfileCardProps) {
+export function ProfileCard({ skeleton, user }: ProfileCardProps) {
+  const { t } = useTranslation()
+  const isGuest = user?.isGuest ?? true
+  const name = user ? (isGuest ? t.home.guest : user.name) : t.home.guest
+  const initial = (name[0] ?? 'G').toUpperCase()
+  const subtext = isGuest
+    ? 'Guest Account · Saved locally'
+    : (user?.email ?? `Elo Rating: ${user?.elo ?? 0}`)
+
   return (
     <div
       className="overflow-hidden rounded-2xl bg-[var(--ma-surface)]"
       style={{ boxShadow: 'var(--ma-shadow-sm)' }}
     >
-      {/* Top band — subtle diagonal line texture */}
+      {/* Top band */}
       <div
         className="h-14 w-full"
         style={{
           background: `repeating-linear-gradient(
             60deg,
-            oklch(0.21 0.013 260) 0px,
-            oklch(0.21 0.013 260) 1px,
-            oklch(0.19 0.012 260) 1px,
-            oklch(0.19 0.012 260) 13px
+            var(--ma-surface-raised) 0px,
+            var(--ma-surface-raised) 1px,
+            var(--ma-surface) 1px,
+            var(--ma-surface) 13px
           )`,
         }}
         aria-hidden="true"
@@ -38,9 +46,17 @@ export function ProfileCard({ skeleton }: ProfileCardProps) {
               ].join(' ')}
             >
               {!skeleton && (
-                <div className="flex h-full w-full items-center justify-center text-xl font-bold text-[var(--ma-fg-muted)]">
-                  N
-                </div>
+                user?.avatarUrl ? (
+                  <img
+                    src={user.avatarUrl}
+                    alt={name}
+                    className="h-full w-full rounded-2xl object-cover"
+                  />
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center text-xl font-bold text-[var(--ma-fg-muted)]">
+                    {initial}
+                  </div>
+                )
               )}
             </div>
             {!skeleton && (
@@ -51,16 +67,20 @@ export function ProfileCard({ skeleton }: ProfileCardProps) {
             )}
           </div>
 
-          {/* XP badge */}
+          {/* Account status badge */}
           {!skeleton && (
             <div className="flex items-center gap-1.5 rounded-xl bg-[var(--ma-surface-raised)] px-3 py-1.5">
-              <span className="text-[11px] font-medium text-[var(--ma-fg-muted)]">XP</span>
-              <span className="text-[13px] font-semibold text-[var(--ma-fg)]">4,820</span>
+              <span className="text-[11px] font-medium text-[var(--ma-fg-muted)]">
+                {isGuest ? 'GUEST' : 'ELO'}
+              </span>
+              <span className="text-[13px] font-semibold text-[var(--ma-fg)]">
+                {isGuest ? 'Local' : (user?.elo ?? 0).toLocaleString()}
+              </span>
             </div>
           )}
         </div>
 
-        {/* Name + level */}
+        {/* Name + info */}
         {skeleton ? (
           <>
             <div className="skeleton mb-1.5 h-4 w-28 rounded" />
@@ -68,30 +88,9 @@ export function ProfileCard({ skeleton }: ProfileCardProps) {
           </>
         ) : (
           <>
-            <p className="text-[15px] font-semibold text-[var(--ma-fg)]">Nguyen Viet</p>
-            <p className="mt-0.5 text-[12px] text-[var(--ma-fg-muted)]">Level 12 · Memory Master</p>
+            <p className="text-[15px] font-semibold text-[var(--ma-fg)]">{name}</p>
+            <p className="mt-0.5 text-[12px] text-[var(--ma-fg-muted)]">{subtext}</p>
           </>
-        )}
-
-        {/* XP progress bar */}
-        {!skeleton && (
-          <div className="mt-3">
-            <div className="mb-1 flex items-center justify-between">
-              <span className="text-[11px] text-[var(--ma-fg-subtle)]">Next level</span>
-              <span className="text-[11px] font-medium text-[var(--ma-fg-muted)]">4,820 / 5,500</span>
-            </div>
-            <div className="h-1.5 w-full overflow-hidden rounded-full bg-[var(--ma-surface-raised)]">
-              <div
-                className="h-full rounded-full bg-[var(--ma-progress)]"
-                style={{ width: '87.6%' }}
-                role="progressbar"
-                aria-valuenow={4820}
-                aria-valuemin={0}
-                aria-valuemax={5500}
-                aria-label="XP progress"
-              />
-            </div>
-          </div>
         )}
       </div>
     </div>

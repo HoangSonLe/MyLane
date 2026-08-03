@@ -1,4 +1,6 @@
 import type { ReactNode } from 'react'
+import { hapticFeedback } from '@/lib/utils/haptics'
+import { soundEffects } from '@/lib/utils/audio'
 
 export function KeypadButton({
   label,
@@ -19,7 +21,11 @@ export function KeypadButton({
     <button
       type="button"
       disabled={disabled}
-      onClick={onPress}
+      onClick={() => {
+        hapticFeedback.light()
+        soundEffects.tap()
+        onPress()
+      }}
       aria-label={ariaLabel ?? label}
       className={[
         'flex h-14 w-full items-center justify-center rounded-xl text-[20px] font-semibold',

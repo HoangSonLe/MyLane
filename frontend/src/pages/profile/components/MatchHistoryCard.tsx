@@ -1,7 +1,11 @@
-import { Card } from '@/components/ui/card'
+import { useState } from 'react'
 
+import { Card, CollapsibleCard } from '@/components/ui/card'
+import { useTranslation } from '@/i18n/useTranslation'
 import type { MatchEntry, ProfileData } from '@/services/profile/profile.interface'
 import { MatchRow } from './MatchRow'
+
+const MAX_VISIBLE = 5
 
 export function MatchHistoryCard({
   skeleton,
@@ -12,6 +16,9 @@ export function MatchHistoryCard({
   data: ProfileData
   onOpenMatch: (match: MatchEntry) => void
 }) {
+  const { t } = useTranslation()
+  const [expanded, setExpanded] = useState(false)
+
   if (skeleton) {
     return (
       <Card className="mx-4 overflow-hidden" shadow="sm">
@@ -35,21 +42,15 @@ export function MatchHistoryCard({
     )
   }
 
-  return (
-    <Card className="mx-4 overflow-hidden" shadow="sm">
-      <div
-        className="flex items-center justify-between px-4 py-3"
-        style={{ borderBottom: '1px solid var(--ma-border-subtle)' }}
-      >
-        <p className="text-[11px] font-semibold uppercase tracking-widest" style={{ color: 'var(--ma-fg-subtle)' }}>
-          Match History
-        </p>
-        <span className="text-[11px] font-semibold tabular-nums" style={{ color: 'var(--ma-fg-subtle)' }}>
-          {data.matchHistory.length} recent
-        </span>
-      </div>
+  const visible = expanded ? data.matchHistory : data.matchHistory.slice(0, MAX_VISIBLE)
+  const hasMore = data.matchHistory.length > MAX_VISIBLE
 
-      {data.matchHistory.map((match, i) => (
+  return (
+    <CollapsibleCard
+      title={t.profile.matchHistory}
+      subtitle={`${data.matchHistory.length} ${t.profile.recent}`}
+    >
+      {visible.map((match, i) => (
         <div
           key={match.id}
           style={{ borderTop: i > 0 ? '1px solid var(--ma-border-subtle)' : undefined }}
@@ -57,6 +58,22 @@ export function MatchHistoryCard({
           <MatchRow match={match} onOpen={onOpenMatch} />
         </div>
       ))}
-    </Card>
+
+      {hasMore && (
+        <button
+          type="button"
+          onClick={() => setExpanded((prev) => !prev)}
+          className="w-full py-2.5 text-[12px] font-semibold transition-opacity hover:opacity-70 active:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ma-ring)]"
+          style={{
+            borderTop: '1px solid var(--ma-border-subtle)',
+            color: 'var(--ma-brand)',
+          }}
+        >
+          {expanded
+            ? t.profile.showLess
+            : t.profile.seeAllMatches(data.matchHistory.length)}
+        </button>
+      )}
+    </CollapsibleCard>
   )
 }

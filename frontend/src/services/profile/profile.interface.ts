@@ -1,4 +1,8 @@
-export type Category = 'number' | 'alphabet' | 'grid' | 'sequence'
+import type { Friend } from '@/services/lobby/lobby.interface'
+
+export type { Friend }
+
+export type Category = 'number' | 'alphabet' | 'grid' | 'sequence' | 'color'
 
 export type MatchOutcome = 'win' | 'loss' | 'draw'
 
@@ -19,14 +23,6 @@ export interface CategoryBest {
   highestLevel: number
 }
 
-export interface Friend {
-  id: string
-  name: string
-  handle: string
-  elo: number
-  status: 'online' | 'offline' | 'in-game'
-}
-
 export interface MatchEntry {
   id: string
   category: Category
@@ -39,7 +35,8 @@ export interface MatchEntry {
   playedAt: string   // e.g. "Today", "Yesterday", "3d ago"
 }
 
-export interface ProfileData {
+/** Server-provided profile stats — friends are fetched separately via `lobbyService` (same list as Lobby). */
+export interface ProfileStats {
   username: string
   handle: string
   joinedLabel: string
@@ -50,6 +47,10 @@ export interface ProfileData {
   wins: number
   losses: number
   draws: number
-  friends: Friend[]
   matchHistory: MatchEntry[]
+}
+
+/** Shape the Profile screen's components render — `ProfileStats` merged with the player's real friends list. */
+export interface ProfileData extends ProfileStats {
+  friends: Friend[]
 }

@@ -1,5 +1,5 @@
-import { Card, StatCell } from '@/components/ui/card'
-
+import { Card, StatCell, CollapsibleCard } from '@/components/ui/card'
+import { useTranslation } from '@/i18n/useTranslation'
 import type { ProfileData } from '@/services/profile/profile.interface'
 
 export function RecordStatsCard({
@@ -9,6 +9,8 @@ export function RecordStatsCard({
   skeleton?: boolean
   data: ProfileData
 }) {
+  const { t } = useTranslation()
+
   if (skeleton) {
     return (
       <Card className="mx-4 overflow-hidden" shadow="sm">
@@ -35,26 +37,17 @@ export function RecordStatsCard({
     : 0
 
   const stats = [
-    { label: 'Games', value: data.totalGames.toLocaleString(), color: 'var(--ma-fg)' },
-    { label: 'Wins',  value: data.wins.toLocaleString(),       color: 'var(--ma-success)' },
-    { label: 'Losses',value: data.losses.toLocaleString(),     color: 'var(--ma-danger)' },
-    { label: 'Draws', value: data.draws.toLocaleString(),      color: 'var(--ma-fg-muted)' },
+    { label: t.profile.games,  value: data.totalGames.toLocaleString(), color: 'var(--ma-fg)' },
+    { label: t.profile.wins,   value: data.wins.toLocaleString(),       color: 'var(--ma-success)' },
+    { label: t.profile.losses, value: data.losses.toLocaleString(),     color: 'var(--ma-danger)' },
+    { label: t.profile.draws,  value: data.draws.toLocaleString(),      color: 'var(--ma-fg-muted)' },
   ]
 
   return (
-    <Card className="mx-4 overflow-hidden" shadow="sm">
-      <div
-        className="flex items-center justify-between px-4 py-3"
-        style={{ borderBottom: '1px solid var(--ma-border-subtle)' }}
-      >
-        <p className="text-[11px] font-semibold uppercase tracking-widest" style={{ color: 'var(--ma-fg-subtle)' }}>
-          Record
-        </p>
-        <p className="text-[12px] font-semibold tabular-nums" style={{ color: 'var(--ma-fg-muted)' }}>
-          {winRate}% win rate
-        </p>
-      </div>
-
+    <CollapsibleCard
+      title={t.profile.record}
+      subtitle={t.profile.winRate(winRate)}
+    >
       {/* Stats row */}
       <div className="flex">
         {stats.map((s, i) => (
@@ -101,6 +94,6 @@ export function RecordStatsCard({
           />
         )}
       </div>
-    </Card>
+    </CollapsibleCard>
   )
 }

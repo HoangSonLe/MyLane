@@ -1,9 +1,11 @@
 import type { BoardType } from '@/services/leaderboard/leaderboard.interface'
+import { useTranslation } from '@/i18n/useTranslation'
 
 export function ResetLabel({ boardType }: { boardType: BoardType }) {
+  const { t } = useTranslation()
   const labels: Partial<Record<BoardType, string>> = {
-    weekly: 'Resets every Monday at 00:00 UTC',
-    monthly: 'Resets on the 1st of each month at 00:00 UTC',
+    weekly: t.leaderboard.resetWeekly,
+    monthly: t.leaderboard.resetMonthly,
   }
   const text = labels[boardType]
   if (!text) return null

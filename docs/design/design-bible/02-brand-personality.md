@@ -2,7 +2,7 @@
 
 ## Brand Position
 
-Memory Arena is a modern brain-training game platform.
+My Lane is a modern brain-training game platform.
 
 It is designed to help players improve cognitive skills while enjoying short and rewarding game sessions.
 
@@ -52,7 +52,7 @@ The application is not a classroom.
 
 ## Personality
 
-Memory Arena should feel:
+My Lane should feel:
 
 ✔ Friendly
 

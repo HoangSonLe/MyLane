@@ -1,0 +1,580 @@
+# Known Gaps — logic chưa làm thật, cần quay lại
+
+Danh sách các chỗ hiện tại vẫn là mock/local/prototype dù UI đã trông "thật" —
+ghi lại để track, không phải bug cần fix ngay. Cập nhật danh sách này khi xử
+lý xong một mục (đánh dấu hoặc xoá khỏi file).
+
+---
+
+## 🚀 Đã hoàn thành gần đây (Supabase Realtime & Friendships System):
+- **Luồng Kết Bạn 2 Chiều Chuẩn Mực**: Quản lý lời mời kết bạn qua bảng `friendships` với các trạng thái `'pending'`, `'accepted'`, `'declined'`.
+- **Cơ Chế Lọc 100% Tài Khoản Cá Nhân**: Đảm bảo không bao giờ gợi ý hoặc tìm kiếm ra tài khoản chính mình.
+- **Hiển Thị Trạng Thái Lời Mời Realtime**: Khi tìm kiếm bạn bè, hiển thị chính xác các trạng thái `⏳ Đang chờ xác nhận`, `✓ Bạn bè`, `📩 Đã gửi lời mời` hoặc `+ Kết bạn`.
+- **Trung Tâm Thông Báo (Bell Center 🔔)**: Modal thông báo chia làm 2 tab rõ ràng (**👥 Lời mời kết bạn** và **📢 Thông báo khác**).
+- **Hệ Thống Presence Heartbeat (Online / In-game / Offline)**: Định kỳ 30s gửi heartbeat cập nhật trạng thái `online`, `in_game` và `updated_at`. Bạn bè tự động ngắt về `offline` nếu ngắt kết nối quá 2 phút.
+- **Tự Động Làm Mới Ngầm (Silent Auto-Polling 10s)**: Tự động quét và cập nhật danh sách bạn bè và số lượng lời mời ở cả 3 trang: Trang Chủ, Lobby và Trang Profile.
+- **Lưu Kết Quả Ranked & Elo Cloud**: Chỉ Solo Ranked/Versus Ranked ghi `match_history` và `category_bests`; Solo Practice/Versus Unranked không lưu. Elo chỉ đổi ở Versus Ranked theo công thức chess-Elo/K-factor trong gameplay docs, khởi điểm 1000 và sàn 100.
+- **Hệ Thống Phòng Đấu 1v1 Realtime Cloud (`LobbyScreen` & `versus_rooms`)**: Tách biệt luồng kết nối tạo phòng, tìm phòng khả dụng (`getAvailableRooms`), Ghép trận nhanh (`quickJoinRoom`), Vào phòng (`joinRoom`), Rời phòng tự chuyển Host (`leaveRoom`), và Bật/tắt quyền riêng tư Public/Private (`toggleRoomPrivacy`) chạy trực tiếp trên Supabase Cloud.
+- **Hệ Thống Thách Đấu 1v1 Realtime (`match_invites` & `ChallengeModal`)**: Khi bấm "Thách đấu", người thách đấu chọn môn thi đấu và mở **Modal Chờ Đối Thủ Xác Nhận (đếm ngược 30s)**. Phía bạn bè nhận **Pop-up Realtime Thông báo Lời mời Thách đấu (`IncomingInviteModal`)**. Khi đối thủ bấm **✓ Chấp nhận (Accept)**, cả 2 người chơi lập tức được chuyển thẳng vào Phòng đấu 1v1! Nếu từ chối hoặc hết 30s, hệ thống báo hủy mượt mà.
+- **Hệ Thống Bảng Xếp Hạng Realtime (`LeaderboardScreen`)**: Tải dữ liệu xếp hạng thực tế từ Supabase Cloud. Hỗ trợ lọc theo 5 thể loại game (`number`, `alphabet`, `grid`, `sequence`, `color`), 2 tiêu chí sắp xếp (**Điểm Elo** vs **Điểm Kỷ Lục**), và 3 chế độ xem (**Bảng Toàn Cầu All-Time**, **Top 100**, và **Bảng Bạn Bè Friends Only**). Tự động ghim hàng **"Hạng Của Bạn" (`pinnedEntry`)** ở đáy bảng khi người chơi nằm ngoài Top 100.
+- **Shared Component `<CollapsibleCard>` UI Kit**: Tách thành phần Card thu gọn/mở rộng thành Component Dùng Chung (`components/ui/card/CollapsibleCard.tsx`), tích hợp **Icon SVG Chevron (`IconChevronDown`)** xoay 90° mượt mà, áp dụng cho `EloCard`, `BestScoresCard`, `RecordStatsCard`, `FriendsCard`, `MatchHistoryCard`, `AvailableRoomsCard`.
+
+---
+
+## 1. Các trang còn state-switcher prototype (`StatePill`)
+
+Đã dọn xong: Landing, Login, Home, Game Select, Gameplay, Lobby, Versus
+Room, Profile, Settings, Leaderboard, **Result** (theo đúng flow đầu tiên —
+xem [mock-auth-api.md](mock-auth-api.md) cho Auth, phần chat trước đó cho
+Home/Game Select/Gameplay).
+
+**Lobby + Versus Room — đã làm:**
+- Bỏ `StatePill`/`ScreenState` giả ở cả 2 trang.
+- `isOffline` nối qua `useNetworkStatus()` thật (banner thật, không phải
+  bấm tay), tách riêng khỏi `isGuest` — trước đây 2 khái niệm này bị lẫn vào
+  nhau: component tên `OfflineWall` ở cả Lobby lẫn Versus Room nhưng nội
+  dung thật ra luôn là "Account required" (yêu cầu đăng nhập), không liên
+  quan gì tới mất mạng. Đã đổi tên đúng bản chất: Lobby →
+  `FriendStateCards.GuestWall`, Versus Room →
+  `components/AccountWall.tsx`, và trigger đúng bằng `isGuest` (từ
+  `useAuthStore`) thay vì `isOffline`.
+- Lobby: danh sách bạn bè + Elo của chính mình nối API thật
+  (`lobbyService.getFriends()` → `GET /api/lobby/friends`, có
+  loading/error/retry đúng pattern Home/Game Select; guest nhận `401`).
+  Elo/tên hiển thị lấy thẳng từ `UserSession` (`useAuthStore`), không cần
+  fetch riêng vì đã có sẵn trong session.
+- Versus Room & Thách đấu 1v1: Create/Join nối API thật (`versusRoomService.createRoom/joinRoom/getRoom`). Form tạo phòng hỗ trợ chọn Môn thi đấu, Độ khó (`easy`, `medium`, `hard`, `super_hard`), Chế độ (Xếp hạng/Đấu thường), Quyền riêng tư (Công khai/Riêng tư) và Thẻ xem trước cấu hình phòng (`PreviewCard`).
+- Hệ thống Thách đấu 1v1 thời gian thực (Hybrid Realtime + Active Auto-Polling 2s): Tự động nổ Pop-up lời mời thách đấu (`IncomingInviteModal`) trên toàn ứng dụng. Hỗ trợ xem thông tin bài học/môn thi đấu và click xem Pop-up Hồ Sơ đối thủ (`FriendProfileModal`). Hỗ trợ chuyển quyền Host tự động ngầm khi rời phòng.
+- Đã sửa kèm 1 bug thật phát hiện khi test: `App.tsx` không truyền
+  `initialTab` cho `VersusRoomScreen`, nên bấm "Join a room" ở Lobby luôn
+  mở nhầm tab Create — thêm state `roomTab` để nhớ đúng tab.
+- Verify bằng Playwright thật: đăng nhập tài khoản thật (không phải guest)
+  → Lobby load đúng elo/tên/bạn bè thật → Create Room ra mã phòng thật →
+  Join Room với mã sai báo lỗi đúng, mã đúng vào được Ready Room.
+
+**Còn thiếu — chưa phải multiplayer thật:**
+- Không có 2 người chơi thật nào cùng nối vào 1 phòng. Vì host đợi đối thủ
+  vào phòng ("waiting for opponent…"), mà chưa có server thật/SignalR, fake
+  backend **tự mô phỏng** một đối thủ giả (`Mia Torres`) tự "vào phòng"
+  sau ~7 giây kể từ lúc tạo phòng — đứng thay cho việc một người bạn thật
+  bấm vào link mời. Nhánh Join thật sự (nhập đúng mã người khác tạo) thì
+  chạy thật (network round-trip thật), nhưng chỉ hoạt động đúng nghĩa
+  2-người khi chạy `VITE_MOCK_MODE=server` (mock-server là 1 process Node
+  dùng chung giữa các tab/trình duyệt) — với MSW mặc định, mỗi tab có state
+  riêng (Service Worker relay message về đúng tab đó) nên 2 tab MSW không
+  thấy phòng của nhau.
+**Result — đã làm (đóng phần lớn mục 5 + phần "Scoring Formula" của mục 10):**
+- Bỏ `StatePill`/`ScreenState` giả và toggle `showVersus` prototype (không
+  vào được qua điều hướng thật). Xoá `services/result/result.mock.ts`
+  (`MOCK_RESULTS`/`MOCK_VERSUS`) và `pages/result/components/StatePill.tsx`
+  — không còn ai dùng.
+- **Vòng lặp "chơi → gửi kết quả → hiển thị lại" giờ khép kín thật sự**:
+  `GameplayScreen` track số liệu cả ván (không chỉ level hiện tại) — tổng
+  round thắng, tổng giây dư khi trả lời đúng, có ăn gian/sai lần nào không,
+  có hoàn thành level 10 không — đóng gói thành `GameResultInput`, truyền
+  qua `onGameOver` (đổi từ `() => void` sang nhận payload) → `App.tsx` giữ
+  tạm → `ResultScreen` tự gọi
+  `resultService.submitResult()` → `POST /api/game/result`.
+- **Công thức tính điểm dùng đúng công thức trong
+  `docs/gameplay/README.md` § Scoring Formula** (trước đây bị đọc sót hoàn
+  toàn dù đã có sẵn trong docs, ghi nhầm là "chưa có trong docs" ở mục 10
+  cũ):
+  ```
+  Final Score = (Base Score + Speed Bonus) × Difficulty Multiplier × Perfect Bonus × Completion Multiplier
+  ```
+  Cài trong `computeScore()` (`services/gameplay/game-rules.ts`, mirror
+  plain-JS ở `mock-server/scoring.mjs`) — dùng chung cho cả 2 nơi tính
+  (fake backend tính "thật", client tự tính lại y hệt làm fallback khi lỗi
+  mạng). Các tallies được giữ riêng theo đúng nghĩa trong docs:
+  - `n` trong `Base Score = 100 × n × (n-1)` = số item đúng liên tiếp cao
+    nhất đạt được trong một round (`maxConsecutiveItems`), không phải tổng
+    số round đã thắng (`roundsCleared`).
+  - "Completed" trong Completion Multiplier = đã hoàn thành đủ số round
+    thắng yêu cầu ở level 10.
+  - Docs ghi mục này "(Ranked games only)" nhưng không định nghĩa công
+    thức riêng cho Practice — Practice dùng cùng Base Score + Speed Bonus,
+    không nhân multiplier nào, khớp với cách `MOCK_RESULTS` cũ vẫn luôn có
+    `score` cho cả Practice dù không có `rankedBreakdown`.
+  - Sửa luôn 1 chỗ UI-vs-docs lệch nhau: `RankedBreakdownCard.tsx` trước
+    giờ vẽ "Perfect Bonus" thành dòng cộng `+200`, nhưng docs định nghĩa nó
+    là **hệ số nhân** (×1.25/×1.0) — đổi UI hiển thị đúng dạng `×`.
+- Guest vẫn chơi được và vẫn thấy điểm tính ra (không chặn), nhưng
+  `GAME_STATS_SEED`/`MOCK_LAST_PLAYED` **không bị ghi đè** cho guest — đúng
+  "guest progress has no server-side save".
+- Với tài khoản thật: nộp kết quả **ghi đè luôn** `GAME_STATS_SEED` (dùng
+  bởi Game Select + `GameplayScreen`'s "bestLevel" stat) và
+  `MOCK_LAST_PLAYED` (dùng bởi Home's Continue card) trong bộ nhớ fake
+  backend — Home/Game Select giờ phản ánh đúng ván vừa chơi, không còn số
+  tĩnh không đổi.
+- Error: nếu submit lỗi mạng, không chặn màn hình — tự tính lại điểm y hệt
+  công thức phía client, hiện banner nhỏ "chưa đồng bộ" + Retry, đúng docs
+  ("vẫn hiện điểm số local... không chặn Play Again").
+- **1 bug thật phát hiện qua Playwright**: React `StrictMode` (đang bật ở
+  `main.tsx`) chạy `useEffect` 2 lần ở dev, khiến `submitResult()` bị gọi 2
+  lần cho cùng 1 kết quả — lần gọi thứ 2 đọc `previousBestScore` SAU khi
+  lần gọi thứ 1 đã ghi đè xong, nên "Previous Best" hiện sai (bằng chính
+  điểm vừa đạt được thay vì điểm cũ thật). Sửa bằng 1 `useRef` chặn lần gọi
+  tự động thứ 2 cho cùng 1 object `result` (nút Retry vẫn gọi thẳng
+  `submit()`, không qua cờ chặn này).
+- Verify bằng Playwright thật: chơi thắng 2 round rồi cố tình thua hết ở
+  Number Memory/Solo Ranked → điểm cuối tính đúng khớp tay
+  (200 base + 272 speed bonus) × 1.3 × 1.00 × 0.6 = 368, "Previous Best"
+  hiện đúng giá trị cũ (14) chứ không phải giá trị vừa ghi; guest chơi thì
+  thấy `GuestNotice`, không có `PERSONAL BEST`/`SCORE BREAKDOWN`; Home sau
+  đó hiện đúng "Continue: Number Memory" vừa chơi.
+
+**Result — đã làm (đóng phần lớn mục 5 + phần "Scoring Formula" của mục 10):**
+- Bỏ `StatePill`/`ScreenState` giả và toggle `showVersus` prototype (không
+  vào được qua điều hướng thật). Xoá `services/result/result.mock.ts`
+  (`MOCK_RESULTS`/`MOCK_VERSUS`) và `pages/result/components/StatePill.tsx`
+  — không còn ai dùng.
+- **Vòng lặp "chơi → gửi kết quả → hiển thị lại" giờ khép kín thật sự**:
+  `GameplayScreen` track số liệu cả ván (không chỉ level hiện tại) — tổng
+  round thắng, tổng giây dư khi trả lời đúng, có ăn gian/sai lần nào không,
+  có hoàn thành level 10 không — đóng gói thành `GameResultInput`, truyền
+  qua `onGameOver` → `App.tsx` giữ tạm → `ResultScreen` tự gọi
+  `resultService.submitResult()` → `POST /api/game/result`.
+- **Profile's `matchHistory` và `categoryBests` đã được tự động đồng bộ khi nộp kết quả** (`src/mocks/result-handlers.ts` & `mock-server/index.mjs`) — nộp ván vừa chơi lập tức xuất hiện ở đầu lịch sử đấu Profile và cập nhật kỷ lục theo từng thể loại game.
+- **Solo Practice "Reveal Answer" (Xem đáp án)**: Nút "Xem đáp án" đã được thêm vào `WrongToast` khi ở chế độ `SOLO_PRACTICE`, tự động hiển thị/nổi bật đáp án đúng trên bàn cờ.
+- **Dọn dẹp `ProtoPill` ở `VersusGameplayScreen.tsx`**: Đã gỡ bỏ toàn bộ 4 thanh `ProtoPill` thử nghiệm, tự động hóa luồng đấu 1v1 mô phỏng mượt mà.
+
+**Leaderboard — đã làm:**
+- Bỏ `StatePill`/`ScreenState` giả. `isOffline`/`isGuest` nối thật
+  (`useNetworkStatus`/`useAuthStore`) — trước đây cả 2 đều là state bấm tay
+  qua `StatePill`, kể cả `isGuest`.
+- Toàn bộ bảng xếp hạng (20 người chơi khác + rank/pinned của chính mình)
+  chuyển từ hàm generate **chạy client-side, có `Math.random()`** (nghĩa là
+  thứ hạng người khác đổi lung tung mỗi lần re-render) sang API thật
+  (`leaderboardService.getBoard({board, category, metric})` →
+  `GET /api/leaderboard`), dữ liệu người khác giờ **cố định** (không random
+  nữa — bảng xếp hạng thật không tự xáo mỗi lần nhìn vào), chỉ có hàng của
+  chính mình là động (tên/handle/elo lấy từ session thật). Guest nhận
+  `401` (App.tsx vốn đã chặn guest vào thẳng Leaderboard, đây là phòng thủ
+  thêm, giống Lobby/Versus Room).
+- Thêm Color Memory (category thứ 5) vào `Category`, `CATEGORIES`, và toàn
+  bộ bảng seed (`BASE_SCORE`, `RANK_SEED`) — trước đó bị bỏ sót.
+- Verify bằng Playwright thật: hàng của tài khoản thật hiện đúng tên/elo,
+  đổi category/board vẫn giữ đúng hàng của mình, Back trả về đúng Lobby
+  (không phải Home).
+
+**Profile + Settings — đã làm:**
+- Bỏ `StatePill`/`ScreenState` giả ở cả 2 trang.
+- Profile: stats (Elo, best scores, record, match history) nối API thật
+  (`profileService.getProfile()` → `GET /api/profile`, có
+  loading/error/retry đúng pattern Home/Game Select; guest nhận `401` —
+  màn hình tự hiện `GuestWall` thay vì gọi API). `username`/`elo` lấy từ
+  session thật của user đăng nhập, không còn hard-code "Alex Rivera".
+- Friends trên Profile giờ dùng **chung 1 nguồn thật** với Lobby
+  (`lobbyService.getFriends()`), thay vì 2 danh sách mock lệch nhau như
+  trước (Lobby thiếu Lena Park, Sam Okafor lại có status khác nhau giữa 2
+  nơi). Lobby lọc chỉ hiện bạn online (đúng tiêu đề "Online friends"),
+  Profile hiện đầy đủ kể cả bạn offline — khác biệt hợp lý, không phải bug.
+- Thêm state "New account, no games yet" đúng theo
+  `docs/ui/screen-interface-spec.md` § Profile ("Empty: chưa có
+  history/session nào (guest **hoặc tài khoản mới**)") — trước đây code chỉ
+  xử lý case guest, bỏ sót case tài khoản thật nhưng chưa chơi ván nào.
+  Chưa demo được bằng mock hiện tại (mock luôn có sẵn lịch sử), nhưng logic
+  đã đúng, không phải bịa thêm nút bấm giả để ép hiện.
+- **Chức năng chưa có (không có trong docs) → không còn no-op câm lặng,
+  giờ hiện toast "This isn't available yet" khi bấm:** Edit Profile,
+  Add login method, Language, Privacy policy, Terms of service, Reset all
+  progress. Trước đây các nút này có `onClick={() => {}}` hoặc
+  `console.log` — bấm vào không có phản hồi gì, giống app bị lỗi. Toast
+  dùng chung 1 component mới `components/ui/Toast.tsx` (tổng quát hoá từ
+  `Toast` cũ chỉ có trong Settings).
+- Đã thêm Color Memory (game thứ 5) vào `Category` và toàn bộ mock data
+  Profile (`categoryElo`, `categoryBests`, `matchHistory`) — trước đó bị bỏ
+  sót hoàn toàn kể từ khi Color Memory được thêm vào app.
+- **Settings**: bỏ hẳn nhánh Empty — theo đúng
+  `docs/ui/screen-interface-spec.md` § Settings ("Empty: không áp dụng"),
+  xoá luôn `components/EmptyState.tsx` (không dùng ở đâu khác). Linked
+  methods + 3 toggle (Notifications/Sounds/Haptics) nối API thật
+  (`settingsService.getSettings()` → `GET /api/settings`) thay vì hard-code
+  `useState(true)`; guest vẫn dùng được Settings (không bị chặn `401`,
+  chỉ không có linked method nào — hợp lý vì âm thanh/thông báo vẫn có ý
+  nghĩa cả khi chưa đăng nhập). Sửa luôn 1 bug thật: header Settings
+  hard-code `aria-label="Back to Home"` dù nút Back giờ có thể về Lobby/
+  Profile/Game Select tuỳ nơi đến (xem mục back-navigation ở lịch sử chat) —
+  đổi thành `"Back"` chung chung, không còn nói sai đích đến.
+- Verify bằng Playwright thật (cả tài khoản guest lẫn tài khoản thật):
+  Profile hiện đúng Elo/tên/bạn bè/Color Memory thật; Edit Profile hiện
+  toast thay vì im lặng; Settings load linked methods thật (Google/Discord),
+  toggle thật hiện toast "Saved", nút "Language" hiện toast "chưa có",
+  label Back đúng.
+
+**Còn thiếu (cố ý, ghi lại để track):**
+- Việc lưu thay đổi Settings (toggle Notifications/Sounds/Haptics) chỉ là
+  local-optimistic — không có `PATCH /api/settings` thật nào được gọi.
+  Docs Settings có nhắc tới case "lưu setting thất bại → thông báo lỗi tại
+  đúng row" nhưng chưa có network layer thật cho việc ghi để case đó có ý
+  nghĩa — cần quyết định trước khi làm (giống gap #5, cần một dạng "submit"
+  thật).
+- Edit Profile, Add login method, Language, Privacy policy, Terms of
+  service, Reset all progress: chỉ dừng ở mức "thông báo đang phát triển",
+  chưa có UI/flow thật cho bất kỳ cái nào — không có trong docs nên không
+  tự bịa hành vi.
+
+**Versus Gameplay — đã dọn phần prototype:** 4 thanh `ProtoPill` đã bị gỡ;
+game/mode/difficulty/seed/player được nhận từ phòng thật, năm game đều dùng
+rule table chung, và kết quả được chuyển sang `ResultScreen` để submit.
+
+**Còn thiếu — chưa phải trận realtime có server làm nguồn sự thật:**
+- `opponentStatus` và điểm đối thủ vẫn do state/mô phỏng cục bộ điều khiển;
+  `VersusGameplayScreen` chưa subscribe `subscribeToRoom()` để nhận hành động
+  và điểm của client còn lại.
+- Vì vậy outcome/Elo hiện đúng công thức và đúng payload, nhưng chưa thể được
+  xem là kết quả cạnh tranh có server xác thực. Cần SignalR/Redis Pub-Sub hoặc
+  Supabase Realtime authoritative flow theo `docs/technical/README.md`.
+
+---
+
+## 2. `pages/game/SequenceMemoryScreen.tsx` — file mồ côi
+
+Không được `App.tsx` hay bất kỳ screen nào khác import. Là bản nháp Sequence
+Memory độc lập từ trước khi có `GameplayScreen` dùng chung template cho cả 4
+game. Chưa quyết định: xoá hẳn, hay giữ lại tham khảo rồi xoá sau. Cần hỏi lại
+trước khi động vào (đã hỏi 1 lần, người dùng chọn sửa `GameplayScreen.tsx`
+thật — file này chưa được xử lý).
+
+---
+
+## 3. Gameplay — timer chạy hoàn toàn client-side
+
+`docs/technical/README.md` (Implementation-Critical Rules) yêu cầu:
+
+> Viewing/Answering countdown timers must be server-controlled — the client
+> only displays them; never trust client-side timing for scoring/anti-cheat.
+
+Hiện tại `GameplayScreen.tsx` tự tạo timer bằng `setInterval` ngay trong
+component, không có server nào kiểm soát.
+
+**Đã làm một phần** (bản "thật nhất có thể" hiện giờ, chưa phải server-
+controlled timer thật): khi mạng thật sự mất (`useNetworkStatus()`) trong
+lúc `phase === 'answering'`, timer đếm ngược **tạm dừng** (không reset) và
+hiện `OfflinePauseOverlay` — khi có mạng lại, đếm tiếp từ đúng giây đã dừng,
+không mất round. Xem effect tách riêng "reset" vs "tick" trong
+`GameplayScreen.tsx` và component
+`pages/gameplay/components/OfflinePauseOverlay.tsx`. Đã test bằng Playwright
+(`context.setOffline`): timer đứng yên khi mất mạng, chạy tiếp đúng giá trị
+khi có mạng lại, không force thua, không reset round.
+
+Vẫn còn thiếu so với docs — chỉ dùng tín hiệu mạng thật (`navigator.onLine`),
+**không phải** server-controlled timer thật:
+- Không chống được gian lận sửa đồng hồ máy/devtools (docs: "never trust
+  client-side timing for scoring/anti-cheat") — vẫn hoàn toàn tin client.
+- Chưa có khái niệm "mất kết nối tới server" thật vì chưa có server nào để
+  mất kết nối tới — chỉ đang phát hiện "máy không có mạng" nói chung.
+- Cần hạ tầng thật (SignalR/timer service phía backend) mới đóng được gap
+  này hoàn toàn — ngoài phạm vi frontend-only hiện tại.
+
+---
+
+## 4. Versus — shared seed đã nối, nguồn sinh vẫn chưa authoritative
+
+`docs/technical/README.md`:
+
+> Versus matches must use a single server-generated `seed` so both players
+> receive an identical puzzle.
+
+`VersusGameplayScreen.tsx` không còn tự sinh seed. Seed được tạo cùng phòng,
+persist trong `versus_rooms`, truyền qua Room → App → Gameplay, rồi dùng PRNG
+xác định theo round/game nên hai client nhận cùng đề khi cùng đọc một phòng.
+
+Phần còn thiếu: nhánh Supabase hiện vẫn sinh seed ở client tạo phòng trước khi
+insert. Vì vậy đã đóng lỗi "mỗi client một seed", nhưng chưa đáp ứng tuyệt đối
+yêu cầu **server-generated**. Cần database default/RPC hoặc match service phía
+server cấp seed.
+
+---
+
+## 5. Pipeline kết quả — ĐÃ NỐI, còn thiếu server authority cho Versus
+
+**Cập nhật:** đã làm — xem mục 1 "Result — đã làm" để biết chi tiết đầy đủ.
+`GameplayScreen` giờ đóng gói kết quả, `ResultScreen` tự submit qua
+`POST /api/game/result`, cả `GAME_STATS_SEED` (Game Select) lẫn
+`MOCK_LAST_PLAYED` (Home) đều được cập nhật thật trong bộ nhớ fake backend.
+
+`Profile.matchHistory`/`categoryBests` đã được cập nhật ở cả MSW và standalone
+mock server. Versus cũng đóng gói outcome/opponent Elo và đi qua cùng pipeline;
+chỉ Versus Ranked mới đổi Elo.
+
+Còn thiếu: điểm/trạng thái đối thủ chưa do server authoritative xác nhận, nên
+kết quả Versus hiện vẫn phụ thuộc mô phỏng client (xem mục 1).
+
+---
+
+## 6. Guest → tài khoản thật: merge chỉ là UI, chưa merge gì thật
+
+`LoginScreen.tsx` có `MergeDialog` (khi `fromGuest`), nhưng `handleMerge()`
+chỉ đóng dialog rồi gọi `onSuccess()` — không có logic thật so sánh/merge
+progress đã lưu local (localStorage) với tài khoản vừa đăng nhập. Docs:
+
+> Guest progress/config is stored in `localStorage`; synced to the server on
+> login.
+
+Chưa có bước sync/merge thật nào xảy ra.
+
+---
+
+## 7. Game Select — Retry stats là retry cả loạt, không phải per-card
+
+Mỗi `GameCard` có nút "Retry" riêng khi `statsError`, nhưng tất cả cùng gọi
+chung `loadStats()` (fetch lại toàn bộ `/api/game-select/stats`), không có
+cách retry riêng một game. Chấp nhận được cho hiện tại (chỉ 1 endpoint trả
+cả 5 game cùng lúc), nhưng nếu sau này tách endpoint theo từng game thì nên
+làm retry thật sự per-card.
+
+---
+
+## 8. Backend giả (MSW + mock-server) là dev-only, chưa có backend thật
+
+Đã ghi chi tiết ở [mock-auth-api.md](mock-auth-api.md) — nhắc lại ở đây vì
+mọi API mới (`/api/home`, `/api/game-select/stats`, và tương lai
+`/api/game/result` ở mục 5) đều cần thêm vào **cả hai** nơi
+(`src/mocks/*-handlers.ts` và `mock-server/*.mjs`) cho tới khi có ASP.NET
+Core thật.
+
+---
+
+## 9. Reconnect window — ĐÃ ĐÓNG
+
+`docs/technical/README.md`:
+
+> Reconnect window during Versus: **60 seconds**. Timing out while
+> disconnected counts as a loss.
+
+State và vòng tròn overlay đều dùng 60 giây. Khi đối thủ hết reconnect window,
+ván chuyển sang Result với outcome thắng do đối thủ bỏ cuộc.
+
+---
+
+## 10. Rule 5 game — đã fix phần lớn, còn vài mục chưa làm
+
+Đối chiếu `pages/gameplay/GameplayScreen.tsx` với
+`docs/gameplay/{README,number-memory,alphabet-memory,grid-memory,sequence-memory,color-memory}.md`.
+Sau khi audit (bảng lệch chi tiết ở lịch sử git của file này), đã **fix theo
+yêu cầu rõ ràng của user** — xem `src/services/gameplay/game-rules.ts` (bảng
+level cho cả 5 game, có comment trỏ tới đúng dòng doc nguồn) và
+`GameplayScreen.tsx`. Đã verify bằng Playwright thật (không chỉ đọc code):
+tự đọc số được gán cho từng ô trong lúc Viewing, tap lại đúng thứ tự, kiểm
+tra thắng/thua/timer/level đúng như kỳ vọng.
+
+**Đã fix:**
+- Lên level cần thắng `roundsToWin` round liên tiếp cùng level (5 cho
+  Number/Alphabet/Sequence, 3 cho Grid) — không còn lên ngay sau 1 round
+  đúng.
+- Game Over khi thua đủ `roundsToWin` round tại cùng level — áp dụng cho
+  **mọi mode** (kể cả Solo Practice), không còn phân biệt Ranked-ends-on-
+  first-mistake / Practice-retry-vô-hạn như trước. `PromptBar` nhận
+  `isGameOver` thay vì tự suy từ `mode`.
+- Difficulty (Easy/Medium/Hard/Super Hard) được nối từ Game Select →
+  `App.tsx` → `GameplayScreen`, cộng đúng số giây vào viewTime/answerTime
+  (Grid: 18s/40s base; Number/Alphabet/Sequence: xem ghi chú "còn thiếu" bên
+  dưới về base time chưa có số cụ thể trong docs).
+- Elo không còn bị cộng/trừ trong Solo (`GameplayScreen` chỉ phục vụ Solo —
+  Versus có `VersusGameplayScreen` riêng) — đúng docs "Elo ... calculated
+  only for Versus Ranked matches".
+- **Number Memory**: độ dài theo bảng level thật (6→15 qua 10 level), digit
+  chỉ 1–9 (bỏ 0).
+- **Alphabet Memory**: độ dài theo cùng bảng Number Memory, bộ ký tự đúng
+  36 ký tự (digit 0–9 + A–Z) — `AlphabetBoard` thêm hẳn 1 hàng phím số vì
+  bàn phím cũ không có cách nào nhập digit dù sequence có thể chứa digit.
+- **Sequence Memory**: board vẽ lại thành lưới 3×3 gồm 9 ô **giống hệt
+  nhau, không màu riêng** (bản cũ chỉ có 4 ô, mỗi ô 1 màu khác nhau — sai
+  hẳn cấu trúc bàn cờ so với docs "3×3 grid of blank, identical tiles"), độ
+  dài theo bảng level thật (4→13), gap giữa các tile đổi từ 200ms sang
+  300ms đúng doc. `VersusGameplayScreen` (dùng chung `SequenceBoard`) cũng
+  được chỉnh phạm vi sinh số 0–3 → 0–8 cho khớp 9 ô mới, không đổi rule
+  Versus nào khác.
+- **Grid Memory** (game sai nhiều nhất): bảng 10 level đúng docs (kích
+  thước lưới không-vuông tăng dần 5×5 → 10×10, `beginCount` 8 → 26), grid
+  không còn bị chặn cứng ở tối đa 5×5. Thêm cơ chế wrong-tap-penalty đúng
+  docs: tap sai → flash đỏ, trừ 3s khỏi giờ còn lại, đặt cờ "đã sai" —
+  hoàn thành đúng hết phần còn lại vẫn tính thua nếu cờ đó bật. Sửa luôn 1
+  bug phát hiện khi viết test: ô lưới trước đây luôn hiện SỐ VỊ TRÍ của
+  chính nó (1..25 cho lưới 5×5) bất kể có phải ô "cần nhớ" hay không, và
+  thứ tự đúng được tính theo **chỉ số ô** thay vì **số được gán ngẫu
+  nhiên** — tức là chưa từng đúng game "Chimpanzee Memory" thật. Giờ chỉ
+  đúng `beginCount` ô hiện số (1..beginCount theo thứ tự sinh ngẫu nhiên),
+  ô còn lại luôn để trống, và thứ tự tap đúng theo số được gán, không theo
+  chỉ số ô.
+
+**Đã fix thêm (sau khi làm Result — xem mục 1 "Result — đã làm"):**
+- **Scoring Formula** — đã cài đúng công thức trong docs, dùng thật khi
+  submit kết quả. Trước đây ghi nhầm là "không có trong docs"; thật ra
+  docs đã có sẵn đầy đủ công thức, chỉ là chưa đọc hết + chưa có pipeline
+  để dùng tới.
+- **Perfect Bonus tracking** — đã track (`perfectRef` trong
+  `GameplayScreen.tsx`, reset mỗi khi `resetRound()`).
+- **Pause/Resume/Reset** — Pause đóng băng cả timer lẫn callback chuyển phase;
+  Resume tiếp tục đúng thời gian còn lại; Reset/Quit có xác nhận và huỷ callback
+  cũ; Settings âm thanh/haptic mở dưới dạng sub-overlay.
+- **Tutorial một lần mỗi game family** — hoàn thành hoặc Skip đều được lưu local
+  để lần chơi sau không hiện lại.
+- **Hoàn thành Level 10** — chỉ đánh dấu completed sau khi thắng đủ streak ở
+  Level 10, không còn đánh dấu ngay lúc vừa bước vào level.
+- **Versus Elo + Reveal Answer** — chess-Elo/K-factor đã dùng cho Versus Ranked;
+  Solo Practice có thể reveal/replay đúng cho Number, Alphabet, Grid, Sequence
+  và Color.
+
+**Còn thiếu, chưa làm (cố ý, không tự bịa số)**:
+- **Grid Memory Simple/Full display layout toggle** — chưa làm, tính năng
+  phụ (settings trong lúc chơi), không phải core win/lose rule.
+- **Endless Mode UI/unlock persistence** — rule cho Number/Alphabet/Grid/
+  Sequence có trong gameplay docs nhưng Game Select chưa có entry/flow thật;
+  Color ghi rõ chưa định nghĩa công thức Endless. **Missing in source
+  documentation:** flow sản phẩm chính xác để chọn/tiếp tục Endless và rule
+  Endless cho Color.
+- **Base viewTime/answerTime cho Number/Alphabet/Sequence** — khác Grid
+  Memory (có số cụ thể 18s/40s trong docs), 3 game này chỉ nói tên biến
+  `viewTime`/`answerTime` mà **không cho số mặc định**. Difficulty-seconds
+  đã được cộng đúng vào, nhưng con số NỀN (trước khi cộng difficulty) vẫn
+  là công thức tự chọn cũ (scale theo độ dài), không có nguồn từ docs — ghi
+  rõ trong comment code, không tự bịa số thay cho docs.
+
+---
+
+## 11. Anti-cheat và tunable numbers — mới có authority ở lifecycle
+
+Migration `20260803_atomic_versus_flows.sql` đã chuyển các phần sau về server:
+shared seed, `start_at`, queue pairing, round submission idempotent/theo thứ tự,
+winner, forfeit và category Elo. Vì vậy client không còn tự sinh điểm đối thủ
+hay tự quyết định Elo.
+
+`docs/technical/README.md` (Implementation-Critical Rules) vẫn còn 2 yêu cầu
+chưa thể hoàn tất trong frontend/Supabase lifecycle RPC:
+
+> Basic anti-cheat: rate-limit input speed, detect abnormal/bot-like input
+> patterns.
+
+> All tunable numbers (level count, timers, mode coefficients, K-factor,
+> etc.) live in server-side config, not hard-coded in core logic.
+
+Viewing/Answering timer, xác thực đáp án và reconnect timeout vẫn cần dedicated
+Game API/WebSocket server; client hiện vẫn chạy timer hiển thị/gameplay. Nhiều
+con số (base timer cho một số game, level tables, difficulty multiplier...)
+vẫn hard-code trong frontend. Đây là yêu cầu ở tầm backend/hạ tầng
+(server-side config service, rate limiting), không phải thứ frontend tự làm
+được — cần triển khai cùng ASP.NET Core/Go Game Server đã mô tả trong kiến trúc.
+
+---
+
+## 12. Hai contract dữ liệu Ranked cần quyết định schema
+
+- Gameplay docs yêu cầu overall Elo là **weighted average** của 5 category
+  Elo, nhưng không định nghĩa trọng số. Matchmaking và Versus hiện đã dùng
+  category Elo authoritative; match finalizer cố ý chưa tự cập nhật
+  `profiles.overall_elo`. **Missing in source documentation:** trọng số và
+  cách xử lý category chưa từng chơi.
+- Gameplay docs yêu cầu best score theo `category + mode`, trong khi
+  `category_bests` hiện chỉ có một cặp `ranked_score/ranked_level`, nên Solo
+  Ranked và Versus Ranked dùng chung kỷ lục. Cần migration/schema contract
+  riêng cho từng mode trước khi tách mà không làm mất dữ liệu hiện có.
+- Result của Versus ghi nút Tái đấu, nhưng `App.tsx` hiện đưa người chơi về
+  Quick Match; flow gửi/accept/decline rematch với đúng đối thủ chưa có API
+  hoặc event contract phía server.
+
+---
+
+## 13. Đề xuất cải tiến thiết kế Độ khó trong tương lai (Backlog)
+
+Ghi nhận đề xuất nâng cao ý nghĩa và sức nặng cho lựa chọn Độ khó (Difficulty Mode):
+- **Tốc độ hiển thị & chớp sáng (Preview & Flash Tempo)**: Điều chỉnh `flashDuration` và `gapDuration` theo độ khó (Easy chớp chậm ~0.8s, Super Hard chớp nhanh ~0.35s) để tăng áp lực nhịp độ xử lý.
+- **Độ phức tạp phân bố mẫu (Pattern & Position Complexity)**: Ở Hard/Super Hard, tăng độ phân tán ô (nằm ở các góc/rải rác) hoặc các bước nhảy ít dự đoán được.
+- **Tăng khoảng cách phần thưởng (Risk & Reward Scaling)**: Nâng hệ số điểm và thưởng Elo cho Super Hard (ví dụ: nâng hệ số từ ×2.2 lên ×3.0+) để tạo động lực chọn thử thách mạo hiểm.
+- **Cơ chế Cực Hạn (Extreme / Hardcore Mechanics)**:
+  - Visual Distractors: Ký tự màu ngẫu nhiên / xoay góc nghiêng 15°–45°, bộ ký tự phân biệt Hoa/Thường (`A-z`) hoặc ký tự đặc biệt (`@#$%`).
+  - Dynamic Grid & Traps: Xoay lật layout bàn phím 180° / lật gương ở pha Answering, hoặc ô bẫy giả mạo.
+  - Variable Tempo & Ghost Flashes: Nhịp chớp không đều (0.15s vs 0.7s) và hiệu ứng chớp bóng mờ giả.
+  - Reverse Recall: Yêu cầu nhập ngược chuỗi từ cuối lên đầu.
+- **Tăng độ dài chuỗi theo Độ khó trong Versus (Difficulty-Based Length Scaling)**: Cho phép độ khó phòng Versus tác động cộng thêm độ dài ký tự/ô số vào chuỗi gốc của từng round (ví dụ: Easy = độ dài chuẩn, Super Hard = cộng thêm +3 đến +4 ký tự ngay từ Round 1) cho các đối thủ muốn trận đấu căng thẳng kéo dài hơn.
+
+---
+
+## 14. Resume-on-reload — ĐÃ ĐÓNG
+
+**Vấn đề gốc:** Trước đây toàn bộ điều hướng màn hình (`App.tsx`'s `history`)
+và tiến trình ván đấu (`level`/`winStreak`/board state trong
+`GameplayScreen.tsx`) chỉ sống trong React `useState`/`useRef` thuần — không
+có URL routing, không có `localStorage`/`sessionStorage` nào lưu lại. Bất kỳ
+reload thật sự nào (F5 vô tình, mobile tab bị OS thu hồi bộ nhớ khi chuyển
+app rồi quay lại, Vite full-reload khi dev) đều đưa app về `LandingScreen`,
+và nếu còn phiên đăng nhập hợp lệ thì tự nhảy thẳng vào Home — mất hẳn màn
+hình/tiến trình đang chơi (Solo lẫn Versus), kể cả khi phòng Versus vẫn còn
+sống trên Supabase.
+
+**Đã làm:**
+- `lib/utils/session-resume.ts`: snapshot `{screen, session, roomCode,
+  roomEntrySource}` vào `sessionStorage` (không phải `localStorage` — đây là
+  state của phiên hiện tại, không phải progress cần giữ vĩnh viễn). `App.tsx`
+  tự đồng bộ snapshot này mỗi khi `screen` đổi: còn ở 1 trong 3 màn hình
+  "đang chơi dở" (`game`, `versus-room`, `versus-game`) thì lưu, rời khỏi thì
+  xoá — nên snapshot luôn tự dọn sạch sau khi ván kết thúc/Quit/logout, không
+  cần xử lý riêng từng nơi.
+- `LandingScreen` (nơi mọi reload luôn đi qua đầu tiên) nhận thêm
+  `resumeTarget`/`onResume`: sau khi `checkSession()` xác nhận có tài khoản
+  thật (không phải guest) VÀ có snapshot chờ sẵn, gọi `onResume` thay vì
+  `onPlayNow()` mặc định.
+- **Solo (`game`)**: khôi phục thẳng `session` (game/mode/difficulty) và vào
+  lại màn Gameplay.
+- **Versus (`versus-room`/`versus-game`)**: KHÔNG tin thẳng màn hình đã lưu —
+  gọi lại `versusRoomService.getRoom(roomCode)` để lấy trạng thái thật từ
+  server rồi tự quyết định đích đến theo `room.status`
+  (`in_progress` → vào thẳng ván đấu, `waiting` → Ready Room, đã
+  `finished`/không tìm thấy → về Lobby). Đúng tinh thần server-authoritative
+  đã có sẵn từ migration `20260803_atomic_versus_flows.sql` — client chỉ cache
+  1 `roomCode`, không tự dựng lại state phòng.
+- **Solo Gameplay checkpoint** (`lib/utils/gameplay-checkpoint.ts`): riêng
+  `GameplayScreen.tsx` tự lưu tiến trình chi tiết hơn (level, win-streak, loss
+  count, và toàn bộ tally dùng cho Scoring Formula — `roundsCleared`,
+  `maxConsecutiveItems`, `bonusSeconds`, `perfect`, `reachedMaxLevel`) mỗi khi
+  qua 1 round, khoá theo đúng `(gameType, mode, difficulty)` để không lỡ khôi
+  phục nhầm game khác. Xoá khi ván kết thúc tự nhiên (`finishGame`) hoặc khi
+  người chơi chủ động Reset/Quit (`resetRound`).
+- **Cố ý (không phải sót)**: bấm nút Back ở header (`GameplayHeader`, khác với
+  nút Back trong `WrongToast` — cái đó có gọi `resetRound()`) KHÔNG xoá
+  checkpoint. Quay lại đúng game/mode/difficulty đó trong cùng phiên (chưa
+  reload) sẽ tự tiếp tục đúng level/streak cũ thay vì bắt đầu lại từ đầu — coi
+  đây là tiện ích phụ của cùng cơ chế (không chỉ chống reload, còn giữ tiến
+  trình khi đi lui/tới trong Game Select), không phải lỗi.
+
+**Cố ý KHÔNG resume (ghi lại để không ai tưởng nhầm là bug):**
+- **Guest chơi Solo**: không resume — guest không có identity bền vững qua
+  reload (đúng nguyên tắc đã ghi ở mục 6 "guest progress has no server-side
+  save"), nên `LandingScreen` chỉ gọi `onResume` khi `checkSession()` xác
+  nhận tài khoản thật.
+- **Matchmaking**: không resume — hàng đợi đã tự hết hạn phía server sau
+  60 giây (mục 1 trong audit matchmaking bên dưới), tìm trận lại từ đầu rẻ
+  hơn và an toàn hơn là cố khôi phục 1 attempt có thể đã hết hạn.
+- **Result**: không resume — điểm đã được `submitResult()` ghi server-side
+  trước khi tới màn Result, nên reload ở đây không mất dữ liệu thật, chỉ mất
+  màn hình tóm tắt (chấp nhận được, quay về Home).
+- **Board state giữa round** (chuỗi đang xem, ô đang sáng, số giây còn lại
+  của timer) KHÔNG được khôi phục — chỉ khôi phục tiến trình bền
+  (level/streak/tally) ở ranh giới round. Vào lại sẽ bắt đầu round mới ở đúng
+  level đã dừng, thay vì cố dựng lại 1 chuỗi đang xem dở — an toàn hơn nhiều
+  (không phát lại 1 phần chuỗi, không đồng bộ lại timer client-side, xem thêm
+  mục 3 "timer chạy hoàn toàn client-side" — vẫn còn nguyên, không liên quan
+  tới thay đổi này).
+
+**Còn thiếu (ngoài phạm vi, cần hạ tầng khác):**
+- Đây vẫn là resume phía client — không chống được việc user cố tình sửa
+  `sessionStorage`. Không phải anti-cheat, chỉ là UX chống mất tiến trình do
+  reload ngoài ý muốn. Cụ thể hơn: checkpoint Solo Gameplay lưu thẳng cả các
+  tally dùng cho Scoring Formula (`roundsCleared`, `maxConsecutiveItems`,
+  `bonusSeconds`, `perfect`, `reachedMaxLevel`), nên sửa tay `sessionStorage`
+  rồi thua 1 round để nộp kết quả là có thể nộp điểm giả — **cùng mức rủi ro
+  đã có sẵn từ trước** ở mục 3/11 (toàn bộ Solo scoring vốn đã 100% client-side,
+  không có xác thực server), chỉ là bề mặt sửa dễ hơn (sửa 1 chuỗi JSON trong
+  DevTools Application tab, không cần đụng tới JS runtime). Không tự vá ở đây
+  — chờ chung 1 đợt với mục 11 (server-side config/anti-cheat) khi có Game API
+  thật, tránh vá nửa vời riêng lẻ.
+- Không giải quyết mất tiến trình khi đóng hẳn tab/trình duyệt (khác PWA/app
+  gốc) — `sessionStorage` bị xoá cùng tab, đúng chủ đích (đây là resume "reload
+  giữa chừng", không phải "tiếp tục ván cũ ngày mai").
+- `RESUMABLE_SCREENS` (`App.tsx`) là 1 danh sách hard-code riêng, không tự suy
+  ra từ đâu khác — thêm 1 màn hình "đang chơi dở" mới trong tương lai (nếu có)
+  cần nhớ thêm tay vào đây. Chấp nhận được ở quy mô 3 màn hình hiện tại; chưa
+  đáng để dựng 1 cơ chế metadata-per-screen tổng quát hơn cho 3 mục.
+
+

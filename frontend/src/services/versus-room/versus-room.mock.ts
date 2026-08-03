@@ -1,5 +1,5 @@
-import type { ErrorKind, GameCategory, PlayerSlot } from './versus-room.interface'
-import { GameId } from '@/configs/enum'
+import type { ErrorKind, GameCategory, PlayerSlot, PublicRoomSummary } from './versus-room.interface'
+import { GameId, RoundMode } from '@/configs/enum'
 
 export const PLAYER_NAME = 'Alex'
 export const PLAYER_HANDLE = 'alex_m'
@@ -26,6 +26,43 @@ export const GAME_CATEGORIES: GameCategory[] = [
   { id: GameId.ALPHABET, label: 'Alphabet Memory',  description: 'Memorise letter sequences'       },
   { id: GameId.GRID,     label: 'Grid Memory',      description: 'Recall highlighted cell patterns' },
   { id: GameId.SEQUENCE, label: 'Sequence Memory',  description: 'Replay growing tile sequences'   },
+  { id: GameId.COLOR,    label: 'Color Memory',     description: 'Repeat growing color sequences'  },
+]
+
+export const MOCK_AVAILABLE_ROOMS: PublicRoomSummary[] = [
+  {
+    code: 'MEM-1204',
+    roomName: 'Sequence Speed Masters',
+    category: GameId.SEQUENCE,
+    mode: RoundMode.VERSUS_RANKED,
+    hostName: 'MasterMemory',
+    hostElo: 1540,
+    playerCount: 1,
+    maxPlayers: 2,
+    isPrivate: false,
+  },
+  {
+    code: 'MEM-3391',
+    roomName: 'Chimpanzee Grid Challenge',
+    category: GameId.GRID,
+    mode: RoundMode.VERSUS_UNRANKED,
+    hostName: 'ProGamer_99',
+    hostElo: 1420,
+    playerCount: 1,
+    maxPlayers: 2,
+    isPrivate: false,
+  },
+  {
+    code: 'MEM-7720',
+    roomName: 'Simon Color Arena',
+    category: GameId.COLOR,
+    mode: RoundMode.VERSUS_RANKED,
+    hostName: 'Elena_R',
+    hostElo: 1390,
+    playerCount: 1,
+    maxPlayers: 2,
+    isPrivate: false,
+  },
 ]
 
 export const ERROR_MESSAGES: Record<ErrorKind, string> = {

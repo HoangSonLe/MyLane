@@ -2,7 +2,7 @@
 
 Route: `/games/sequence`
 
-> **Status: confirmed original Version 1 game.** Unlike [Number Memory](number-memory.md), [Alphabet Memory](alphabet-memory.md), and [Grid Memory](grid-memory.md) — which come directly from [`MEMORY_ARENA_GAME_DESIGN.md`](../../MEMORY_ARENA_GAME_DESIGN.md) — this game has no entry in that root document; `00-project-overview.md` lists it as a Version 1 game but never defined its rules. This file was authored to close that gap and has been confirmed by the project owner as a core game, on equal footing with the other 3. `MEMORY_ARENA_GAME_DESIGN.md` itself has not been amended with an entry for it — this file remains the canonical rules source for Sequence Memory.
+> **Status: confirmed original Version 1 game.** Unlike [Number Memory](number-memory.md), [Alphabet Memory](alphabet-memory.md), and [Grid Memory](grid-memory.md) — which come directly from [`MY_LANE_GAME_DESIGN.md`](../../MY_LANE_GAME_DESIGN.md) — this game has no entry in that root document; `00-project-overview.md` lists it as a Version 1 game but never defined its rules. This file was authored to close that gap and has been confirmed by the project owner as a core game, on equal footing with the other 3. `MY_LANE_GAME_DESIGN.md` itself has not been amended with an entry for it — this file remains the canonical rules source for Sequence Memory.
 
 Shared systems (scoring, Elo, modes) live in [`README.md`](README.md).
 

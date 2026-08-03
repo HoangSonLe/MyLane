@@ -7,7 +7,7 @@ Mục tiêu là để Claude và team review nhanh theo cùng một khung nhìn:
 - Người dùng cần làm gì ở đây
 - Giao diện nên ưu tiên thành phần nào
 - Workflow đi tiếp là gì
-- Vì sao layout đó phù hợp với Memory Arena
+- Vì sao layout đó phù hợp với My Lane
 
 Nguồn gốc quyết định:
 - Product docs là nguồn ưu tiên cao nhất
@@ -119,52 +119,86 @@ Nguồn gốc quyết định:
 
 **Purpose**: Trung tâm cho social và multiplayer, tách biệt với Home.
 
-**Primary action**: Quick Match.
+**Primary action**: Quick Join / Quick Match.
 
 **Interface**:
 - Header với back về Home.
-- Một card Quick Match thật nổi bật.
-- Create Room và Join Room đặt thành secondary actions cùng cụm.
+- Một card **Quick Match** và **Quick Join** (Tham gia nhanh phòng Public khả dụng mà không cần tự tạo phòng mới) thật nổi bật.
+- Danh sách **Phòng khả dụng (Available Public Rooms)**: hiển thị danh sách các phòng Public đang mở với tên chủ phòng, chế độ game, số người (1/2), và nút "Tham gia" trực tiếp.
+  - **Public Room Detail Modal**: Khi người chơi nhấp vào một card phòng trong danh sách Public, một modal nhỏ hiện ra hiển thị chi tiết tên phòng, danh mục game, thông tin chủ phòng (Avatar/Name/Elo Rating), số slot người chơi, cùng 2 nút "Vào phòng ngay" (Join) và "Đóng" (Close).
+- Create Room (kèm toggle **Public / Private**) và Join Room (nhập mã phòng) đặt thành secondary actions cùng cụm.
+- **Trung Tâm Thông Báo (Bell Icon 🔔)**: Icon Cái Chuông ở Header (Home & Lobby) với Badge số đỏ. Bấm vào mở Modal 2 Tab:
+  - 👥 **Lời mời kết bạn**: Danh sách người chơi gửi lời mời kết bạn kèm nút **`✓ Đồng ý`** & **`✕ Từ chối`**.
+  - 📢 **Thông báo khác**: Danh sách thông báo hệ thống, cập nhật Elo và thách đấu.
+- **Modal Tìm Kiếm Bạn Bè (`AddFriendModal`)**: Cho phép tìm kiếm người chơi theo tên/handle. Nút bấm tự động chuyển trạng thái `⏳ Đang chờ xác nhận`, `✓ Bạn bè`, `📩 Đã gửi lời mời` hoặc `+ Kết bạn`.
+- **Màn Hình Xem Trước Hồ Sơ (`FriendProfileModal`)**: Khi bấm vào tên/avatar của bất kỳ người chơi nào (trong kết quả tìm kiếm, lời mời, hoặc danh sách bạn bè), Modal chi tiết hồ sơ sẽ hiển thị thông số Elo, Win Rate %, Kỷ lục game và nút Thách đấu 1v1.
+- **Hệ Thống Presence & Auto-Refresh**: Tự động cập nhật trạng thái `online`, `in_game` (khi vào ván), `offline` qua Heartbeat 30s. Danh sách bạn bè tự động làm mới ngầm 10s/lần.
 - Một cụm shortcut cho Profile, Leaderboard, Settings nếu người chơi muốn đi sâu.
 - Không dùng layout giống Home để tránh nhầm vai trò.
 
 **Versus room flow UI**:
+- Quick Join: nút tham gia ngay phòng Public mở mà không cần tạo phòng.
+- Available Rooms List: danh sách phòng Public có sẵn để chọn tham gia.
 - Quick Match: card chính, mô tả ngắn về Elo-based matchmaking.
-- Create Room: form tối giản gồm game category, mode, room name optional, và nút tạo room.
-- Join Room: input room code/link, nút join rõ ràng, feedback lỗi nếu code sai hoặc room đầy.
-- Nếu đã có phòng, room state nên hiển thị host, player slot, game category, mode, và trạng thái ready.
-- Nếu chưa đủ người, màn phải nói rõ đang chờ đối thủ hay đang chia sẻ phòng.
+- Create Room: form gồm game category, mode, privacy setting (Public/Private), room name optional, và nút tạo room.
+- Join Room: input room code (6 ký tự) hoặc link, nút join rõ ràng, feedback lỗi nếu code sai hoặc room đầy.
+- Nếu đã có phòng, room state nên hiển thị host badge, player slot, game category, mode, privacy status, và trạng thái ready.
+- Nếu chủ phòng (Host) bấm rời phòng: hiển thị **Confirm Modal xác nhận rời phòng** cảnh báo chuyển quyền chủ phòng cho người còn lại.
+- **Match Challenge Invite Toast & Mute UI**:
+  - **Incoming Challenge Toast/Modal**: Banner/modal nổi khi nhận lời mời thách đấu từ người chơi khác (gồm Avatar/Tên người mời, Elo, danh mục game, mã phòng, nút Accept, Decline, và Mute).
+  - **Mute Duration Selector**: Khi bấm "Tắt nhận lời mời", hiển thị menu/modal cho phép chọn thời gian tạm tắt lời mời từ người đó: 5 phút, 15 phút, 30 phút, hoặc Hết phiên (End of session).
+- **Public Friend Profile Popup**:
+  - Khi nhấp vào bạn bè bất kỳ trong danh sách Lobby/Online friends, một Modal xem hồ sơ cá nhân công khai (`FriendProfileModal`) sẽ hiện ra.
+  - Hiển thị Avatar, tên người chơi, handle, trạng thái Online/In-game, điểm Elo tổng, tổng số trận đấu, tỉ lệ thắng %, và kỷ lục các danh mục game.
+  - Chứa nút **Thách đấu** (Challenge) và nút **Tắt/Mở lời mời** (Mute/Unmute) trực tiếp từ popup.
+- **Centralized Modal Backdrop Component (`ModalBackdrop.tsx`)**:
+  - Tất cả các Modal và Dialog (`FriendProfileModal`, `PublicRoomDetailModal`, `MuteInviteModal`, `ConfirmDialog`, `LogOutDialog`, `WrongToast`) đều được bọc bởi component `ModalBackdrop` chung.
+  - Tự động đóng gói logic cô lập sự kiện click (`e.stopPropagation()` & `e.preventDefault()`), đảm bảo 100% không bao giờ xảy ra lỗi click-through xuyên nền sang các phần tử phía dưới.
+- **Solo Practice Reveal Answer (Xem đáp án)**:
+  - Khi ở chế độ Luyện tập Solo (Solo Practice), trên màn hình báo sai `WrongToast` xuất hiện nút **Xem đáp án** (Reveal Answer). Bấm vào nút này sẽ làm nổi bật đáp án đúng (Number/Alphabet: dòng đáp án; Grid: ô màu xanh; Color/Sequence: chớp lại chuỗi nốt).
+- **Haptic Vibration Feedback**:
+  - Khi người chơi tương tác với các ô bàn cờ (Grid/Sequence), nút chọn màu (Color), nút chọn chữ cái (Alphabet) hoặc bàn phím nhập số (Number), thiết bị sẽ phát xung rung nhẹ Haptic (`12ms`).
+  - Khi trả lời sai hoặc chọn sai chuỗi, thiết bị phát nhịp rung cảnh báo (`[30ms, 40ms, 50ms]`).
+  - Có nút gạt Tắt/Bật rung (Toggle Switch) trong mục **Cài đặt (Settings) > Game > Phản hồi rung (Haptic Feedback)** giúp người chơi chủ động bật hoặc tắt rung theo ý muốn.
+- **Web Audio Sound Effects**:
+  - Phát âm thanh tổng hợp Web Audio API (không tốn dung lượng tải file audio) cho các thao tác chọn đáp án (tiếng click nhẹ), trả lời đúng (hợp âm chiến thắng), và trả lời sai (tiếng buzz cảnh báo).
+  - Có nút gạt Tắt/Bật âm thanh (Toggle Switch) trong mục **Cài đặt (Settings) > Game > Âm thanh hiệu ứng (Sound Effects)**.
 
 **Trạng thái** (suy ra từ nguyên tắc chung — cần xác nhận nếu muốn khác):
-- Loading: skeleton cho danh sách bạn online / trạng thái phòng.
-- Empty: không có bạn nào online → thông báo ngắn, Quick Match/Create Room vẫn hoạt động bình thường.
+- Loading: skeleton cho danh sách phòng khả dụng / danh sách bạn online / trạng thái phòng.
+- Empty: không có phòng Public khả dụng → hiển thị nút Quick Join fallback tự tạo phòng mới hoặc bấm Create Room.
 - Error: mất kết nối tới lobby service → banner lỗi phía trên với Retry/Reload, không chặn thao tác Quick Match nếu service đó vẫn khả dụng.
 
 **Why this layout**:
 - Lobby là nơi xử lý social intent, nên cần cảm giác riêng.
 - Tách khỏi Home giúp Home vẫn giữ vai trò “quay lại chơi” thay vì “điều khiển mọi thứ”.
 - Room entry là bước trung gian giữa ý định social và gameplay, nên cần được tách khỏi Home/Game Select để không làm dày các màn chính.
-- Quick Match cần là primary vì đây là đường đi nhanh nhất; Create Room và Join Room là nhánh có chủ đích hơn.
+- Quick Join và Quick Match cần là primary vì đây là đường đi nhanh nhất; Create Room và Join Room là nhánh có chủ đích hơn.
 
 **Workflow**:
 - Home → Lobby → Game Select hoặc Matchmaking
+- Lobby → Quick Join → Tham gia phòng Public khả dụng
+- Lobby → Available Rooms List → Select Room → Versus Room
 - Lobby → Back → Home
-- Lobby → Create Room → Room Ready → Game Select hoặc Gameplay start
+- Lobby → Create Room → Room Ready (Host) → Game Select hoặc Gameplay start
 - Lobby → Join Room → Room Ready → Game Select hoặc Gameplay start
 - Lobby → Quick Match → Matchmaking Queue
 
 ### Versus Room / Create Room / Join Room
 
-**Purpose**: Cho người chơi tạo phòng, nhập phòng bằng code/link, hoặc xác nhận phòng đã sẵn sàng.
+**Purpose**: Cho người chơi tạo phòng, chọn chế độ Public/Private, nhập phòng bằng code/link, hoặc xác nhận phòng đã sẵn sàng.
 
 **Primary action**: Create Room / Join Room / Start Match, tùy trạng thái.
 
 **Interface**:
 - Header với back về Lobby.
 - Mode summary card cho Versus Ranked hoặc Versus Unranked.
-- Create room form với category, room name optional, và nút tạo.
+- Create room form với category, difficulty selector (Dễ, Trung bình, Khó, Siêu khó), privacy setting (Public / Private), room name optional, Thẻ Xem Trước Cấu Hình Phòng (Preview Card), và nút tạo phòng.
 - Join room form với code/link input và nút join.
-- Ready room state với host, slot người chơi, share code/link, và nút start cho host.
+- Link chia sẻ dùng dạng `/?room={CODE}`; khi mở link, ứng dụng giữ mã qua bước đăng nhập và mở trực tiếp form Join đã điền sẵn. Link cũ `/versus-room/{CODE}` và `/r/{CODE}` vẫn được hỗ trợ.
+- Ready room state với Host badge, slot người chơi, privacy badge, share code/link, và nút start cho Host.
+- **1v1 Challenge Modal & Incoming Invite Modal**: Cho phép thách đấu chọn cấu hình Game trước khi gửi. Người nhận thách đấu có thể click mở rộng xem chi tiết luật chơi/môn đấu và click vào thẻ người mời để xem trước Pop-up Hồ Sơ (`FriendProfileModal`).
+- **Host Leave Confirm Modal**: Tự động đóng phòng mượt mà khi chỉ có 1 mình trong phòng; chỉ mở Modal xác nhận rời phòng khi phòng ĐÃ có đối thủ (thông báo quyền Host sẽ tự động chuyển ngầm cho người còn lại).
 - Inline error state cho code sai, phòng đầy, hoặc mất kết nối.
 
 **Trạng thái** (suy ra từ nguyên tắc chung — cần xác nhận nếu muốn khác):
@@ -192,14 +226,14 @@ Nguồn gốc quyết định:
 
 **Interface**:
 - Back row ở phía trên.
-- Game cards cho 4 game: Sequence, Number, Alphabet, Grid.
+- Game cards cho 5 game: Sequence, Number, Alphabet, Grid, Color.
 - Mode selector đặt gần đầu màn để người chơi biết ngữ cảnh trước khi chọn game.
 - Lock state rõ cho mode cần account.
 - Hint hoặc metadata nhỏ cho best score / difficulty / eligibility.
 
 **Trạng thái** (suy ra từ nguyên tắc chung — cần xác nhận nếu muốn khác):
 - Loading: skeleton cho game card trong lúc tải best score / lock state.
-- Empty: không áp dụng, 4 game luôn cố định.
+- Empty: không áp dụng, 5 game luôn cố định.
 - Error: không tải được lock-state/best-score → vẫn cho chọn game, ẩn metadata lỗi, hiện Retry nhỏ trên card đó.
 
 **Why this layout**:
@@ -225,6 +259,7 @@ Nguồn gốc quyết định:
 - Vùng chơi chiếm phần lớn màn hình.
 - Controls chỉ xuất hiện khi thật cần thiết.
 - Pause / quit / settings chỉ là overlay, không phá route chính.
+- HUD stat row (Solo): Level, Streak, Elo, và **Best** (kỷ lục — highest level reached của game đó, theo `docs/gameplay/README.md#accounts`). Ô "Best" chỉ hiện với tài khoản đã đăng nhập; ẩn hoàn toàn với Guest hoặc khi chưa tải được dữ liệu, thay vì hiện số cũ/sai.
 
 **Versus 1v1 gameplay UI**:
 - Hai người chơi được hiển thị đối xứng theo vai trò hoặc tên.
@@ -267,8 +302,12 @@ Nguồn gốc quyết định:
 - Header nhỏ gọn hiển thị hai người chơi.
 - Shared timer hoặc round progress rõ ràng.
 - Opponent state indicator: connected, disconnected, answered, locked-in, waiting, or reconnecting.
+- HUD hiển thị trực tiếp kết quả đúng và số round đã hoàn thành của cả hai người chơi; tiến độ đối thủ được cập nhật trong khi trận đang diễn ra.
 - Game board hoặc input area vẫn phải là vùng lớn nhất.
-- Feedback ngắn cho correct / wrong / complete.
+- Vòng đầu và các vòng kế tiếp tự động bắt đầu; không hiển thị nút “Bắt đầu vòng” riêng cho từng người chơi.
+- Feedback correct / wrong / timeout chỉ hiển thị inline; không dùng `WrongToast` hoặc modal trong mode Thi đấu.
+- Sau feedback, trận tự chuyển tiếp sang round kế tiếp.
+- Khi đối thủ bỏ cuộc, client nhận kết quả server, thông báo ngắn “Đối thủ đã bỏ cuộc” và tự chuyển sang Result.
 - Quit action luôn có; pause chỉ xuất hiện nếu source rules cho mode đó cho phép.
 
 **Trạng thái** (suy ra từ nguyên tắc chung — cần xác nhận nếu muốn khác):
@@ -298,6 +337,7 @@ Nguồn gốc quyết định:
 **Interface**:
 - Hero score card làm visual anchor.
 - Summary ngắn về tiến bộ, round, mode, và trạng thái thắng/thua nếu có.
+- Với Versus, hiển thị card so sánh gọn gồm tên hai người chơi, số round đúng, trạng thái thắng/thua/hòa và lý do bỏ cuộc nếu có.
 - Nút Play Again đặt nổi bật nhất.
 - Secondary actions chỉ là đổi game, quay về Home, hoặc xem chi tiết nếu cần.
 

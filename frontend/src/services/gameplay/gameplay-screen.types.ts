@@ -3,19 +3,30 @@
  * Shared types (GameId, ModeId) được import từ configs/enum.ts.
  */
 import { GameId, ModeId } from '@/configs/enum'
+import { translations } from '@/i18n/translations'
 
 export { GameId, ModeId }
 
-export const GAME_LABELS: Record<GameId, string> = {
-  [GameId.NUMBER]:   'Number Memory',
-  [GameId.ALPHABET]: 'Alphabet Memory',
-  [GameId.GRID]:     'Grid Memory',
-  [GameId.SEQUENCE]: 'Sequence Memory',
+type Dictionary = (typeof translations)['en']
+
+// Locale-aware — takes the resolved dictionary from useTranslation() so
+// callers stay in sync with Settings > Language instead of a hardcoded
+// English-only Record.
+export function getGameLabels(t: Dictionary): Record<GameId, string> {
+  return {
+    [GameId.NUMBER]:   t.gameLabels.number,
+    [GameId.ALPHABET]: t.gameLabels.alphabet,
+    [GameId.GRID]:     t.gameLabels.grid,
+    [GameId.SEQUENCE]: t.gameLabels.sequence,
+    [GameId.COLOR]:    t.gameLabels.color,
+  }
 }
 
-export const MODE_LABELS: Record<ModeId, string> = {
-  [ModeId.SOLO_PRACTICE]:   'Solo Practice',
-  [ModeId.SOLO_RANKED]:     'Solo Ranked',
-  [ModeId.VERSUS_RANKED]:   'Versus Ranked',
-  [ModeId.VERSUS_UNRANKED]: 'Versus Unranked',
+export function getModeLabels(t: Dictionary): Record<ModeId, string> {
+  return {
+    [ModeId.SOLO_PRACTICE]:   t.modeLabels.soloPractice,
+    [ModeId.SOLO_RANKED]:     t.modeLabels.soloRanked,
+    [ModeId.VERSUS_RANKED]:   t.modeLabels.versusRanked,
+    [ModeId.VERSUS_UNRANKED]: t.modeLabels.versusUnranked,
+  }
 }

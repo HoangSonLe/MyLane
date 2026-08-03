@@ -1,4 +1,4 @@
-import type { DifficultyMeta, GameMeta, ModeMeta } from './game-select.interface'
+import type { DifficultyMeta, GameMeta, GameStats, ModeMeta } from './game-select.interface'
 import { GameId, ModeId, DifficultyId } from '@/configs/enum'
 
 function IconHash() {
@@ -39,43 +39,63 @@ function IconSequence() {
   )
 }
 
+function IconColor() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <rect x="3" y="3" width="8" height="8" rx="2" fill="currentColor" opacity="0.85" />
+      <rect x="13" y="3" width="8" height="8" rx="2" fill="currentColor" opacity="0.6" />
+      <rect x="3" y="13" width="8" height="8" rx="2" fill="currentColor" opacity="0.35" />
+      <rect x="13" y="13" width="8" height="8" rx="2" fill="currentColor" opacity="0.15" />
+    </svg>
+  )
+}
+
 export const GAMES: GameMeta[] = [
   {
     id: GameId.NUMBER,
     label: 'Number Memory',
     description: 'Recall growing digit sequences',
     icon: <IconHash />,
-    elo: 1240,
-    bestScore: 14,
-    highestLevel: 14,
   },
   {
     id: GameId.ALPHABET,
     label: 'Alphabet Memory',
     description: 'Memorise letter sequences',
     icon: <IconLetters />,
-    elo: 1185,
-    bestScore: 12,
-    highestLevel: 12,
   },
   {
     id: GameId.GRID,
     label: 'Grid Memory',
     description: 'Recall highlighted cell patterns',
     icon: <IconGrid />,
-    elo: 1310,
-    bestScore: 9,
-    highestLevel: 9,
   },
   {
     id: GameId.SEQUENCE,
     label: 'Sequence Memory',
     description: 'Replay growing tile sequences',
     icon: <IconSequence />,
-    elo: 1420,
-    bestScore: 18,
-    highestLevel: 18,
   },
+  {
+    id: GameId.COLOR,
+    label: 'Color Memory',
+    description: 'Repeat growing color sequences',
+    icon: <IconColor />,
+  },
+]
+
+/**
+ * Seed data the fake backend (src/mocks/handlers.ts) serves from
+ * GET /api/game-select/stats. The client never falls back to this on error —
+ * per docs/ui/screen-interface-spec.md ("ẩn metadata lỗi"), a failed fetch
+ * hides the stats row rather than showing possibly-stale numbers. Mirrored
+ * in plain JS at mock-server/game-stats.mjs for the standalone server.
+ */
+export const GAME_STATS_SEED: GameStats[] = [
+  { id: GameId.NUMBER, elo: 1240, bestScore: 14, highestLevel: 10 },
+  { id: GameId.ALPHABET, elo: 1185, bestScore: 12, highestLevel: 10 },
+  { id: GameId.GRID, elo: 1310, bestScore: 9, highestLevel: 9 },
+  { id: GameId.SEQUENCE, elo: 1420, bestScore: 18, highestLevel: 10 },
+  { id: GameId.COLOR, elo: 1150, bestScore: 6, highestLevel: 6 },
 ]
 
 export const MODES: ModeMeta[] = [

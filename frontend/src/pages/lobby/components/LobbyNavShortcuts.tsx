@@ -1,6 +1,7 @@
 import { IconUser, IconTrophy20 as IconTrophy } from '@/components/ui/icons'
 import { ShortcutGrid } from '@/components/ui/grid'
 import { IconSettings } from './icons'
+import { useTranslation } from '@/i18n/useTranslation'
 
 interface NavShortcut {
   id: string
@@ -14,10 +15,11 @@ interface LobbyNavShortcutsProps {
 }
 
 export function LobbyNavShortcuts({ skeleton, onNavigate }: LobbyNavShortcutsProps) {
+  const { t } = useTranslation()
   const shortcuts: NavShortcut[] = [
-    { id: 'profile',     label: 'Profile',     icon: <IconUser /> },
-    { id: 'leaderboard', label: 'Leaderboard', icon: <IconTrophy /> },
-    { id: 'settings',    label: 'Settings',    icon: <IconSettings /> },
+    { id: 'profile',     label: t.lobby.navProfile,     icon: <IconUser /> },
+    { id: 'leaderboard', label: t.lobby.navLeaderboard, icon: <IconTrophy /> },
+    { id: 'settings',    label: t.lobby.navSettings,    icon: <IconSettings /> },
   ]
 
   return (

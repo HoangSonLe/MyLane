@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import type { CSSProperties, ReactNode } from 'react'
 
 import { StatusBanner } from '@/components/ui/StatusBanner'
@@ -16,6 +17,12 @@ export function ScreenShell({
   className?: string
   style?: CSSProperties
 }) {
+  useEffect(() => {
+    window.scrollTo(0, 0)
+    document.documentElement.scrollTop = 0
+    document.body.scrollTop = 0
+  }, [])
+
   return (
     <div
       className={['relative flex min-h-dvh flex-col', className].filter(Boolean).join(' ')}
@@ -36,7 +43,7 @@ export function ScreenOfflineBanner({
 }) {
   if (!show) return null
   return (
-    <div className="pt-16">
+    <div className="pt-6">
       <StatusBanner variant="offline" message={message} />
     </div>
   )
@@ -53,7 +60,7 @@ export function ScreenMain({
   id = 'main-content',
   gap = true,
   bottomPadding,
-  topPadding = 'auto',
+  topPadding = 'none',
   offline = false,
   ariaBusy,
   className = '',

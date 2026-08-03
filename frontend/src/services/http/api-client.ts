@@ -1,6 +1,8 @@
 import axios from 'axios'
+import type { UserSession } from '@/services/auth/auth.service'
 
 const TOKEN_KEY = 'ma_token'
+const USER_KEY = 'ma_user'
 
 /**
  * Shared HTTP client (Axios, per docs/technical/README.md).
@@ -21,14 +23,27 @@ apiClient.interceptors.request.use((config) => {
   return config
 })
 
-export function saveToken(token: string) {
+export function saveToken(token: string, user?: UserSession) {
   localStorage.setItem(TOKEN_KEY, token)
+  if (user) {
+    localStorage.setItem(USER_KEY, JSON.stringify(user))
+  }
 }
 
 export function clearToken() {
   localStorage.removeItem(TOKEN_KEY)
+  localStorage.removeItem(USER_KEY)
 }
 
 export function getToken(): string | null {
   return localStorage.getItem(TOKEN_KEY)
+}
+
+export function getCachedUser(): UserSession | null {
+  try {
+    const raw = localStorage.getItem(USER_KEY)
+    return raw ? (JSON.parse(raw) as UserSession) : null
+  } catch {
+    return null
+  }
 }

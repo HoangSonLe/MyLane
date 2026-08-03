@@ -3,6 +3,8 @@
 // [back button] [title + subtitle center] [pause button]
 // with pt-16 safe area padding and a pause button (vs. a trailing action icon).
 
+import { useTranslation } from '@/i18n/useTranslation'
+
 interface GameplayHeaderProps {
   title: string
   subtitle: string
@@ -34,11 +36,12 @@ export function GameplayHeader({
   onBack,
   onPause,
 }: GameplayHeaderProps) {
+  const { t } = useTranslation()
   return (
-    <header className="flex items-center justify-between px-4 pb-2 pt-16">
+    <header className="flex items-center justify-between px-4 pb-2 pt-6">
       <button
         type="button"
-        aria-label="Back"
+        aria-label={t.common.back}
         onClick={onBack}
         className="flex h-10 w-10 items-center justify-center rounded-xl transition-colors active:bg-[var(--ma-surface-raised)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ma-ring)]"
         style={{ background: 'var(--ma-surface)', color: 'var(--ma-fg-muted)', boxShadow: 'var(--ma-shadow-sm)' }}
@@ -57,7 +60,7 @@ export function GameplayHeader({
 
       <button
         type="button"
-        aria-label="Pause game"
+        aria-label={t.gameplayHeader.pauseGame}
         onClick={onPause}
         disabled={pauseDisabled}
         className={[
@@ -69,17 +72,6 @@ export function GameplayHeader({
       >
         <IconPause />
       </button>
-    </header>
-  )
-}
-
-// Loading placeholder for GameplayHeader
-export function GameplayHeaderSkeleton() {
-  return (
-    <header className="flex items-center justify-between px-4 pb-2 pt-16">
-      <div className="skeleton h-10 w-10 rounded-xl" />
-      <div className="skeleton h-10 w-36 rounded-xl" />
-      <div className="skeleton h-10 w-10 rounded-xl" />
     </header>
   )
 }

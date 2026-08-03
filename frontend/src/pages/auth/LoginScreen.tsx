@@ -1,11 +1,13 @@
-﻿import { useState, useId, useRef, FormEvent } from 'react'
+import { useState, useId, useRef, FormEvent } from 'react'
 import { StatusBanner } from '@/components/ui/StatusBanner'
 import { Card } from '@/components/ui/card'
+import { ScreenShell, ScreenMain } from '@/components/ui/layout'
 import { InputField } from './components/InputField'
 import { MergeDialog } from './components/MergeDialog'
 import { IconSpinner, IconGoogle, IconDiscord, IconMail, IconEye } from './components/icons'
 import { useNetworkStatus } from '@/lib/hooks/useNetworkStatus'
 import { useAuthStore } from '@/stores/auth.store'
+import { useTranslation } from '@/i18n/useTranslation'
 
 // ─── Main component ───────────────────────────────────────────────
 export function LoginScreen({
@@ -26,7 +28,12 @@ export function LoginScreen({
   const [showMergeDialog, setShowMergeDialog] = useState(false)
 
   const { isOffline } = useNetworkStatus()
-  const { isLoading, errorMessage, loginWithEmail, loginWithOAuth, clearError } = useAuthStore()
+  const { t } = useTranslation()
+  const isLoading = useAuthStore((s) => s.isLoading)
+  const errorMessage = useAuthStore((s) => s.errorMessage)
+  const loginWithEmail = useAuthStore((s) => s.loginWithEmail)
+  const loginWithOAuth = useAuthStore((s) => s.loginWithOAuth)
+  const clearError = useAuthStore((s) => s.clearError)
 
   const emailId = useId()
   const passwordId = useId()
@@ -80,41 +87,40 @@ export function LoginScreen({
   }
 
   return (
-    <div
-      className="relative flex min-h-dvh flex-col"
-      style={{ background: 'var(--ma-bg)' }}
-    >
+    <ScreenShell>
       {/* ── Back / Guest link — top-left ── */}
-      <div className="flex items-center px-5 pt-8">
+      <header className="flex items-center px-4 pb-2 pt-6">
         <button
           type="button"
           onClick={onBack}
           className={[
             'flex items-center gap-1.5 text-[13px] font-medium',
             'transition-colors duration-[var(--ma-duration-micro)]',
-            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ma-ring)] rounded-lg px-1',
+            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ma-ring)] rounded-lg px-2 py-1',
+            'active:bg-[var(--ma-surface-raised)]',
           ].join(' ')}
           style={{ color: 'var(--ma-fg-muted)' }}
-          aria-label="Back to landing screen"
+          aria-label={fromGuest ? t.auth.continueAsGuest : t.common.back}
         >
           <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
             <path d="M10 4L6 8l4 4" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
-          {fromGuest ? 'Continue as guest' : 'Back'}
+          {fromGuest ? t.auth.continueAsGuest : t.common.back}
         </button>
-      </div>
+      </header>
 
       {/* ── Main content ── */}
-      <main
-        id="main-content"
-        className="flex flex-1 flex-col items-center px-6 pb-32 pt-6"
+      <ScreenMain
+        bottomPadding="pb-8"
+        topPadding="none"
+        className="items-center px-6 my-auto py-6"
       >
         {/* Offline banner — in-flow, above card */}
         {isOffline && (
           <div className="mb-4 w-full max-w-xs">
             <StatusBanner
               variant="offline"
-              message="You're offline. Log in requires a connection."
+              message={t.auth.offlineBanner}
             />
           </div>
         )}
@@ -126,15 +132,15 @@ export function LoginScreen({
               className="text-[20px] font-bold leading-snug tracking-tight"
               style={{ color: 'var(--ma-fg)' }}
             >
-              {fromGuest ? 'Create your account' : 'Welcome back'}
+              {fromGuest ? t.auth.createAccount : t.auth.welcomeBack}
             </h1>
             <p
               className="mt-1 text-[13px] leading-relaxed"
               style={{ color: 'var(--ma-fg-muted)' }}
             >
               {fromGuest
-                ? 'Save progress, unlock Elo & leaderboards.'
-                : 'Log in to access Versus, Elo, and friends.'}
+                ? t.auth.createAccountSub
+                : t.auth.welcomeBackSub}
             </p>
           </div>
 
@@ -156,7 +162,7 @@ export function LoginScreen({
               type="button"
               onClick={() => handleOAuth('google')}
               disabled={isDisabled}
-              aria-label="Continue with Google"
+              aria-label={t.auth.continueWithGoogle}
               className={[
                 'flex h-12 w-full items-center justify-center gap-2.5',
                 'text-[14px] font-semibold',
@@ -172,7 +178,7 @@ export function LoginScreen({
               }}
             >
               <IconGoogle />
-              Continue with Google
+              {t.auth.continueWithGoogle}
             </button>
 
             {/* Discord */}
@@ -180,7 +186,7 @@ export function LoginScreen({
               type="button"
               onClick={() => handleOAuth('discord')}
               disabled={isDisabled}
-              aria-label="Continue with Discord"
+              aria-label={t.auth.continueWithDiscord}
               className={[
                 'flex h-12 w-full items-center justify-center gap-2.5',
                 'text-[14px] font-semibold',
@@ -196,7 +202,7 @@ export function LoginScreen({
               }}
             >
               <IconDiscord />
-              Continue with Discord
+              {t.auth.continueWithDiscord}
             </button>
           </div>
 
@@ -204,7 +210,7 @@ export function LoginScreen({
           <div className="my-5 flex items-center gap-3" aria-hidden="true">
             <div className="h-px flex-1" style={{ background: 'var(--ma-border)' }} />
             <span className="shrink-0 text-[11px] font-semibold uppercase tracking-widest" style={{ color: 'var(--ma-fg-subtle)' }}>
-              or
+              {t.auth.or}
             </span>
             <div className="h-px flex-1" style={{ background: 'var(--ma-border)' }} />
           </div>
@@ -214,7 +220,7 @@ export function LoginScreen({
             <fieldset
               disabled={isDisabled}
               className="flex flex-col gap-3 border-0 p-0 m-0"
-              aria-label="Email and password"
+              aria-label={t.auth.emailPassword}
             >
               {/* Section label with icon */}
               <div className="flex items-center gap-1.5 mb-0.5">
@@ -230,13 +236,13 @@ export function LoginScreen({
                   <IconMail />
                 </div>
                 <span className="text-[12px] font-semibold uppercase tracking-widest" style={{ color: 'var(--ma-fg-subtle)' }}>
-                  Email &amp; Password
+                  {t.auth.emailPassword}
                 </span>
               </div>
 
               <InputField
                 id={emailId}
-                label="Email"
+                label={t.auth.email}
                 type="email"
                 value={email}
                 onChange={setEmail}
@@ -246,7 +252,7 @@ export function LoginScreen({
 
               <InputField
                 id={passwordId}
-                label="Password"
+                label={t.auth.password}
                 type={showPassword ? 'text' : 'password'}
                 value={password}
                 onChange={setPassword}
@@ -257,7 +263,7 @@ export function LoginScreen({
                     type="button"
                     onClick={() => setShowPassword((v) => !v)}
                     className="flex items-center justify-center rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ma-ring)]"
-                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    aria-label={showPassword ? t.auth.hidePassword : t.auth.showPassword}
                     style={{ color: 'var(--ma-fg-subtle)' }}
                     tabIndex={0}
                   >
@@ -287,7 +293,7 @@ export function LoginScreen({
                 }}
               >
                 {isLoading && <IconSpinner />}
-                Log In
+                {t.auth.logIn}
               </button>
             </fieldset>
           </form>
@@ -298,17 +304,17 @@ export function LoginScreen({
           className="mt-6 text-center text-[12px] leading-relaxed"
           style={{ color: 'var(--ma-fg-subtle)' }}
         >
-          Versus, Elo, leaderboard, and friends require an account.{' '}
+          {t.auth.footnote}{' '}
           <button
             type="button"
             onClick={onBack}
             className="font-medium underline underline-offset-2 focus-visible:outline-none focus-visible:rounded"
             style={{ color: 'var(--ma-fg-muted)' }}
           >
-            Continue as guest
+            {t.auth.continueAsGuest}
           </button>
         </p>
-      </main>
+      </ScreenMain>
 
       {/* ── Merge dialog ── */}
       <MergeDialog
@@ -316,6 +322,6 @@ export function LoginScreen({
         onMerge={handleMerge}
         onSkip={handleSkip}
       />
-    </div>
+    </ScreenShell>
   )
 }

@@ -14,3 +14,703 @@ Port 5173 is in use, trying another one...
 [2m9:24:52 PM[22m [36m[1m[vite][22m[39m server restarted.
 [2m9:26:10 PM[22m [36m[1m[vite][22m[39m [32m.env.development.local changed, restarting server...[39m
 [2m9:26:10 PM[22m [36m[1m[vite][22m[39m server restarted.
+[2m10:08:49 PM[22m [36m[1m[vite][22m[39m [32m.env.development.local changed, restarting server...[39m
+[2m10:08:49 PM[22m [36m[1m[vite][22m[39m server restarted.
+[2m10:14:04 PM[22m [36m[1m[vite][22m[39m [32m.env.development.local changed, restarting server...[39m
+[2m10:14:04 PM[22m [36m[1m[vite][22m[39m server restarted.
+[2m8:58:28 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\gameplay\components\PhaseBanner.tsx, /src/index.css[22m
+[2m8:58:42 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\gameplay\components\PhaseBanner.tsx, /src/index.css[22m
+[2m8:58:47 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/gameplay/GameplayScreen.tsx, /src/index.css[22m
+[2m8:58:57 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/gameplay/GameplayScreen.tsx, /src/index.css[22m
+[2m8:59:03 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/gameplay/GameplayScreen.tsx, /src/index.css[22m
+[2m8:59:07 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/gameplay/GameplayScreen.tsx, /src/index.css[22m
+[2m8:59:25 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\gameplay\components\CountdownRing.tsx, /src/index.css[22m
+[2m9:01:02 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/services/versus-room/versus-room.interface.ts[22m
+[2m9:01:09 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/pages/versus-room/VersusRoomScreen.tsx, /@fs/D:\repos\GameBoard\frontend\src\pages\versus-room\components\CreateRoomForm.tsx, /@fs/D:\repos\GameBoard\frontend\src\pages\versus-room\components\InlineError.tsx[22m
+[2m9:01:46 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mpackage.json[22m
+[2m9:02:02 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/mocks/handlers.ts[22m
+[2m9:02:19 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mmock-server/index.mjs[22m
+[2m9:02:29 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mmock-server/index.mjs[22m
+[2m9:02:44 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\lobby\components\FriendStateCards.tsx, /src/index.css[22m
+[2m9:02:54 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\gameplay\components\PhaseBanner.tsx, /src/index.css[22m
+[2m9:03:02 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/lobby/LobbyScreen.tsx, /src/index.css[22m
+[2m9:03:03 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\gameplay\components\PhaseBanner.tsx, /src/index.css[22m
+[2m9:03:23 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-room\components\OfflineWall.tsx, /src/index.css[22m
+[2m9:03:23 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\gameplay\components\PhaseBanner.tsx, /src/index.css[22m
+[2m9:03:29 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/gameplay/GameplayScreen.tsx, /src/index.css[22m
+[2m9:03:35 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/gameplay/GameplayScreen.tsx, /src/index.css[22m
+[2m9:03:41 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/gameplay/GameplayScreen.tsx, /src/index.css[22m
+[2m9:04:15 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/versus-room/VersusRoomScreen.tsx, /src/index.css[22m
+[2m9:04:36 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.app.tsbuildinfo[22m
+[2m9:04:37 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.node.tsbuildinfo[22m
+[2m9:06:57 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css[22m
+[2m9:07:06 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\gameplay\components\PhaseBanner.tsx, /src/index.css[22m
+[2m9:10:14 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/App.tsx, /src/index.css[22m
+[2m9:10:19 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/App.tsx, /src/index.css[22m
+[2m9:10:23 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/App.tsx, /src/index.css[22m
+[2m9:10:37 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mpackage.json[22m
+[2m9:11:24 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.app.tsbuildinfo[22m
+[2m9:11:24 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.node.tsbuildinfo[22m
+[2m10:11:03 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/App.tsx, /src/index.css[22m
+[2m10:11:12 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/App.tsx, /src/index.css[22m
+[2m10:11:25 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/settings/SettingsScreen.tsx, /src/index.css[22m
+[2m10:11:30 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/settings/SettingsScreen.tsx, /src/index.css[22m
+[2m10:11:53 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.app.tsbuildinfo[22m
+[2m10:11:53 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.node.tsbuildinfo[22m
+[2m10:15:26 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.app.tsbuildinfo[22m
+[2m10:15:26 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.node.tsbuildinfo[22m
+[2m10:16:41 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/gameplay/GameplayScreen.tsx, /src/index.css[22m
+[2m10:16:47 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/gameplay/GameplayScreen.tsx, /src/index.css[22m
+[2m10:16:51 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/versus-gameplay/VersusGameplayScreen.tsx, /src/index.css[22m
+[2m10:16:57 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/versus-gameplay/VersusGameplayScreen.tsx, /src/index.css[22m
+[2m10:20:46 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\gameplay\components\StatRow.tsx, /src/index.css[22m
+[2m10:20:51 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/gameplay/GameplayScreen.tsx, /src/index.css[22m
+[2m10:21:22 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\gameplay\components\StatRow.tsx, /src/index.css[22m
+[2m10:21:30 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/gameplay/GameplayScreen.tsx, /src/index.css[22m
+[2m10:21:40 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/gameplay/GameplayScreen.tsx, /src/index.css[22m
+[2m10:21:47 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/gameplay/GameplayScreen.tsx, /src/index.css[22m
+[2m10:21:53 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/gameplay/GameplayScreen.tsx, /src/index.css[22m
+[2m10:22:31 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mpackage.json[22m
+[2m10:22:40 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css[22m
+[2m10:23:08 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/gameplay/GameplayScreen.tsx, /src/index.css[22m
+[2m10:23:30 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\gameplay\components\PhaseBanner.tsx, /src/index.css[22m
+[2m10:25:30 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mpackage.json[22m
+[2m10:29:22 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/gameplay/GameplayScreen.tsx, /src/index.css[22m
+[2m10:29:33 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/versus-gameplay/VersusGameplayScreen.tsx, /src/index.css[22m
+[2m10:31:10 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/services/lobby/lobby.interface.ts[22m
+[2m10:31:23 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/pages/lobby/LobbyScreen.tsx[22m
+[2m10:31:39 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/lobby/LobbyScreen.tsx, /src/index.css[22m
+[2m10:31:44 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/gameplay/GameplayScreen.tsx, /src/index.css[22m
+[2m10:31:46 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/lobby/LobbyScreen.tsx, /src/index.css[22m
+[2m10:32:02 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/services/profile/profile.interface.ts[22m
+[2m10:32:19 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/pages/profile/ProfileScreen.tsx[22m
+[2m10:32:41 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/mocks/handlers.ts[22m
+[2m10:33:17 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/gameplay/GameplayScreen.tsx, /src/index.css[22m
+[2m10:33:18 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/pages/settings/SettingsScreen.tsx[22m
+[2m10:33:26 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/gameplay/GameplayScreen.tsx, /src/index.css[22m
+[2m10:33:30 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/gameplay/GameplayScreen.tsx, /src/index.css[22m
+[2m10:33:42 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/gameplay/GameplayScreen.tsx, /src/index.css[22m
+[2m10:34:00 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mmock-server/index.mjs[22m
+[2m10:34:06 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/versus-gameplay/VersusGameplayScreen.tsx, /src/index.css[22m
+[2m10:34:10 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/versus-gameplay/VersusGameplayScreen.tsx, /src/index.css[22m
+[2m10:34:11 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mmock-server/index.mjs[22m
+[2m10:34:15 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/versus-gameplay/VersusGameplayScreen.tsx, /src/index.css[22m
+[2m10:34:19 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/versus-gameplay/VersusGameplayScreen.tsx, /src/index.css[22m
+[2m10:35:13 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\settings\components\Toast.tsx, /src/index.css[22m
+[2m10:35:13 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\settings\components\EmptyState.tsx, /src/index.css[22m
+[2m10:35:39 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/profile/ProfileScreen.tsx, /src/index.css[22m
+[2m10:36:04 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/profile/ProfileScreen.tsx, /src/index.css[22m
+[2m10:36:08 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/profile/ProfileScreen.tsx, /src/index.css[22m
+[2m10:37:02 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/settings/SettingsScreen.tsx, /src/index.css[22m
+[2m10:37:18 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.app.tsbuildinfo[22m
+[2m10:37:18 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.node.tsbuildinfo[22m
+[2m10:41:01 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.app.tsbuildinfo[22m
+[2m10:41:01 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.node.tsbuildinfo[22m
+[2m10:43:17 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\profile\components\FriendsCard.tsx, /src/index.css[22m
+[2m10:43:33 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\profile\components\MatchHistoryCard.tsx, /src/index.css[22m
+[2m10:43:52 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/lobby/LobbyScreen.tsx, /src/index.css[22m
+[2m10:44:01 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/lobby/LobbyScreen.tsx, /src/index.css[22m
+[2m10:44:44 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/settings/SettingsScreen.tsx, /src/index.css[22m
+[2m10:44:50 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/settings/SettingsScreen.tsx, /src/index.css[22m
+[2m10:44:55 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/settings/SettingsScreen.tsx, /src/index.css[22m
+[2m10:45:03 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/settings/SettingsScreen.tsx, /src/index.css[22m
+[2m10:45:08 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/settings/SettingsScreen.tsx, /src/index.css[22m
+[2m10:45:19 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/settings/SettingsScreen.tsx, /src/index.css[22m
+[2m10:45:25 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/settings/SettingsScreen.tsx, /src/index.css[22m
+[2m10:45:45 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/settings/SettingsScreen.tsx, /src/index.css[22m
+[2m10:46:49 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/pages/gameplay/GameplayScreen.tsx, /@fs/D:\repos\GameBoard\frontend\src\pages\gameplay\components\PauseOverlay.tsx[22m
+[2m10:46:56 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/gameplay/GameplayScreen.tsx, /src/index.css[22m
+[2m10:47:06 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/gameplay/GameplayScreen.tsx, /src/index.css[22m
+[2m10:47:11 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/gameplay/GameplayScreen.tsx, /src/index.css[22m
+[2m10:47:27 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\gameplay\components\StatRow.tsx, /src/index.css[22m
+[2m10:47:33 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\gameplay\components\StatRow.tsx, /src/index.css[22m
+[2m10:47:51 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\gameplay\components\PhaseBanner.tsx, /src/index.css[22m
+[2m10:47:58 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\gameplay\components\PhaseBanner.tsx, /src/index.css[22m
+[2m10:48:08 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\gameplay\components\PromptBar.tsx, /src/index.css[22m
+[2m10:48:22 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\gameplay\components\PromptBar.tsx, /src/index.css[22m
+[2m10:48:34 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\gameplay\components\PromptBar.tsx, /src/index.css[22m
+[2m10:49:53 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\gameplay\components\PauseOverlay.tsx, /src/index.css[22m
+[2m10:50:03 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\gameplay\components\PauseOverlay.tsx, /src/index.css[22m
+[2m10:50:08 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\gameplay\components\PauseOverlay.tsx, /src/index.css[22m
+[2m10:50:12 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\gameplay\components\PauseOverlay.tsx, /src/index.css[22m
+[2m10:50:18 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\gameplay\components\PauseOverlay.tsx, /src/index.css[22m
+[2m10:50:23 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\gameplay\components\PauseOverlay.tsx, /src/index.css[22m
+[2m10:50:55 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\gameplay\components\GameplayHeader.tsx, /src/index.css[22m
+[2m10:51:00 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\gameplay\components\GameplayHeader.tsx, /src/index.css[22m
+[2m10:51:05 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\gameplay\components\GameplayHeader.tsx, /src/index.css[22m
+[2m10:51:32 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/gameplay/GameplayScreen.tsx, /src/index.css[22m
+[2m10:52:16 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\gameplay\components\OfflinePauseOverlay.tsx, /src/index.css[22m
+[2m10:52:32 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\gameplay\components\OfflinePauseOverlay.tsx, /src/index.css[22m
+[2m10:54:04 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\gameplay\components\TutorialOverlay.tsx, /src/index.css[22m
+[2m10:54:15 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\gameplay\components\TutorialOverlay.tsx, /src/index.css[22m
+[2m10:54:19 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\gameplay\components\TutorialOverlay.tsx, /src/index.css[22m
+[2m10:54:24 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\gameplay\components\TutorialOverlay.tsx, /src/index.css[22m
+[2m10:54:56 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/versus-gameplay/VersusGameplayScreen.tsx, /src/index.css[22m
+[2m10:55:08 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/versus-gameplay/VersusGameplayScreen.tsx, /src/index.css[22m
+[2m10:55:41 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/versus-gameplay/VersusGameplayScreen.tsx, /src/index.css[22m
+[2m11:22:00 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/pages/settings/SettingsScreen.tsx[22m
+[2m11:23:02 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/settings/SettingsScreen.tsx, /src/index.css[22m
+[2m11:23:24 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/App.tsx, /src/index.css[22m
+[2m7:59:29 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/landing/LandingScreen.tsx, /src/index.css[22m
+[2m8:00:14 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\auth\components\MergeDialog.tsx, /src/index.css[22m
+[2m8:00:47 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/home/HomeScreen.tsx, /src/index.css[22m
+[2m8:00:58 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\home\components\HomeHeader.tsx, /src/index.css[22m
+[2m8:01:07 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\home\components\PlayCta.tsx, /src/index.css[22m
+[2m8:01:16 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\home\components\ContinueCard.tsx, /src/index.css[22m
+[2m8:01:25 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\home\components\EmptyPrompt.tsx, /src/index.css[22m
+[2m8:01:38 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\home\components\NavShortcuts.tsx, /src/index.css[22m
+[2m8:02:02 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/lobby/LobbyScreen.tsx, /src/index.css[22m
+[2m8:02:16 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\lobby\components\FriendRow.tsx, /src/index.css[22m
+[2m8:02:33 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\lobby\components\FriendStateCards.tsx, /src/index.css[22m
+[2m8:02:50 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\lobby\components\RoomActions.tsx, /src/index.css[22m
+[2m8:03:00 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\lobby\components\LobbyHeader.tsx, /src/index.css[22m
+[2m8:03:08 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\lobby\components\EloContextBadge.tsx, /src/index.css[22m
+[2m8:03:17 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\lobby\components\LobbyNavShortcuts.tsx, /src/index.css[22m
+[2m8:03:39 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/leaderboard/LeaderboardScreen.tsx, /src/index.css[22m
+[2m8:03:55 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\leaderboard\components\LeaderboardHeader.tsx, /src/index.css[22m
+[2m8:04:07 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\leaderboard\components\EmptyState.tsx, /src/index.css[22m
+[2m8:04:17 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\leaderboard\components\ErrorState.tsx, /src/index.css[22m
+[2m8:04:28 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\leaderboard\components\GuestNotice.tsx, /src/index.css[22m
+[2m8:04:41 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\leaderboard\components\OfflineNotice.tsx, /src/index.css[22m
+[2m8:04:51 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\leaderboard\components\FilterRow.tsx, /src/index.css[22m
+[2m8:05:15 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/profile/ProfileScreen.tsx, /src/index.css[22m
+[2m8:05:32 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\profile\components\ProfileHeader.tsx, /src/index.css[22m
+[2m8:05:42 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\profile\components\ProfileHeader.tsx, /src/index.css[22m
+[2m8:06:19 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\profile\components\ProfileHeader.tsx, /src/index.css[22m
+[2m8:06:30 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\profile\components\GuestWall.tsx, /src/index.css[22m
+[2m8:06:40 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\profile\components\FriendsCard.tsx, /src/index.css[22m
+[2m8:06:59 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\profile\components\MatchHistoryCard.tsx, /src/index.css[22m
+[2m8:07:10 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\profile\components\MatchRow.tsx, /src/index.css[22m
+[2m8:07:31 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\profile\components\MatchDetailDialog.tsx, /src/index.css[22m
+[2m8:07:45 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\profile\components\RecordStatsCard.tsx, /src/index.css[22m
+[2m8:08:04 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/game-select/GameSelectScreen.tsx, /src/index.css[22m
+[2m8:18:20 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\auth\components\MergeDialog.tsx, /src/index.css[22m
+[2m8:18:20 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/auth/LoginScreen.tsx, /src/index.css[22m
+[2m8:18:20 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/game-select/GameSelectScreen.tsx, /src/index.css[22m
+[2m8:18:20 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\home\components\ContinueCard.tsx, /src/index.css[22m
+[2m8:18:20 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\home\components\EmptyPrompt.tsx, /src/index.css[22m
+[2m8:18:20 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\home\components\HomeHeader.tsx, /src/index.css[22m
+[2m8:18:20 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\home\components\NavShortcuts.tsx, /src/index.css[22m
+[2m8:18:20 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\home\components\PlayCta.tsx, /src/index.css[22m
+[2m8:18:20 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/home/HomeScreen.tsx, /src/index.css[22m
+[2m8:18:20 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/landing/LandingScreen.tsx, /src/index.css[22m
+[2m8:18:20 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\leaderboard\components\EmptyState.tsx, /src/index.css[22m
+[2m8:18:20 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\leaderboard\components\ErrorState.tsx, /src/index.css[22m
+[2m8:18:20 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\leaderboard\components\FilterRow.tsx, /src/index.css[22m
+[2m8:18:20 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\leaderboard\components\GuestNotice.tsx, /src/index.css[22m
+[2m8:18:20 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\leaderboard\components\LeaderboardHeader.tsx, /src/index.css[22m
+[2m8:18:20 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\leaderboard\components\OfflineNotice.tsx, /src/index.css[22m
+[2m8:18:20 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/leaderboard/LeaderboardScreen.tsx, /src/index.css[22m
+[2m8:18:20 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\lobby\components\EloContextBadge.tsx, /src/index.css[22m
+[2m8:18:20 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\lobby\components\FriendRow.tsx, /src/index.css[22m
+[2m8:18:20 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\lobby\components\FriendStateCards.tsx, /src/index.css[22m
+[2m8:18:20 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\lobby\components\LobbyHeader.tsx, /src/index.css[22m
+[2m8:18:20 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\lobby\components\LobbyNavShortcuts.tsx, /src/index.css[22m
+[2m8:18:20 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\lobby\components\QuickMatchCta.tsx, /src/index.css[22m
+[2m8:18:20 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\lobby\components\RoomActions.tsx, /src/index.css[22m
+[2m8:18:20 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/lobby/LobbyScreen.tsx, /src/index.css[22m
+[2m8:18:20 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\profile\components\FriendsCard.tsx, /src/index.css[22m
+[2m8:18:20 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\profile\components\GuestWall.tsx, /src/index.css[22m
+[2m8:18:20 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\profile\components\MatchDetailDialog.tsx, /src/index.css[22m
+[2m8:18:20 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\profile\components\MatchHistoryCard.tsx, /src/index.css[22m
+[2m8:18:20 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\profile\components\MatchRow.tsx, /src/index.css[22m
+[2m8:18:20 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\profile\components\ProfileHeader.tsx, /src/index.css[22m
+[2m8:18:20 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\profile\components\RecordStatsCard.tsx, /src/index.css[22m
+[2m8:18:20 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/profile/ProfileScreen.tsx, /src/index.css[22m
+[2m8:18:47 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/landing/LandingScreen.tsx, /src/index.css[22m
+[2m8:19:53 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/landing/LandingScreen.tsx, /src/index.css[22m
+[2m8:19:57 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/landing/LandingScreen.tsx, /src/index.css[22m
+[2m8:22:19 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\game-select\components\BackRow.tsx, /src/index.css[22m
+[2m8:22:24 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\game-select\components\BackRow.tsx, /src/index.css[22m
+[2m8:22:30 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\game-select\components\BackRow.tsx, /src/index.css[22m
+[2m8:22:34 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\game-select\components\BackRow.tsx, /src/index.css[22m
+[2m8:22:43 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\game-select\components\GuestNudge.tsx, /src/index.css[22m
+[2m8:22:47 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\game-select\components\GuestNudge.tsx, /src/index.css[22m
+[2m8:22:52 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\game-select\components\ModeChip.tsx, /src/index.css[22m
+[2m8:23:00 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\game-select\components\ModeChip.tsx, /src/index.css[22m
+[2m8:23:06 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\game-select\components\ModeChip.tsx, /src/index.css[22m
+[2m8:23:12 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\game-select\components\StartButton.tsx, /src/index.css[22m
+[2m8:23:21 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\game-select\components\StartButton.tsx, /src/index.css[22m
+[2m8:23:25 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\game-select\components\StartButton.tsx, /src/index.css[22m
+[2m8:23:30 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\game-select\components\StartButton.tsx, /src/index.css[22m
+[2m8:23:35 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\game-select\components\GameCard.tsx, /src/index.css[22m
+[2m8:24:02 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\game-select\components\GameCard.tsx, /src/index.css[22m
+[2m8:24:07 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\game-select\components\GameCard.tsx, /src/index.css[22m
+[2m8:24:13 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\game-select\components\GameCard.tsx, /src/index.css[22m
+[2m8:24:20 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\game-select\components\GameCard.tsx, /src/index.css[22m
+[2m8:26:21 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\profile\components\AvatarHero.tsx, /src/index.css[22m
+[2m8:26:26 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\profile\components\AvatarHero.tsx, /src/index.css[22m
+[2m8:26:30 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\profile\components\AvatarHero.tsx, /src/index.css[22m
+[2m8:26:37 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\profile\components\AvatarHero.tsx, /src/index.css[22m
+[2m8:26:41 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\profile\components\AvatarHero.tsx, /src/index.css[22m
+[2m8:26:47 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\profile\components\BestScoresCard.tsx, /src/index.css[22m
+[2m8:26:52 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\profile\components\BestScoresCard.tsx, /src/index.css[22m
+[2m8:26:57 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\profile\components\BestScoresCard.tsx, /src/index.css[22m
+[2m8:27:03 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\profile\components\BestScoresCard.tsx, /src/index.css[22m
+[2m8:27:09 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\profile\components\BestScoresCard.tsx, /src/index.css[22m
+[2m8:27:15 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\profile\components\EloCard.tsx, /src/index.css[22m
+[2m8:27:20 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\profile\components\EloCard.tsx, /src/index.css[22m
+[2m8:27:25 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\profile\components\EloCard.tsx, /src/index.css[22m
+[2m8:27:31 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\profile\components\EloCard.tsx, /src/index.css[22m
+[2m8:27:42 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\profile\components\ErrorState.tsx, /src/index.css[22m
+[2m8:27:49 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\profile\components\FriendRow.tsx, /src/index.css[22m
+[2m8:27:58 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\profile\components\LoadingIndicator.tsx, /src/index.css[22m
+[2m8:29:52 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\leaderboard\components\BoardTabs.tsx, /src/index.css[22m
+[2m8:30:00 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\leaderboard\components\BoardTabs.tsx, /src/index.css[22m
+[2m8:30:05 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\leaderboard\components\BoardTabs.tsx, /src/index.css[22m
+[2m8:30:10 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\leaderboard\components\RankBadge.tsx, /src/index.css[22m
+[2m8:30:16 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\leaderboard\components\RankBadge.tsx, /src/index.css[22m
+[2m8:30:21 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\leaderboard\components\RankBadge.tsx, /src/index.css[22m
+[2m8:30:26 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\leaderboard\components\RankBadge.tsx, /src/index.css[22m
+[2m8:30:31 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\leaderboard\components\RankBadge.tsx, /src/index.css[22m
+[2m8:30:40 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\leaderboard\components\LeaderboardRow.tsx, /src/index.css[22m
+[2m8:30:49 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\leaderboard\components\LeaderboardRow.tsx, /src/index.css[22m
+[2m8:30:54 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\leaderboard\components\LeaderboardRow.tsx, /src/index.css[22m
+[2m8:31:02 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\leaderboard\components\ListHeader.tsx, /src/index.css[22m
+[2m8:31:11 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\leaderboard\components\PinnedPlayerRow.tsx, /src/index.css[22m
+[2m8:31:17 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\leaderboard\components\ResetLabel.tsx, /src/index.css[22m
+[2m8:32:07 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/versus-room/VersusRoomScreen.tsx, /src/index.css[22m
+[2m8:32:12 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/versus-room/VersusRoomScreen.tsx, /src/index.css[22m
+[2m8:32:17 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/versus-room/VersusRoomScreen.tsx, /src/index.css[22m
+[2m8:35:01 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-room\components\RoomHeader.tsx, /src/index.css[22m
+[2m8:35:05 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-room\components\RoomHeader.tsx, /src/index.css[22m
+[2m8:35:11 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-room\components\RoomHeader.tsx, /src/index.css[22m
+[2m8:35:16 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-room\components\RoomHeader.tsx, /src/index.css[22m
+[2m8:35:44 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-room\components\ModeSummaryCard.tsx, /src/index.css[22m
+[2m8:35:53 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-room\components\ModeSummaryCard.tsx, /src/index.css[22m
+[2m8:36:01 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-room\components\ModeSummaryCard.tsx, /src/index.css[22m
+[2m8:36:06 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-room\components\ModeSummaryCard.tsx, /src/index.css[22m
+[2m8:36:14 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-room\components\InlineError.tsx, /src/index.css[22m
+[2m8:36:52 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-room\components\InlineError.tsx, /src/index.css[22m
+[2m8:36:57 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-room\components\InlineError.tsx, /src/index.css[22m
+[2m8:37:02 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-room\components\InlineError.tsx, /src/index.css[22m
+[2m8:37:07 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-room\components\InlineError.tsx, /src/index.css[22m
+[2m8:37:21 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-room\components\EmptyChoiceView.tsx, /src/index.css[22m
+[2m8:37:27 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-room\components\EmptyChoiceView.tsx, /src/index.css[22m
+[2m8:37:33 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-room\components\EmptyChoiceView.tsx, /src/index.css[22m
+[2m8:39:47 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-room\components\CreateRoomForm.tsx, /src/index.css[22m
+[2m8:39:54 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-room\components\CreateRoomForm.tsx, /src/index.css[22m
+[2m8:40:00 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-room\components\CreateRoomForm.tsx, /src/index.css[22m
+[2m8:40:06 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-room\components\CreateRoomForm.tsx, /src/index.css[22m
+[2m8:40:20 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-room\components\CreateRoomForm.tsx, /src/index.css[22m
+[2m8:40:24 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-room\components\CreateRoomForm.tsx, /src/index.css[22m
+[2m8:40:30 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-room\components\CreateRoomForm.tsx, /src/index.css[22m
+[2m8:40:37 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-room\components\CreateRoomForm.tsx, /src/index.css[22m
+[2m8:40:43 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-room\components\JoinRoomForm.tsx, /src/index.css[22m
+[2m8:40:47 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-room\components\JoinRoomForm.tsx, /src/index.css[22m
+[2m8:40:53 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-room\components\JoinRoomForm.tsx, /src/index.css[22m
+[2m8:41:06 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-room\components\JoinRoomForm.tsx, /src/index.css[22m
+[2m8:41:13 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-room\components\ReadyRoomView.tsx, /src/index.css[22m
+[2m8:41:18 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-room\components\ReadyRoomView.tsx, /src/index.css[22m
+[2m8:41:23 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-room\components\ReadyRoomView.tsx, /src/index.css[22m
+[2m8:41:32 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-room\components\ReadyRoomView.tsx, /src/index.css[22m
+[2m8:41:36 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-room\components\ReadyRoomView.tsx, /src/index.css[22m
+[2m8:41:45 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-room\components\ReadyRoomView.tsx, /src/index.css[22m
+[2m8:41:51 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-room\components\PlayerSlotCard.tsx, /src/index.css[22m
+[2m8:42:00 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-room\components\PlayerSlotCard.tsx, /src/index.css[22m
+[2m8:42:05 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-room\components\PlayerSlotCard.tsx, /src/index.css[22m
+[2m8:42:12 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-room\components\PlayerSlotCard.tsx, /src/index.css[22m
+[2m8:42:18 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-room\components\PlayerSlotCard.tsx, /src/index.css[22m
+[2m8:42:22 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-room\components\PlayerSlotCard.tsx, /src/index.css[22m
+[2m8:42:27 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-room\components\RoomCodeBar.tsx, /src/index.css[22m
+[2m8:42:33 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-room\components\RoomCodeBar.tsx, /src/index.css[22m
+[2m8:42:38 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-room\components\RoomCodeBar.tsx, /src/index.css[22m
+[2m8:42:43 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-room\components\RoomCodeBar.tsx, /src/index.css[22m
+[2m8:42:48 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-room\components\RoomCodeBar.tsx, /src/index.css[22m
+[2m8:42:53 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-room\components\RoomCodeBar.tsx, /src/index.css[22m
+[2m8:45:12 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\result\components\ScoreHero.tsx, /src/index.css[22m
+[2m8:45:18 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\result\components\ScoreHero.tsx, /src/index.css[22m
+[2m8:45:24 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\result\components\ScoreHero.tsx, /src/index.css[22m
+[2m8:45:28 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\result\components\ScoreHero.tsx, /src/index.css[22m
+[2m8:45:33 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\result\components\ScoreHero.tsx, /src/index.css[22m
+[2m8:45:40 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\result\components\NewRecordBadge.tsx, /src/index.css[22m
+[2m8:45:47 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\result\components\NewRecordBadge.tsx, /src/index.css[22m
+[2m8:45:52 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\result\components\NewRecordBadge.tsx, /src/index.css[22m
+[2m8:45:56 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\result\components\NewRecordBadge.tsx, /src/index.css[22m
+[2m8:46:04 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\result\components\EloChangeCard.tsx, /src/index.css[22m
+[2m8:46:10 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\result\components\EloChangeCard.tsx, /src/index.css[22m
+[2m8:46:18 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\result\components\EloChangeCard.tsx, /src/index.css[22m
+[2m8:46:28 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\result\components\RankedBreakdownCard.tsx, /src/index.css[22m
+[2m8:46:40 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\result\components\RankedBreakdownCard.tsx, /src/index.css[22m
+[2m8:46:45 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\result\components\RankedBreakdownCard.tsx, /src/index.css[22m
+[2m8:46:50 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\result\components\BestComparison.tsx, /src/index.css[22m
+[2m8:46:55 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\result\components\BestComparison.tsx, /src/index.css[22m
+[2m8:47:02 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\result\components\BestComparison.tsx, /src/index.css[22m
+[2m8:47:07 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\result\components\BestComparison.tsx, /src/index.css[22m
+[2m8:47:13 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\result\components\GuestNotice.tsx, /src/index.css[22m
+[2m8:47:21 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\result\components\GuestNotice.tsx, /src/index.css[22m
+[2m8:47:30 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\result\components\SavingOverlay.tsx, /src/index.css[22m
+[2m8:47:36 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\result\components\SaveErrorCard.tsx, /src/index.css[22m
+[2m8:47:44 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\result\components\PrimaryButton.tsx, /src/index.css[22m
+[2m8:47:49 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\result\components\PrimaryButton.tsx, /src/index.css[22m
+[2m8:47:55 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\result\components\SecondaryActions.tsx, /src/index.css[22m
+[2m8:48:01 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\result\components\SecondaryActions.tsx, /src/index.css[22m
+[2m8:48:06 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\result\components\SecondaryActions.tsx, /src/index.css[22m
+[2m8:50:39 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-gameplay\components\MatchupHeader.tsx, /src/index.css[22m
+[2m8:50:48 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-gameplay\components\MatchupHeader.tsx, /src/index.css[22m
+[2m8:50:53 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-gameplay\components\MatchupHeader.tsx, /src/index.css[22m
+[2m8:51:03 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-gameplay\components\MatchupHeader.tsx, /src/index.css[22m
+[2m8:51:10 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-gameplay\components\MatchupHeader.tsx, /src/index.css[22m
+[2m8:51:14 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-gameplay\components\MatchupHeader.tsx, /src/index.css[22m
+[2m8:51:19 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-gameplay\components\MatchupHeader.tsx, /src/index.css[22m
+[2m8:51:23 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-gameplay\components\MatchupHeader.tsx, /src/index.css[22m
+[2m8:51:28 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-gameplay\components\MatchupHeader.tsx, /src/index.css[22m
+[2m8:51:41 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-gameplay\components\RoundBanner.tsx, /src/index.css[22m
+[2m8:51:47 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-gameplay\components\RoundBanner.tsx, /src/index.css[22m
+[2m8:51:53 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-gameplay\components\PromptBar.tsx, /src/index.css[22m
+[2m8:51:59 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-gameplay\components\PromptBar.tsx, /src/index.css[22m
+[2m8:52:04 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-gameplay\components\PromptBar.tsx, /src/index.css[22m
+[2m8:52:10 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-gameplay\components\PromptBar.tsx, /src/index.css[22m
+[2m8:52:14 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-gameplay\components\PromptBar.tsx, /src/index.css[22m
+[2m8:52:20 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-gameplay\components\PromptBar.tsx, /src/index.css[22m
+[2m8:52:25 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-gameplay\components\ErrorOverlay.tsx, /src/index.css[22m
+[2m8:52:30 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-gameplay\components\ErrorOverlay.tsx, /src/index.css[22m
+[2m8:52:36 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-gameplay\components\ErrorOverlay.tsx, /src/index.css[22m
+[2m8:52:44 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-gameplay\components\ErrorOverlay.tsx, /src/index.css[22m
+[2m8:52:49 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-gameplay\components\ErrorOverlay.tsx, /src/index.css[22m
+[2m8:52:54 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-gameplay\components\ErrorOverlay.tsx, /src/index.css[22m
+[2m8:53:00 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-gameplay\components\ReconnectingOverlay.tsx, /src/index.css[22m
+[2m8:53:04 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-gameplay\components\ReconnectingOverlay.tsx, /src/index.css[22m
+[2m8:53:12 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-gameplay\components\ReconnectingOverlay.tsx, /src/index.css[22m
+[2m8:53:19 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-gameplay\components\ReconnectingOverlay.tsx, /src/index.css[22m
+[2m8:53:26 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-gameplay\components\ReconnectingOverlay.tsx, /src/index.css[22m
+[2m8:53:32 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-gameplay\components\ResultTransition.tsx, /src/index.css[22m
+[2m8:53:41 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-gameplay\components\ResultTransition.tsx, /src/index.css[22m
+[2m8:53:48 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-gameplay\components\ResultTransition.tsx, /src/index.css[22m
+[2m8:53:54 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-gameplay\components\ResultTransition.tsx, /src/index.css[22m
+[2m8:54:02 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-gameplay\components\ResultTransition.tsx, /src/index.css[22m
+[2m8:54:08 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-gameplay\components\ResultTransition.tsx, /src/index.css[22m
+[2m8:54:14 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-gameplay\components\ResultTransition.tsx, /src/index.css[22m
+[2m8:54:19 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-gameplay\components\ResultTransition.tsx, /src/index.css[22m
+[2m8:54:26 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-gameplay\components\WaitingState.tsx, /src/index.css[22m
+[2m8:54:31 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-gameplay\components\WaitingState.tsx, /src/index.css[22m
+[2m8:54:36 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-gameplay\components\WaitingState.tsx, /src/index.css[22m
+[2m8:54:43 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-gameplay\components\SeedBadge.tsx, /src/index.css[22m
+[2m8:54:48 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-gameplay\components\LoadingSkeleton.tsx, /src/index.css[22m
+[2m8:54:53 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-gameplay\components\LoadingSkeleton.tsx, /src/index.css[22m
+[2m8:55:22 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/versus-gameplay/VersusGameplayScreen.tsx, /src/index.css[22m
+[2m8:55:52 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/versus-gameplay/VersusGameplayScreen.tsx, /src/index.css[22m
+[2m8:56:02 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/versus-gameplay/VersusGameplayScreen.tsx, /src/index.css[22m
+[2m8:59:30 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/auth/LoginScreen.tsx, /src/index.css[22m
+[2m8:59:30 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/auth/LoginScreen.tsx, /src/index.css[22m
+[2m8:59:34 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/auth/LoginScreen.tsx, /src/index.css[22m
+[2m8:59:39 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/auth/LoginScreen.tsx, /src/index.css[22m
+[2m8:59:43 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/auth/LoginScreen.tsx, /src/index.css[22m
+[2m9:00:05 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\leaderboard\components\FilterRow.tsx, /src/index.css[22m
+[2m9:00:10 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\leaderboard\components\FilterRow.tsx, /src/index.css[22m
+[2m9:00:19 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\lobby\components\RoomActions.tsx, /src/index.css[22m
+[2m9:00:24 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\lobby\components\RoomActions.tsx, /src/index.css[22m
+[2m9:00:36 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/profile/ProfileScreen.tsx, /src/index.css[22m
+[2m9:06:40 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mindex.html[22m
+[2m9:06:46 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mindex.html[22m
+[2m9:06:59 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/landing/LandingScreen.tsx, /src/index.css[22m
+[2m9:07:04 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/landing/LandingScreen.tsx, /src/index.css[22m
+[2m9:07:48 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css[22m
+[2m9:07:57 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css[22m
+[2m9:08:08 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\components\ui\button\Button.tsx, /src/index.css[22m
+[2m9:08:14 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\components\ui\button\Button.tsx, /src/index.css[22m
+[2m9:24:01 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/landing/LandingScreen.tsx, /src/index.css[22m
+[2m9:24:09 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/landing/LandingScreen.tsx, /src/index.css[22m
+[2m9:24:14 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/landing/LandingScreen.tsx, /src/index.css[22m
+[2m9:27:45 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.app.tsbuildinfo[22m
+[2m9:27:45 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.node.tsbuildinfo[22m
+[2m9:34:13 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/services/leaderboard/leaderboard.interface.ts[22m
+[2m9:34:29 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/pages/leaderboard/LeaderboardScreen.tsx, /@fs/D:\repos\GameBoard\frontend\src\pages\leaderboard\components\FilterRow.tsx, /@fs/D:\repos\GameBoard\frontend\src\pages\leaderboard\components\EmptyState.tsx, /@fs/D:\repos\GameBoard\frontend\src\pages\leaderboard\components\ListHeader.tsx, /@fs/D:\repos\GameBoard\frontend\src\pages\leaderboard\components\BoardTabs.tsx[22m
+[2m9:35:01 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/mocks/handlers.ts[22m
+[2m9:35:27 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mmock-server/index.mjs[22m
+[2m9:35:35 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mmock-server/index.mjs[22m
+[2m9:35:57 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/leaderboard/LeaderboardScreen.tsx, /src/index.css[22m
+[2m9:36:13 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.app.tsbuildinfo[22m
+[2m9:36:13 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.node.tsbuildinfo[22m
+[2m9:48:04 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/pages/gameplay/GameplayScreen.tsx[22m
+[2m9:48:26 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/pages/gameplay/GameplayScreen.tsx[22m
+[2m9:48:42 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/pages/gameplay/GameplayScreen.tsx[22m
+[2m9:48:59 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/gameplay/GameplayScreen.tsx, /src/index.css[22m
+[2m9:49:07 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/gameplay/GameplayScreen.tsx, /src/index.css[22m
+[2m9:49:23 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/gameplay/GameplayScreen.tsx, /src/index.css[22m
+[2m9:49:30 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/gameplay/GameplayScreen.tsx, /src/index.css[22m
+[2m9:49:35 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/gameplay/GameplayScreen.tsx, /src/index.css[22m
+[2m9:49:40 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/gameplay/GameplayScreen.tsx, /src/index.css[22m
+[2m9:49:58 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/services/result/result.interface.ts[22m
+[2m9:50:47 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/mocks/handlers.ts[22m
+[2m9:51:02 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mmock-server/index.mjs[22m
+[2m9:51:15 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mmock-server/index.mjs[22m
+[2m9:51:26 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/App.tsx, /src/index.css[22m
+[2m9:51:34 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/App.tsx, /src/index.css[22m
+[2m9:51:40 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/App.tsx, /src/index.css[22m
+[2m9:52:19 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/services/result/result.interface.ts[22m
+[2m9:52:28 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mmock-server/index.mjs[22m
+[2m9:52:49 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/result/ResultScreen.tsx, /src/index.css[22m
+[2m9:53:08 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/pages/result/ResultScreen.tsx[22m
+[2m9:53:08 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\result\components\StatePill.tsx, /src/index.css[22m
+[2m9:53:16 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\result\components\RankedBreakdownCard.tsx, /src/index.css[22m
+[2m9:53:37 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\result\components\RankedBreakdownCard.tsx, /src/index.css[22m
+[2m9:53:44 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\result\components\RankedBreakdownCard.tsx, /src/index.css[22m
+[2m9:54:00 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.app.tsbuildinfo[22m
+[2m9:54:00 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.node.tsbuildinfo[22m
+[2m9:55:17 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.app.tsbuildinfo[22m
+[2m9:55:17 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.node.tsbuildinfo[22m
+[2m10:00:09 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/result/ResultScreen.tsx, /src/index.css[22m
+[2m10:00:14 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/result/ResultScreen.tsx, /src/index.css[22m
+[2m10:00:19 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/result/ResultScreen.tsx, /src/index.css[22m
+[2m10:03:30 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.app.tsbuildinfo[22m
+[2m10:03:30 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.node.tsbuildinfo[22m
+[2m10:05:05 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.app.tsbuildinfo[22m
+[2m10:05:05 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.node.tsbuildinfo[22m
+[2m12:37:31 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/game-select/GameSelectScreen.tsx, /src/index.css[22m
+[2m12:37:34 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/game-select/GameSelectScreen.tsx, /src/index.css[22m
+[2m12:37:40 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/result/ResultScreen.tsx, /src/index.css[22m
+[2m12:37:47 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/auth/LoginScreen.tsx, /src/index.css[22m
+[2m12:37:49 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/auth/LoginScreen.tsx, /src/index.css[22m
+[2m12:37:56 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/settings/SettingsScreen.tsx, /src/index.css[22m
+[2m12:38:02 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/settings/SettingsScreen.tsx, /src/index.css[22m
+[2m12:38:06 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/settings/SettingsScreen.tsx, /src/index.css[22m
+[2m12:38:14 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\settings\SettingsSection.tsx, /src/index.css[22m
+[2m12:38:14 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\settings\SettingsRow.tsx, /src/index.css[22m
+[2m12:38:14 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\settings\SettingsToggle.tsx, /src/index.css[22m
+[2m12:41:39 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/pages/leaderboard/LeaderboardScreen.tsx, /src/pages/auth/LoginScreen.tsx, /@fs/D:\repos\GameBoard\frontend\src\pages\profile\components\LoadingIndicator.tsx, /@fs/D:\repos\GameBoard\frontend\src\pages\result\components\SecondaryActions.tsx, /@fs/D:\repos\GameBoard\frontend\src\pages\profile\components\AvatarHero.tsx, /@fs/D:\repos\GameBoard\frontend\src\pages\profile\components\FriendsCard.tsx, /@fs/D:\repos\GameBoard\frontend\src\pages\profile\components\EloCard.tsx, /@fs/D:\repos\GameBoard\frontend\src\pages\result\components\ScoreHero.tsx, /@fs/D:\repos\GameBoard\frontend\src\pages\versus-room\components\ReadyRoomView.tsx, /@fs/D:\repos\GameBoard\frontend\src\pages\gameplay\components\PauseOverlay.tsx, /@fs/D:\repos\GameBoard\frontend\src\pages\result\components\RankedBreakdownCard.tsx, /@fs/D:\repos\GameBoard\frontend\src\pages\home\components\EmptyPrompt.tsx, /@fs/D:\repos\GameBoard\frontend\src\pages\gameplay\components\StatRow.tsx, /@fs/D:\repos\GameBoard\frontend\src\pages\profile\components\ErrorState.tsx, /@fs/D:\repos\GameBoard\frontend\src\pages\profile\components\GuestWall.tsx, /@fs/D:\repos\GameBoard\frontend\src\pages\profile\components\MatchDetailDialog.tsx, /@fs/D:\repos\GameBoard\frontend\src\pages\game-select\components\GuestNudge.tsx, /@fs/D:\repos\GameBoard\frontend\src\pages\versus-room\components\ModeSummaryCard.tsx, /@fs/D:\repos\GameBoard\frontend\src\pages\auth\components\MergeDialog.tsx, /@fs/D:\repos\GameBoard\frontend\src\pages\game-select\components\GameCard.tsx, /@fs/D:\repos\GameBoard\frontend\src\pages\gameplay\components\OfflinePauseOverlay.tsx, /@fs/D:\repos\GameBoard\frontend\src\pages\profile\components\RecordStatsCard.tsx, /@fs/D:\repos\GameBoard\frontend\src\pages\leaderboard\components\EmptyState.tsx, /@fs/D:\repos\GameBoard\frontend\src\pages\profile\components\BestScoresCard.tsx, /@fs/D:\repos\GameBoard\frontend\src\pages\result\components\SavingOverlay.tsx, /@fs/D:\repos\GameBoard\frontend\src\pages\lobby\components\EloContextBadge.tsx, /@fs/D:\repos\GameBoard\frontend\src\pages\home\components\ContinueCard.tsx, /@fs/D:\repos\GameBoard\frontend\src\pages\result\components\EloChangeCard.tsx, /@fs/D:\repos\GameBoard\frontend\src\pages\leaderboard\components\ErrorState.tsx, /@fs/D:\repos\GameBoard\frontend\src\pages\gameplay\components\PromptBar.tsx, /@fs/D:\repos\GameBoard\frontend\src\pages\result\components\BestComparison.tsx, /@fs/D:\repos\GameBoard\frontend\src\pages\lobby\components\FriendRow.tsx, /@fs/D:\repos\GameBoard\frontend\src\pages\lobby\components\RoomActions.tsx, /@fs/D:\repos\GameBoard\frontend\src\pages\gameplay\components\TutorialOverlay.tsx, /@fs/D:\repos\GameBoard\frontend\src\pages\lobby\components\FriendStateCards.tsx, /@fs/D:\repos\GameBoard\frontend\src\pages\profile\components\MatchHistoryCard.tsx, /@fs/D:\repos\GameBoard\frontend\src\pages\versus-room\components\RoomCodeBar.tsx, /@fs/D:\repos\GameBoard\frontend\src\pages\versus-room\components\PlayerSlotCard.tsx[22m
+[2m12:41:45 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\profile\components\GuestWall.tsx, /src/index.css[22m
+[2m12:41:50 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\home\components\ContinueCard.tsx, /src/index.css[22m
+[2m12:43:31 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\auth\components\InputField.tsx, /src/index.css[22m
+[2m12:43:52 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\game-select\components\GameCard.tsx, /src/index.css[22m
+[2m12:43:56 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\game-select\components\ModeChip.tsx, /src/index.css[22m
+[2m12:44:00 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\game-select\components\DifficultyChip.tsx, /src/index.css[22m
+[2m12:45:35 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/landing/LandingScreen.tsx, /src/index.css[22m
+[2m12:45:39 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/landing/LandingScreen.tsx, /src/index.css[22m
+[2m12:45:45 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\leaderboard\components\BoardTabs.tsx, /src/index.css[22m
+[2m12:45:50 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\leaderboard\components\FilterRow.tsx, /src/index.css[22m
+[2m12:51:00 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\components\ui\layout\ScreenHeader.tsx, /src/index.css[22m
+[2m12:51:06 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\leaderboard\components\LeaderboardHeader.tsx, /src/index.css[22m
+[2m12:51:45 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\components\ui\layout\ScreenShell.tsx, /src/index.css[22m
+[2m12:53:16 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/App.tsx, /src/pages/landing/LandingScreen.tsx, /src/pages/game-select/GameSelectScreen.tsx, /src/pages/home/HomeScreen.tsx, /src/pages/settings/SettingsScreen.tsx, /src/pages/auth/LoginScreen.tsx[22m
+[2m12:53:23 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/App.tsx, /src/pages/landing/LandingScreen.tsx, /src/pages/game-select/GameSelectScreen.tsx, /src/pages/home/HomeScreen.tsx, /src/pages/settings/SettingsScreen.tsx, /src/pages/auth/LoginScreen.tsx[22m
+[2m12:53:29 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/landing/LandingScreen.tsx, /src/index.css[22m
+[2m12:53:54 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/landing/LandingScreen.tsx, /src/index.css[22m
+[2m12:53:58 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/auth/LoginScreen.tsx, /src/index.css[22m
+[2m12:54:03 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/App.tsx, /src/index.css[22m
+[2m12:54:09 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/home/HomeScreen.tsx, /src/index.css[22m
+[2m12:54:16 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/lobby/LobbyScreen.tsx, /src/index.css[22m
+[2m12:54:22 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/leaderboard/LeaderboardScreen.tsx, /src/index.css[22m
+[2m12:54:29 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/profile/ProfileScreen.tsx, /src/index.css[22m
+[2m12:54:36 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/result/ResultScreen.tsx, /src/index.css[22m
+[2m12:54:42 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/versus-room/VersusRoomScreen.tsx, /src/index.css[22m
+[2m12:54:55 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/game-select/GameSelectScreen.tsx, /src/index.css[22m
+[2m12:55:01 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/gameplay/GameplayScreen.tsx, /src/index.css[22m
+[2m12:57:38 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/auth/LoginScreen.tsx, /src/index.css[22m
+[2m12:59:02 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/auth/LoginScreen.tsx, /src/index.css[22m
+[2m12:59:35 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.app.tsbuildinfo[22m
+[2m12:59:35 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.node.tsbuildinfo[22m
+[2m12:59:39 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.app.tsbuildinfo[22m
+[2m12:59:39 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.node.tsbuildinfo[22m
+[2m1:00:05 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.app.tsbuildinfo[22m
+[2m1:00:05 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.node.tsbuildinfo[22m
+[2m1:00:17 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.app.tsbuildinfo[22m
+[2m1:00:17 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.node.tsbuildinfo[22m
+[2m1:01:12 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css[22m
+[2m1:01:17 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/main.tsx[22m
+[2m1:01:38 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/settings/SettingsScreen.tsx, /src/index.css[22m
+[2m1:01:44 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/settings/SettingsScreen.tsx, /src/index.css[22m
+[2m1:01:49 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/settings/SettingsScreen.tsx, /src/index.css[22m
+[2m1:01:56 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.app.tsbuildinfo[22m
+[2m1:01:57 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.node.tsbuildinfo[22m
+[2m1:03:51 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/settings/SettingsScreen.tsx, /src/index.css[22m
+[2m1:04:05 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/leaderboard/LeaderboardScreen.tsx, /src/index.css[22m
+[2m1:04:13 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.app.tsbuildinfo[22m
+[2m1:04:13 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.node.tsbuildinfo[22m
+[2m1:04:50 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\settings\components\ProfileCard.tsx, /src/index.css[22m
+[2m1:04:58 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/settings/SettingsScreen.tsx, /src/index.css[22m
+[2m1:05:03 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/settings/SettingsScreen.tsx, /src/index.css[22m
+[2m1:05:11 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.app.tsbuildinfo[22m
+[2m1:05:11 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.node.tsbuildinfo[22m
+[2m1:06:42 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/App.tsx, /src/index.css[22m
+[2m1:06:56 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/game-select/GameSelectScreen.tsx, /src/index.css[22m
+[2m1:07:02 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\result\components\GuestNotice.tsx, /src/index.css[22m
+[2m1:07:15 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/result/ResultScreen.tsx, /src/index.css[22m
+[2m1:07:21 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/result/ResultScreen.tsx, /src/index.css[22m
+[2m1:07:27 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/App.tsx, /src/index.css[22m
+[2m1:07:35 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.app.tsbuildinfo[22m
+[2m1:07:35 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.node.tsbuildinfo[22m
+[2m1:07:41 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/result/ResultScreen.tsx, /src/index.css[22m
+[2m1:07:48 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.app.tsbuildinfo[22m
+[2m1:07:48 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.node.tsbuildinfo[22m
+[2m1:08:19 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\components\ui\layout\ScreenShell.tsx, /src/index.css[22m
+[2m1:08:25 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/App.tsx, /src/index.css[22m
+[2m1:08:34 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.app.tsbuildinfo[22m
+[2m1:08:34 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.node.tsbuildinfo[22m
+[2m1:09:34 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/auth/LoginScreen.tsx, /src/index.css[22m
+[2m1:09:42 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.app.tsbuildinfo[22m
+[2m1:09:42 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.node.tsbuildinfo[22m
+[2m1:11:02 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/auth/LoginScreen.tsx, /src/index.css[22m
+[2m1:11:10 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.app.tsbuildinfo[22m
+[2m1:11:10 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.node.tsbuildinfo[22m
+[2m1:14:34 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/versus-room/VersusRoomScreen.tsx, /src/index.css[22m
+[2m1:14:42 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/versus-gameplay/VersusGameplayScreen.tsx, /src/index.css[22m
+[2m1:14:50 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\gameplay\components\GameplayHeader.tsx, /src/index.css[22m
+[2m1:14:58 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/pages/game/SequenceMemoryScreen.tsx[22m
+[2m1:15:05 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/landing/LandingScreen.tsx, /src/index.css[22m
+[2m1:15:15 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\components\ui\layout\ScreenShell.tsx, /src/index.css[22m
+[2m1:15:19 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/versus-room/VersusRoomScreen.tsx, /src/index.css[22m
+[2m1:15:27 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.app.tsbuildinfo[22m
+[2m1:15:27 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.node.tsbuildinfo[22m
+[2m1:16:18 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.app.tsbuildinfo[22m
+[2m1:16:18 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.node.tsbuildinfo[22m
+[2m1:16:44 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.app.tsbuildinfo[22m
+[2m1:16:45 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.node.tsbuildinfo[22m
+[2m1:27:05 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/services/versus-room/versus-room.interface.ts[22m
+[2m1:27:11 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/pages/versus-room/VersusRoomScreen.tsx, /@fs/D:\repos\GameBoard\frontend\src\pages\versus-room\components\CreateRoomForm.tsx, /@fs/D:\repos\GameBoard\frontend\src\pages\versus-room\components\InlineError.tsx[22m
+[2m1:27:30 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mmock-server/index.mjs[22m
+[2m1:28:29 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/lobby/LobbyScreen.tsx, /src/index.css[22m
+[2m1:28:43 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-room\components\CreateRoomForm.tsx, /src/index.css[22m
+[2m1:28:49 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\versus-room\components\CreateRoomForm.tsx, /src/index.css[22m
+[2m1:28:57 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/versus-room/VersusRoomScreen.tsx, /src/index.css[22m
+[2m1:29:05 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.app.tsbuildinfo[22m
+[2m1:29:05 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.node.tsbuildinfo[22m
+[2m1:29:12 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/pages/versus-room/VersusRoomScreen.tsx, /@fs/D:\repos\GameBoard\frontend\src\pages\versus-room\components\CreateRoomForm.tsx, /@fs/D:\repos\GameBoard\frontend\src\pages\versus-room\components\InlineError.tsx[22m
+[2m1:29:25 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.app.tsbuildinfo[22m
+[2m1:29:25 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.node.tsbuildinfo[22m
+[2m1:30:37 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\components\ui\card\StatCard.tsx, /src/index.css[22m
+[2m1:30:46 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.app.tsbuildinfo[22m
+[2m1:30:46 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.node.tsbuildinfo[22m
+[2m1:32:46 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\lobby\components\QuickMatchCta.tsx, /src/index.css[22m
+[2m1:33:05 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.app.tsbuildinfo[22m
+[2m1:33:05 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.node.tsbuildinfo[22m
+[2m1:36:30 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/lobby/LobbyScreen.tsx, /src/index.css[22m
+[2m1:36:44 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.app.tsbuildinfo[22m
+[2m1:36:44 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.node.tsbuildinfo[22m
+[2m1:38:42 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/lobby/LobbyScreen.tsx, /src/index.css[22m
+[2m1:38:50 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.app.tsbuildinfo[22m
+[2m1:38:50 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.node.tsbuildinfo[22m
+[2m1:38:55 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\components\ui\StatusBanner.tsx, /src/index.css[22m
+[2m1:39:07 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.app.tsbuildinfo[22m
+[2m1:39:07 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.node.tsbuildinfo[22m
+[2m1:39:40 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/lobby/LobbyScreen.tsx, /src/index.css[22m
+[2m1:39:48 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.app.tsbuildinfo[22m
+[2m1:39:48 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.node.tsbuildinfo[22m
+[2m1:41:14 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/services/lobby/lobby.interface.ts[22m
+[2m1:41:21 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/pages/lobby/LobbyScreen.tsx[22m
+[2m1:41:46 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\lobby\components\FriendRow.tsx, /src/index.css[22m
+[2m1:41:56 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/lobby/LobbyScreen.tsx, /src/index.css[22m
+[2m1:42:08 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/lobby/LobbyScreen.tsx, /src/index.css[22m
+[2m1:42:13 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/lobby/LobbyScreen.tsx, /src/index.css[22m
+[2m1:42:17 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/lobby/LobbyScreen.tsx, /src/index.css[22m
+[2m1:42:25 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.app.tsbuildinfo[22m
+[2m1:42:25 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.node.tsbuildinfo[22m
+[2m1:43:16 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\components\ui\icons.tsx, /src/index.css[22m
+[2m1:43:22 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\lobby\components\FriendRow.tsx, /src/index.css[22m
+[2m1:43:37 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.app.tsbuildinfo[22m
+[2m1:43:37 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.node.tsbuildinfo[22m
+[2m1:44:15 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\components\ui\icons.tsx, /src/index.css[22m
+[2m1:44:23 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.app.tsbuildinfo[22m
+[2m1:44:23 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.node.tsbuildinfo[22m
+[2m1:44:49 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\components\ui\icons.tsx, /src/index.css[22m
+[2m1:44:57 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.app.tsbuildinfo[22m
+[2m1:44:57 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.node.tsbuildinfo[22m
+[2m1:45:30 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\components\ui\icons.tsx, /src/index.css[22m
+[2m1:45:38 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.app.tsbuildinfo[22m
+[2m1:45:38 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.node.tsbuildinfo[22m
+[2m1:45:51 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\components\ui\icons.tsx, /src/index.css[22m
+[2m1:46:00 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.app.tsbuildinfo[22m
+[2m1:46:00 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.node.tsbuildinfo[22m
+[2m1:46:22 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\components\ui\icons.tsx, /src/index.css[22m
+[2m1:46:30 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.app.tsbuildinfo[22m
+[2m1:46:30 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.node.tsbuildinfo[22m
+[2m2:49:09 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.node.tsbuildinfo[22m
+[2m4:52:37 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\components\ui\icons.tsx, /src/index.css[22m
+[2m4:52:47 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.app.tsbuildinfo[22m
+[2m4:52:48 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.node.tsbuildinfo[22m
+[2m4:54:10 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\components\ui\icons.tsx, /src/index.css[22m
+[2m4:54:18 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.app.tsbuildinfo[22m
+[2m4:54:18 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.node.tsbuildinfo[22m
+[2m4:54:57 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\components\ui\icons.tsx, /src/index.css[22m
+[2m4:55:05 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.app.tsbuildinfo[22m
+[2m4:55:05 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.node.tsbuildinfo[22m
+[2m4:55:45 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\components\ui\icons.tsx, /src/index.css[22m
+[2m4:55:53 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.app.tsbuildinfo[22m
+[2m4:55:54 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.node.tsbuildinfo[22m
+[2m4:56:16 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\components\ui\icons.tsx, /src/index.css[22m
+[2m4:56:24 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.app.tsbuildinfo[22m
+[2m4:56:24 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.node.tsbuildinfo[22m
+[2m4:56:46 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\components\ui\icons.tsx, /src/index.css[22m
+[2m4:58:57 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/pages/game/SequenceMemoryScreen.tsx[22m
+[2m4:59:08 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/pages/game/SequenceMemoryScreen.tsx[22m
+[2m4:59:31 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\components\ui\gameplay\KeypadButton.tsx, /src/index.css[22m
+[2m4:59:35 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\components\ui\gameplay\ColorBoard.tsx, /src/index.css[22m
+[2m4:59:38 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\components\ui\gameplay\ColorBoard.tsx, /src/index.css[22m
+[2m4:59:42 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\components\ui\gameplay\AlphabetBoard.tsx, /src/index.css[22m
+[2m4:59:48 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\components\ui\gameplay\AlphabetBoard.tsx, /src/index.css[22m
+[2m4:59:52 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\components\ui\gameplay\GridBoard.tsx, /src/index.css[22m
+[2m4:59:56 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\components\ui\gameplay\GridBoard.tsx, /src/index.css[22m
+[2m5:00:00 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\components\ui\gameplay\SequenceBoard.tsx, /src/index.css[22m
+[2m5:00:04 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\components\ui\gameplay\SequenceBoard.tsx, /src/index.css[22m
+[2m5:00:18 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/gameplay/GameplayScreen.tsx, /src/index.css[22m
+[2m5:00:25 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/gameplay/GameplayScreen.tsx, /src/index.css[22m
+[2m5:00:28 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/gameplay/GameplayScreen.tsx, /src/index.css[22m
+[2m5:00:36 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.app.tsbuildinfo[22m
+[2m5:00:36 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.node.tsbuildinfo[22m
+[2m5:00:39 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/pages/game/SequenceMemoryScreen.tsx[22m
+[2m5:00:47 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.app.tsbuildinfo[22m
+[2m5:00:47 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.node.tsbuildinfo[22m
+[2m5:02:01 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/settings/SettingsScreen.tsx, /src/index.css[22m
+[2m5:02:05 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/settings/SettingsScreen.tsx, /src/index.css[22m
+[2m5:02:09 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/settings/SettingsScreen.tsx, /src/index.css[22m
+[2m5:02:17 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.app.tsbuildinfo[22m
+[2m5:02:17 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.node.tsbuildinfo[22m
+[2m5:03:39 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.app.tsbuildinfo[22m
+[2m5:03:39 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.node.tsbuildinfo[22m
+[2m5:06:14 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\components\ui\ConfirmDialog.tsx, /src/index.css[22m
+[2m5:06:19 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\components\ui\ConfirmDialog.tsx, /src/index.css[22m
+[2m5:06:24 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\components\ui\ConfirmDialog.tsx, /src/index.css[22m
+[2m5:06:32 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.app.tsbuildinfo[22m
+[2m5:06:32 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.node.tsbuildinfo[22m
+[2m5:06:45 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.app.tsbuildinfo[22m
+[2m5:06:45 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.node.tsbuildinfo[22m
+[2m5:07:51 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\components\ui\gameplay\KeypadButton.tsx, /src/index.css[22m
+[2m5:07:55 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\components\ui\gameplay\ColorBoard.tsx, /src/index.css[22m
+[2m5:07:59 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\components\ui\gameplay\ColorBoard.tsx, /src/index.css[22m
+[2m5:08:03 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\components\ui\gameplay\AlphabetBoard.tsx, /src/index.css[22m
+[2m5:08:08 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\components\ui\gameplay\AlphabetBoard.tsx, /src/index.css[22m
+[2m5:08:13 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\components\ui\gameplay\GridBoard.tsx, /src/index.css[22m
+[2m5:08:18 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\components\ui\gameplay\GridBoard.tsx, /src/index.css[22m
+[2m5:08:22 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\components\ui\gameplay\SequenceBoard.tsx, /src/index.css[22m
+[2m5:08:26 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\components\ui\gameplay\SequenceBoard.tsx, /src/index.css[22m
+[2m5:08:35 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/gameplay/GameplayScreen.tsx, /src/index.css[22m
+[2m5:08:39 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/gameplay/GameplayScreen.tsx, /src/index.css[22m
+[2m5:08:48 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/settings/SettingsScreen.tsx, /src/index.css[22m
+[2m5:08:53 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/settings/SettingsScreen.tsx, /src/index.css[22m
+[2m5:08:59 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/settings/SettingsScreen.tsx, /src/index.css[22m
+[2m5:09:07 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.app.tsbuildinfo[22m
+[2m5:09:07 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.node.tsbuildinfo[22m
+[2m5:13:45 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/pages/gameplay/GameplayScreen.tsx[22m
+[2m5:13:54 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.app.tsbuildinfo[22m
+[2m5:13:54 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.node.tsbuildinfo[22m
+[2m5:19:42 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/gameplay/GameplayScreen.tsx, /src/index.css[22m
+[2m5:19:52 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/gameplay/GameplayScreen.tsx, /src/index.css[22m
+[2m5:20:00 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/gameplay/GameplayScreen.tsx, /src/index.css[22m
+[2m5:20:19 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.app.tsbuildinfo[22m
+[2m5:20:19 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.node.tsbuildinfo[22m
+[2m7:12:59 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/versus-gameplay/VersusGameplayScreen.tsx, /src/index.css[22m
+[2m7:13:06 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/versus-gameplay/VersusGameplayScreen.tsx, /src/index.css[22m
+[2m7:13:24 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/lobby/LobbyScreen.tsx, /src/index.css[22m
+[2m7:13:30 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/@fs/D:\repos\GameBoard\frontend\src\pages\result\components\NewRecordBadge.tsx, /src/index.css[22m
+[2m7:13:38 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.app.tsbuildinfo[22m
+[2m7:13:38 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.node.tsbuildinfo[22m
+[2m7:13:43 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/lobby/LobbyScreen.tsx, /src/index.css[22m
+[2m7:13:48 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/versus-gameplay/VersusGameplayScreen.tsx, /src/index.css[22m
+[2m7:13:56 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.app.tsbuildinfo[22m
+[2m7:13:56 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.node.tsbuildinfo[22m
+[2m7:14:47 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.app.tsbuildinfo[22m
+[2m7:14:48 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.node.tsbuildinfo[22m
+[2m8:02:29 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.app.tsbuildinfo[22m
+[2m8:02:29 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.node.tsbuildinfo[22m
+[2m8:11:47 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mpackage.json[22m
+[2m8:12:11 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.app.tsbuildinfo[22m
+[2m8:12:11 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.node.tsbuildinfo[22m
+[2m8:12:23 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.app.tsbuildinfo[22m
+[2m8:12:24 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.node.tsbuildinfo[22m
+[2m8:12:37 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.app.tsbuildinfo[22m
+[2m8:12:37 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mtsconfig.node.tsbuildinfo[22m
+[2m9:30:46 PM[22m [36m[1m[vite][22m[39m [32m.env changed, restarting server...[39m
+[2m9:30:46 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m Re-optimizing dependencies because lockfile has changed
+[2m9:30:46 PM[22m [36m[1m[vite][22m[39m server restarted.
+[2m9:33:08 PM[22m [36m[1m[vite][22m[39m [32m.env changed, restarting server...[39m
+[2m9:33:09 PM[22m [36m[1m[vite][22m[39m server restarted.

@@ -1,6 +1,6 @@
 # AI Prompt Template
 
-Use the complete Memory Arena Design Bible before generating anything.
+Use the complete My Lane Design Bible before generating anything.
 
 Never change the design language.
 

@@ -1,6 +1,8 @@
 import { IconSpinner } from './icons'
+import { useTranslation } from '@/i18n/useTranslation'
 
 export function LoadingSkeleton({ message }: { message: string }) {
+  const { t } = useTranslation()
   return (
     <div className="flex flex-1 flex-col items-center justify-center gap-6 px-6 text-center">
       <div
@@ -12,7 +14,7 @@ export function LoadingSkeleton({ message }: { message: string }) {
       <div>
         <p className="text-[16px] font-bold" style={{ color: 'var(--ma-fg)' }}>{message}</p>
         <p className="mt-1 text-[13px]" style={{ color: 'var(--ma-fg-muted)' }}>
-          This only takes a moment
+          {t.versusGameplay.takesAMoment}
         </p>
       </div>
     </div>

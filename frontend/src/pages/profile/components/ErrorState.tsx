@@ -1,7 +1,9 @@
 import { IconAlertCircle } from '@/components/ui/icons'
 import { ErrorStateCard } from '@/components/ui/card'
+import { useTranslation } from '@/i18n/useTranslation'
 
 export function ErrorState({ onRetry }: { onRetry?: () => void }) {
+  const { t } = useTranslation()
   return (
     <ErrorStateCard
       gapClassName="gap-4"
@@ -14,8 +16,8 @@ export function ErrorState({ onRetry }: { onRetry?: () => void }) {
         borderRadius: 'var(--radius-xl)',
         background: 'var(--ma-icon-bg)',
       }}
-      title="Could not load profile"
-      description="Something went wrong fetching your profile data. Check your connection and try again."
+      title={t.profile.errorTitle}
+      description={t.profile.errorDesc}
       action={
         <button
           type="button"
@@ -33,7 +35,7 @@ export function ErrorState({ onRetry }: { onRetry?: () => void }) {
             color: 'var(--ma-fg)',
           }}
         >
-          Try again
+          {t.common.retry}
         </button>
       }
     />

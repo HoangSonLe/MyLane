@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This directory contains screen definitions and navigation flows for Memory Arena.
+This directory contains screen definitions and navigation flows for My Lane.
 
 It defines *which* screens exist and *how users move between them*.
 

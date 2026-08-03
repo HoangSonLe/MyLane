@@ -8,7 +8,7 @@ export type BoardType =
 
 export type SortMetric = 'score' | 'elo'
 
-export type Category = 'number' | 'alphabet' | 'grid' | 'sequence'
+export type Category = 'number' | 'alphabet' | 'grid' | 'sequence' | 'color'
 
 export interface LeaderboardEntry {
   rank: number
@@ -18,4 +18,10 @@ export interface LeaderboardEntry {
   score: number
   elo: number
   isCurrentUser?: boolean
+}
+
+export interface LeaderboardBoard {
+  entries: LeaderboardEntry[]
+  pinnedEntry: LeaderboardEntry | null
+  isEmpty: boolean
 }

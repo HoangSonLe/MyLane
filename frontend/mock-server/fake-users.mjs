@@ -34,7 +34,7 @@ export function makeEmailUser(email) {
     name: nameFromEmail ? nameFromEmail.charAt(0).toUpperCase() + nameFromEmail.slice(1) : 'Player',
     email,
     isGuest: false,
-    elo: 1200,
+    elo: 1000,
   }
 }
 

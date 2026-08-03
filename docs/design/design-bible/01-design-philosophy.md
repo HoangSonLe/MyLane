@@ -12,7 +12,7 @@ The interface exists to support gameplay, not replace it.
 
 Game Before Dashboard
 
-The user opens Memory Arena because they want to play.
+The user opens My Lane because they want to play.
 
 Not because they want statistics.
 

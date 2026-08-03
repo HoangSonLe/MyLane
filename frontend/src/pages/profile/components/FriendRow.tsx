@@ -1,8 +1,15 @@
 import { Avatar } from '@/components/ui/Avatar'
 
-import type { Friend } from '@/services/profile/profile.interface'
+import type { Friend } from '@/services/lobby/lobby.interface'
+import { useTranslation } from '@/i18n/useTranslation'
 
-export function FriendRow({ friend }: { friend: Friend }) {
+interface Props {
+  friend: Friend
+  onSelect?: (friend: Friend) => void
+}
+
+export function FriendRow({ friend, onSelect }: Props) {
+  const { t } = useTranslation()
   const statusBg =
     friend.status === 'online'
       ? 'var(--ma-success)'
@@ -12,14 +19,16 @@ export function FriendRow({ friend }: { friend: Friend }) {
 
   const statusLabel =
     friend.status === 'online'
-      ? 'Online'
+      ? t.profile.statusOnline
       : friend.status === 'in-game'
-      ? 'In game'
-      : 'Offline'
+      ? t.profile.statusInGame
+      : t.profile.statusOffline
 
   return (
     <div
-      className="flex items-center gap-3 px-4 py-3"
+      onClick={() => onSelect?.(friend)}
+      className="flex items-center gap-3 px-4 py-3 cursor-pointer transition-opacity hover:opacity-80 active:opacity-60"
+      title="Bấm để xem thông tin bạn bè"
     >
       {/* Avatar */}
       <Avatar name={friend.name} size="2.25rem" fontSize="12px">
@@ -38,7 +47,7 @@ export function FriendRow({ friend }: { friend: Friend }) {
 
       {/* Name + handle */}
       <div className="flex min-w-0 flex-1 flex-col">
-        <span className="truncate text-[13px] font-semibold" style={{ color: 'var(--ma-fg)' }}>
+        <span className="truncate text-[13px] font-semibold hover:underline" style={{ color: 'var(--ma-fg)' }}>
           {friend.name}
         </span>
         <div className="flex items-center gap-1.5 mt-0.5">

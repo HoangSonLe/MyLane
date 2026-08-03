@@ -1,9 +1,8 @@
-import { useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 import { BottomNavBar } from '@/components/ui/BottomNavBar'
-import { StatusBanner } from '@/components/ui/StatusBanner'
 import { SectionLabel } from '@/components/ui/SectionLabel'
-import { StatePill } from '@/components/ui/StatePill'
+import { ScreenShell, ScreenOfflineBanner, ScreenMain } from '@/components/ui/layout'
 import { BackRow } from './components/BackRow'
 import { GameCard } from './components/GameCard'
 import { ModeChip } from './components/ModeChip'
@@ -11,7 +10,12 @@ import { DifficultyChip } from './components/DifficultyChip'
 import { StartButton } from './components/StartButton'
 import { GuestNudge } from './components/GuestNudge'
 import { GAMES, MODES, DIFFICULTIES } from '@/services/game-select/game-select.mock'
-import { ScreenState, GameId, ModeId, DifficultyId, EntryPoint } from '@/configs/enum'
+import { gameSelectService } from '@/services/game-select/game-select.service'
+import type { GameStats } from '@/services/game-select/game-select.interface'
+import { GameId, ModeId, DifficultyId, EntryPoint } from '@/configs/enum'
+import { useNetworkStatus } from '@/lib/hooks/useNetworkStatus'
+import { useAuthStore } from '@/stores/auth.store'
+import { useTranslation } from '@/i18n/useTranslation'
 
 // ─── Main component ──────────────────────────────────────────────
 export function GameSelectScreen({
@@ -23,19 +27,37 @@ export function GameSelectScreen({
   onBack?: () => void
   onNavigate?: (id: string, meta?: { game: GameId; mode: ModeId; difficulty: DifficultyId }) => void
 }) {
-  const [screenState, setScreenState]       = useState<ScreenState>(ScreenState.NORMAL)
-  const [selectedGame, setSelectedGame]     = useState<GameId>(GameId.SEQUENCE)
-  const [selectedMode, setSelectedMode]     = useState<ModeId>(ModeId.SOLO_PRACTICE)
-  const [selectedDiff, setSelectedDiff]     = useState<DifficultyId>(DifficultyId.MEDIUM)
+  const { isOffline } = useNetworkStatus()
+  const user = useAuthStore((s) => s.user)
+  const isGuest = user?.isGuest ?? true
+  const { t } = useTranslation()
 
-  const isLoading = screenState === ScreenState.LOADING
-  const isOffline = screenState === ScreenState.OFFLINE
+  const [selectedGame, setSelectedGame] = useState<GameId>(GameId.SEQUENCE)
+  const [selectedMode, setSelectedMode] = useState<ModeId>(ModeId.SOLO_PRACTICE)
+  const [selectedDiff, setSelectedDiff] = useState<DifficultyId>(DifficultyId.MEDIUM)
 
-  // In offline / logged-out states show as guest
-  const isGuest = isOffline
+  const [stats, setStats] = useState<GameStats[] | null>(null)
+  const [isLoadingStats, setIsLoadingStats] = useState(true)
+  const [statsError, setStatsError] = useState(false)
+
+  const loadStats = useCallback(async () => {
+    setIsLoadingStats(true)
+    setStatsError(false)
+    try {
+      setStats(await gameSelectService.getStats())
+    } catch {
+      setStatsError(true)
+    } finally {
+      setIsLoadingStats(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    loadStats()
+  }, [loadStats])
 
   const currentMode = MODES.find((m) => m.id === selectedMode) ?? MODES[0]
-  const canStart = !isLoading && !isOffline
+  const canStart = !isLoadingStats && !isOffline
 
   function handleStart() {
     if (!canStart) return
@@ -48,52 +70,39 @@ export function GameSelectScreen({
   }
 
   return (
-    <div
-      className="relative flex min-h-dvh flex-col"
-      style={{ background: 'var(--ma-bg)' }}
-    >
+    <ScreenShell>
       {/* Offline banner — above the back row */}
-      {isOffline && (
-        <div className="pt-16">
-          <StatusBanner
-            variant="offline"
-            message="You're offline. Only Solo Practice is available."
-          />
-        </div>
-      )}
+      <ScreenOfflineBanner show={isOffline} message={t.gameSelect.offlineBanner} />
 
-      <main
-        id="main-content"
-        className={[
-          'flex flex-1 flex-col gap-5 pb-32',
-          isOffline ? '' : 'pt-16',
-        ].join(' ')}
-      >
+      <ScreenMain bottomPadding="pb-32" offline={isOffline}>
         {/* Back row + title */}
         <BackRow
-          skeleton={isLoading}
+          skeleton={isLoadingStats}
           entryPoint={entryPoint}
           onBack={onBack}
         />
 
         {/* ── Game cards ── */}
         <div className="flex flex-col gap-3">
-          {isLoading ? (
+          {isLoadingStats ? (
             <div
               className="skeleton mx-4"
               style={{ height: '0.75rem', width: '4rem', borderRadius: 'var(--radius-sm)' }}
             />
           ) : (
-            <SectionLabel label="Choose a game" />
+            <SectionLabel label={t.gameSelect.chooseGame} />
           )}
           <div className="flex flex-col gap-2.5 px-4">
             {GAMES.map((game) => (
               <GameCard
                 key={game.id}
                 game={game}
-                selected={!isLoading && selectedGame === game.id}
+                stats={stats?.find((s) => s.id === game.id) ?? null}
+                statsError={statsError}
+                onRetryStats={loadStats}
+                selected={!isLoadingStats && selectedGame === game.id}
                 isGuest={isGuest}
-                skeleton={isLoading}
+                skeleton={isLoadingStats}
                 onSelect={() => setSelectedGame(game.id)}
               />
             ))}
@@ -102,22 +111,23 @@ export function GameSelectScreen({
 
         {/* ── Mode selector ── */}
         <div className="flex flex-col gap-3">
-          {isLoading ? (
+          {isLoadingStats ? (
             <div
               className="skeleton mx-4"
               style={{ height: '0.75rem', width: '4rem', borderRadius: 'var(--radius-sm)' }}
             />
           ) : (
-            <SectionLabel label="Mode" />
+            <SectionLabel label={t.gameSelect.mode} />
           )}
           <div className="flex gap-2 px-4">
             {MODES.map((mode) => (
               <ModeChip
                 key={mode.id}
                 mode={mode}
-                selected={!isLoading && selectedMode === mode.id}
+                selected={!isLoadingStats && selectedMode === mode.id}
                 isGuest={isGuest}
-                skeleton={isLoading}
+                skeleton={isLoadingStats}
+                onLogIn={() => onNavigate?.('login')}
                 onSelect={() => {
                   if (!isGuest || !mode.requiresAccount) {
                     setSelectedMode(mode.id)
@@ -130,46 +140,43 @@ export function GameSelectScreen({
 
         {/* ── Difficulty selector ── */}
         <div className="flex flex-col gap-3">
-          {isLoading ? (
+          {isLoadingStats ? (
             <div
               className="skeleton mx-4"
               style={{ height: '0.75rem', width: '5rem', borderRadius: 'var(--radius-sm)' }}
             />
           ) : (
-            <SectionLabel label="Difficulty" />
+            <SectionLabel label={t.gameSelect.difficulty} />
           )}
           <div className="flex gap-2 px-4">
             {DIFFICULTIES.map((diff) => (
               <DifficultyChip
                 key={diff.id}
                 difficulty={diff}
-                selected={!isLoading && selectedDiff === diff.id}
-                skeleton={isLoading}
+                selected={!isLoadingStats && selectedDiff === diff.id}
+                skeleton={isLoadingStats}
                 onSelect={() => setSelectedDiff(diff.id)}
               />
             ))}
           </div>
         </div>
 
-        {/* Guest nudge — shown when offline/guest */}
-        {isGuest && !isLoading && (
+        {/* Guest nudge — shown when logged in as guest */}
+        {isGuest && !isLoadingStats && (
           <GuestNudge onLogIn={() => onNavigate?.('login')} />
         )}
 
         {/* ── Start button ── */}
         <StartButton
-          skeleton={isLoading}
+          skeleton={isLoadingStats}
           selectedMode={currentMode}
           disabled={!canStart}
           onClick={handleStart}
         />
-      </main>
+      </ScreenMain>
 
       {/* Bottom nav */}
       <BottomNavBar active="play" onNavigate={onNavigate} />
-
-      {/* State switcher — prototype only */}
-      <StatePill current={screenState} onChange={setScreenState} states={[ScreenState.NORMAL, ScreenState.LOADING, ScreenState.OFFLINE]} />
-    </div>
+    </ScreenShell>
   )
 }
