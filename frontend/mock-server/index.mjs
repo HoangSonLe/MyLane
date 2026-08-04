@@ -163,7 +163,7 @@ app.get('/api/settings', (req, res) => {
 // Formula; docs/technical/known-gaps.md #5). Guests get a computed score
 // back but nothing is persisted (guest progress has no server-side save).
 const GAME_LABELS = { number: 'Number Memory', alphabet: 'Alphabet Memory', grid: 'Grid Memory', sequence: 'Sequence Memory', color: 'Color Memory' }
-const MODE_LABELS = { 'solo-practice': 'Solo Practice', 'solo-ranked': 'Solo Ranked', 'versus-ranked': 'Versus Ranked', 'versus-unranked': 'Versus Unranked' }
+const MODE_LABELS = { 'solo-practice': 'Solo Practice', 'solo-ranked': 'Solo Ranked', 'solo-endless': 'Solo Endless', 'versus-ranked': 'Versus Ranked', 'versus-unranked': 'Versus Unranked' }
 
 app.post('/api/game/result', (req, res) => {
   const token = req.headers.authorization?.replace('Bearer ', '')
@@ -174,7 +174,7 @@ app.post('/api/game/result', (req, res) => {
   const breakdown = computeScore({ ...input, isRanked })
 
   const isGuest = !user || user.isGuest
-  const shouldPersist = !isGuest && isRanked
+  const shouldPersist = !isGuest && (isRanked || input.mode === 'solo-practice' || input.mode === 'solo-endless')
   const outcome = input.outcome ?? (input.perfect || input.roundsCleared >= 5 ? 'win' : 'loss')
   const previousElo = isVersusRanked && shouldPersist ? (user?.elo ?? 1000) : undefined
   const eloChange = previousElo === undefined

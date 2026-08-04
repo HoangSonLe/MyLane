@@ -214,7 +214,6 @@ export function DemoApp() {
       {screen === 'leaderboard' && (
         <LeaderboardScreen
           onBack={() => setScreen('home')}
-          onViewProfile={() => setScreen('profile')}
           onNavigate={(id) => {
             if (id === 'login') setScreen('login')
             else if (id === 'home') setScreen('home')

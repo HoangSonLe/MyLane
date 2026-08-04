@@ -44,6 +44,7 @@ export const supabaseService = {
 
   // Game & Leaderboard
   submitResult: gameSupabaseService.submitResult.bind(gameSupabaseService),
+  getStats: gameSupabaseService.getStats.bind(gameSupabaseService),
   getLeaderboard: gameSupabaseService.getLeaderboard.bind(gameSupabaseService),
 
   // Versus Rooms

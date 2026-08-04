@@ -55,24 +55,33 @@ export function PromptBar({
   if (phase === Phase.VIEWING) {
     const canSkip = SKIPPABLE_VIEWING_GAMES.has(gameType) && !!onSkip
     return (
-      <div className="flex w-full flex-col gap-2">
-        <Card
-          className="flex w-full items-center justify-center gap-3 py-4 text-[15px] font-semibold"
-          style={{ color: 'var(--ma-fg-muted)' }}
+      <div className="flex w-full items-center gap-2.5">
+        <div
+          className="flex flex-1 items-center justify-center gap-2.5 rounded-2xl py-3.5 px-4 text-[14px] font-semibold"
+          style={{
+            background: 'oklch(0.68 0.12 200 / 0.10)',
+            border: '1px solid oklch(0.68 0.12 200 / 0.25)',
+            color: 'var(--ma-progress)',
+          }}
           aria-live="polite"
         >
           <IconSpinner />
           <span>{t.promptBar.memorise}</span>
-        </Card>
+        </div>
         {canSkip && (
           <button
             type="button"
             onClick={onSkip}
-            className="flex w-full items-center justify-center gap-2 rounded-2xl py-3 text-[14px] font-semibold transition-all active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ma-ring)]"
-            style={{ background: 'var(--ma-surface)', color: 'var(--ma-fg-muted)', boxShadow: 'var(--ma-shadow-sm)' }}
+            className="flex items-center justify-center gap-2 rounded-2xl px-5 py-3.5 text-[14px] font-semibold transition-all active:scale-[0.96] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ma-ring)] shrink-0"
+            style={{
+              background: 'var(--ma-surface-raised)',
+              color: 'var(--ma-brand)',
+              border: '1px solid var(--ma-border)',
+              boxShadow: 'var(--ma-shadow-sm)',
+            }}
           >
             <IconSkip />
-            {t.promptBar.skip}
+            <span>{t.promptBar.skip}</span>
           </button>
         )}
       </div>

@@ -518,7 +518,14 @@ export function GameplayScreen({
     const next = [...colorInput, id]
     const pos = next.length - 1
     setColorPressed(id)
-    scheduleTimeout(() => setColorPressed(null), 180)
+    // Plain setTimeout, not the shared scheduleTimeout: the round-transition
+    // delay armed by handleCorrect() right below (same tick, on the final
+    // tap) shares one timeout slot and would cancel this before it fires —
+    // which previously skipped the "pressed" flash on the winning tap
+    // entirely (setColorPressed(id) then setColorPressed(null) batched into
+    // the same render). An independent timer still un-presses the tile
+    // after 180ms without racing the next round's schedule.
+    setTimeout(() => setColorPressed(null), 180)
 
     if (next[pos] !== colorSequence[pos]) {
       handleWrong(); return
@@ -538,10 +545,14 @@ export function GameplayScreen({
     setPhase(Phase.CORRECT)
     roundsClearedRef.current += 1
     bonusSecondsRef.current += Math.max(0, timer)
+    // Color Memory's flash animation needs more breathing room between rounds
+    // than the other games — 1.2s wasn't enough for the previous sequence's
+    // last flash to visually settle before the next one starts.
+    const nextRoundDelayMs = gameType === GameId.COLOR ? 2500 : 1200
     if (isEndless) {
       scheduleTimeout(() => {
         startRound(level)
-      }, 1200)
+      }, nextRoundDelayMs)
       return
     }
     const roundsToWin = getRoundsToWin(gameType, level)
@@ -562,7 +573,7 @@ export function GameplayScreen({
       } else {
         startRound(level)
       }
-    }, 1200)
+    }, nextRoundDelayMs)
   }
 
   function handleWrong(reason: 'incorrect' | 'timeout' = 'incorrect') {

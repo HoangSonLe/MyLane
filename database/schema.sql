@@ -79,7 +79,7 @@ CREATE TABLE IF NOT EXISTS public.match_history (
   user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
   category TEXT NOT NULL CHECK (category IN ('number', 'alphabet', 'grid', 'sequence', 'color')),
   category_label TEXT NOT NULL,
-  mode TEXT NOT NULL CHECK (mode IN ('solo_practice', 'solo_ranked', 'versus_ranked', 'versus_unranked')),
+  mode TEXT NOT NULL CHECK (mode IN ('solo_practice', 'solo_ranked', 'solo_endless', 'versus_ranked', 'versus_unranked')),
   difficulty TEXT CHECK (difficulty IN ('easy', 'medium', 'hard', 'super_hard')) DEFAULT 'medium',
   outcome TEXT CHECK (outcome IN ('win', 'loss', 'draw')) NOT NULL,
   score INTEGER NOT NULL,

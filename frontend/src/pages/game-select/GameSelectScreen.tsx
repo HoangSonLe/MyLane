@@ -48,6 +48,13 @@ export function GameSelectScreen({
   const selectedGameStats = stats?.find((s) => s.id === selectedGame)
   const maxUnlockedLevel = Math.max(1, selectedGameStats?.highestLevel ?? 1)
   const [selectedStartLevel, setSelectedStartLevel] = useState<number>(1)
+  // Endless's own Level-10 unlock, for the currently selected game — guests
+  // are blocked separately via `requiresAccount`, not this check. Recomputed
+  // from `selectedGame`'s own data, so switching game cards while Endless is
+  // selected re-evaluates it (a mode picked for one game can be locked for
+  // another).
+  const isEndlessLevelLocked = !isGuest && (selectedGameStats?.highestLevel ?? 1) < 10
+  const isSelectedModeLocked = selectedMode === ModeId.SOLO_ENDLESS && isEndlessLevelLocked
 
   const loadStats = useCallback(async () => {
     setIsLoadingStats(true)
@@ -69,6 +76,15 @@ export function GameSelectScreen({
     setSelectedStartLevel(maxUnlockedLevel)
   }, [selectedGame, maxUnlockedLevel])
 
+  // Switching games while Endless is selected can make it locked for the new
+  // game (highestLevel is per-game) — fall back to Practice rather than
+  // leaving a locked mode selected (and startable, see canStart below).
+  useEffect(() => {
+    if (isSelectedModeLocked) {
+      setSelectedMode(ModeId.SOLO_PRACTICE)
+    }
+  }, [isSelectedModeLocked])
+
   const gameLabels = getGameLabels(t)
   const modeLabels = getModeLabels(t)
   const difficultyLabels = getDifficultyLabels(t)
@@ -79,7 +95,7 @@ export function GameSelectScreen({
     label: difficultyLabels[difficulty.id],
   }))
   const currentMode = localizedModes.find((mode) => mode.id === selectedMode) ?? localizedModes[0]
-  const canStart = !isLoadingStats && !isOffline
+  const canStart = !isLoadingStats && !isOffline && !isSelectedModeLocked
 
   function handleStart() {
     if (!canStart) return
@@ -143,20 +159,19 @@ export function GameSelectScreen({
           )}
           <div className="flex gap-2 px-4">
             {localizedModes.map((mode) => {
-              // Endless's own Level-10 unlock only applies once account-gating already let the
-              // player in — guests are blocked by `requiresAccount` below, not by this check.
-              const isEndlessLevelLocked = mode.id === ModeId.SOLO_ENDLESS && !isGuest && (selectedGameStats?.highestLevel ?? 1) < 10
+              const modeLocked = mode.id === ModeId.SOLO_ENDLESS && isEndlessLevelLocked
               return (
                 <ModeChip
                   key={mode.id}
                   mode={mode}
                   selected={!isLoadingStats && selectedMode === mode.id}
                   isGuest={isGuest}
-                  customLocked={isEndlessLevelLocked ? true : undefined}
+                  customLocked={modeLocked ? true : undefined}
+                  currentLevel={selectedGameStats?.highestLevel ?? 1}
                   skeleton={isLoadingStats}
                   onLogIn={() => onNavigate?.('login')}
                   onSelect={() => {
-                    if (!isEndlessLevelLocked && (!isGuest || !mode.requiresAccount)) {
+                    if (!modeLocked && (!isGuest || !mode.requiresAccount)) {
                       setSelectedMode(mode.id)
                     }
                   }}

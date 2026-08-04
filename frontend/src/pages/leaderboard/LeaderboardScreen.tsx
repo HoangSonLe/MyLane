@@ -20,21 +20,35 @@ import { OfflineNotice } from './components/OfflineNotice'
 import { GuestNotice } from './components/GuestNotice'
 import { LeaderboardRow } from './components/LeaderboardRow'
 import { leaderboardService } from '@/services/leaderboard/leaderboard.service'
-import type { BoardType, Category, LeaderboardBoard, SortMetric } from '@/services/leaderboard/leaderboard.interface'
+import type { BoardType, Category, LeaderboardBoard, LeaderboardEntry, SortMetric } from '@/services/leaderboard/leaderboard.interface'
+import { FriendProfileModal } from '@/pages/lobby/components/FriendProfileModal'
+import type { Friend } from '@/services/lobby/lobby.interface'
 import { useNetworkStatus } from '@/lib/hooks/useNetworkStatus'
 import { useAuthStore } from '@/stores/auth.store'
 import { useTranslation } from '@/i18n/useTranslation'
 
 interface Props {
   onBack?: () => void
-  onViewProfile?: (userId: string) => void
   onNavigate?: (screen: string) => void
 }
 
 const EMPTY_BOARD: LeaderboardBoard = { entries: [], pinnedEntry: null, isEmpty: true }
 
+/** Seeds FriendProfileModal instantly from the row's own data; the modal
+ * re-fetches full records/win-rate itself (same as Lobby's friend rows). */
+function entryToFriend(entry: LeaderboardEntry): Friend {
+  return {
+    id: entry.userId,
+    name: entry.username,
+    handle: entry.handle,
+    avatarUrl: entry.avatarUrl,
+    elo: entry.elo,
+    status: 'offline',
+  }
+}
+
 // ─── Main screen ─────────────────────────────────────────────────
-export function LeaderboardScreen({ onBack, onViewProfile, onNavigate }: Props) {
+export function LeaderboardScreen({ onBack, onNavigate }: Props) {
   const { isOffline } = useNetworkStatus()
   const user = useAuthStore((s) => s.user)
   const isGuest = user?.isGuest ?? true
@@ -47,9 +61,14 @@ export function LeaderboardScreen({ onBack, onViewProfile, onNavigate }: Props) 
   const [data, setData] = useState<LeaderboardBoard>(EMPTY_BOARD)
   const [isLoading, setIsLoading] = useState(true)
   const [isError, setIsError] = useState(false)
+  const [selectedProfile, setSelectedProfile] = useState<Friend | null>(null)
 
   // Endless board forces score metric
-  const effectiveMetric = board === 'endless' ? 'score' : metric
+  // Endless/Weekly/Monthly are score-only — FilterRow already hides the
+  // Score/Elo toggle for them (Elo doesn't have a meaningful weekly/monthly
+  // "reset"), so force score here too rather than leaving a stale 'elo'
+  // selection from a previous board silently reach the backend.
+  const effectiveMetric = board === 'endless' || board === 'weekly' || board === 'monthly' ? 'score' : metric
 
   const load = useCallback(async () => {
     if (isGuest) {
@@ -154,7 +173,7 @@ export function LeaderboardScreen({ onBack, onViewProfile, onNavigate }: Props) 
                       entry={entry}
                       metric={effectiveMetric}
                       isCurrentUser={!!entry.isCurrentUser}
-                      onPress={() => onViewProfile?.(entry.userId)}
+                      onPress={() => setSelectedProfile(entryToFriend(entry))}
                     />
                   </div>
                 ))}
@@ -165,7 +184,7 @@ export function LeaderboardScreen({ onBack, onViewProfile, onNavigate }: Props) 
                     <PinnedPlayerRow
                       entry={data.pinnedEntry}
                       metric={effectiveMetric}
-                      onPress={() => onViewProfile?.(data.pinnedEntry!.userId)}
+                      onPress={() => setSelectedProfile(entryToFriend(data.pinnedEntry!))}
                     />
                   </div>
                 )}
@@ -179,6 +198,12 @@ export function LeaderboardScreen({ onBack, onViewProfile, onNavigate }: Props) 
       </ScreenMain>
 
       <BottomNavBar active="leaderboard" onNavigate={onNavigate} />
+
+      <FriendProfileModal
+        friend={selectedProfile}
+        show={!!selectedProfile}
+        onClose={() => setSelectedProfile(null)}
+      />
     </ScreenShell>
   )
 }

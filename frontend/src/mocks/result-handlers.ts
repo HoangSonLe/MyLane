@@ -54,7 +54,10 @@ export const resultHandlers = [
     })
 
     const isGuest = !user || user.isGuest
-    const shouldPersist = !isGuest && isRanked
+    // Practice and Endless also persist stats now — only Elo (isVersusRanked
+    // above) stays exclusively Ranked. See game.supabase.ts's shouldPersist
+    // for the real-backend equivalent.
+    const shouldPersist = !isGuest && (isRanked || input.mode === ModeId.SOLO_PRACTICE || input.mode === ModeId.SOLO_ENDLESS)
     const outcome = input.outcome ?? (input.perfect || input.roundsCleared >= 5 ? 'win' : 'loss')
     const previousElo = isVersusRanked && shouldPersist ? (user?.elo ?? 1000) : undefined
     const eloChange = previousElo === undefined

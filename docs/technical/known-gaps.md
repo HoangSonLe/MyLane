@@ -13,11 +13,14 @@ lý xong một mục (đánh dấu hoặc xoá khỏi file).
 - **Trung Tâm Thông Báo (Bell Center 🔔)**: Modal thông báo chia làm 2 tab rõ ràng (**👥 Lời mời kết bạn** và **📢 Thông báo khác**).
 - **Hệ Thống Presence Heartbeat (Online / In-game / Offline)**: Định kỳ 30s gửi heartbeat cập nhật trạng thái `online`, `in_game` và `updated_at`. Bạn bè tự động ngắt về `offline` nếu ngắt kết nối quá 2 phút.
 - **Tự Động Làm Mới Ngầm (Silent Auto-Polling 10s)**: Tự động quét và cập nhật danh sách bạn bè và số lượng lời mời ở cả 3 trang: Trang Chủ, Lobby và Trang Profile.
-- **Lưu Kết Quả Ranked & Elo Cloud**: Chỉ Solo Ranked/Versus Ranked ghi `match_history` và `category_bests`; Solo Practice/Versus Unranked không lưu. Elo chỉ đổi ở Versus Ranked theo công thức chess-Elo/K-factor trong gameplay docs, khởi điểm 1000 và sàn 100.
+- **Lưu Kết Quả Ranked & Elo Cloud**: Solo Ranked/Versus Ranked **và Solo Practice/Endless** đều ghi `match_history` + `category_bests` (`practice_score`/`practice_level`/`highest_level`); Versus Unranked vẫn không lưu. Elo (`category_elo`) vẫn chỉ đổi ở Versus Ranked theo công thức chess-Elo/K-factor trong gameplay docs, khởi điểm 1000 và sàn 100. **🚨 CẦN CHẠY MIGRATION**: `match_history.mode` CHECK constraint trong DB thật chưa cho phép `'solo_endless'` (có từ trước khi Endless Mode tồn tại) — mọi lượt Endless của tài khoản thật hiện **throw lỗi khi ghi `match_history`** thay vì lưu thành công. Đã thêm `database/migrations/20260804_add_solo_endless_match_history_mode.sql` (và cập nhật `schema.sql`) — **phải chạy migration này trên Supabase project thật** thì Endless mới thực sự lưu được, code không tự áp dụng migration.
+- **Game Select — Stats Nối Supabase Thật**: `gameSelectService.getStats()` giờ đọc `category_bests`/`category_elo` thật theo `user_id` (trước đó luôn trả về seed cố định `GAME_STATS_SEED` bất kể tài khoản). Game chưa có Ranked/Practice/Endless nào trả `bestScore`/`highestLevel` là `null` → UI hiện "—"/"Level 1", không còn hiện cấp độ giả. Guest (không có phiên Supabase Auth thật) nhận mảng rỗng, ẩn cả hàng stat.
+- **Game Select — Starting Level Selector**: Thêm bộ chọn "cấp độ bắt đầu" (1 → cấp cao nhất đã đạt) cho Solo Practice/Ranked, không áp dụng cho Endless và **chưa nối cho Versus** (chọn ở đó không có tác dụng — xem mục "Starting Level chưa nối Versus" bên dưới). Chưa có trong `docs/ui/screen-interface-spec.md`.
+- **Endless Mode — Guest bị chặn hoàn toàn**: `SOLO_ENDLESS` đổi thành `requiresAccount: true`; guest luôn thấy khoá + dẫn tới màn login, không còn phụ thuộc `highestLevel`.
 - **Hệ Thống Phòng Đấu 1v1 Realtime Cloud (`LobbyScreen` & `versus_rooms`)**: Tách biệt luồng kết nối tạo phòng, tìm phòng khả dụng (`getAvailableRooms`), Ghép trận nhanh (`quickJoinRoom`), Vào phòng (`joinRoom`), Rời phòng tự chuyển Host (`leaveRoom`), và Bật/tắt quyền riêng tư Public/Private (`toggleRoomPrivacy`) chạy trực tiếp trên Supabase Cloud.
 - **Hệ Thống Thách Đấu 1v1 Realtime (`match_invites` & `ChallengeModal`)**: Khi bấm "Thách đấu", người thách đấu chọn môn thi đấu và mở **Modal Chờ Đối Thủ Xác Nhận (đếm ngược 30s)**. Phía bạn bè nhận **Pop-up Realtime Thông báo Lời mời Thách đấu (`IncomingInviteModal`)**. Khi đối thủ bấm **✓ Chấp nhận (Accept)**, cả 2 người chơi lập tức được chuyển thẳng vào Phòng đấu 1v1! Nếu từ chối hoặc hết 30s, hệ thống báo hủy mượt mà.
 - **Tắt Lời Mời Đồng Bộ Theo Tài Khoản**: Mute 5/15/30 phút được lưu bằng profile ID trong `invite_mutes`, hydrate trước listener lời mời và đồng bộ thiết bị qua Supabase Realtime. Mute Hết phiên vẫn chỉ giữ trong phiên ứng dụng hiện tại.
-- **Hệ Thống Bảng Xếp Hạng Realtime (`LeaderboardScreen`)**: Tải dữ liệu xếp hạng thực tế từ Supabase Cloud. Hỗ trợ lọc theo 5 thể loại game (`number`, `alphabet`, `grid`, `sequence`, `color`), 2 tiêu chí sắp xếp (**Điểm Elo** vs **Điểm Kỷ Lục**), và 3 chế độ xem (**Bảng Toàn Cầu All-Time**, **Top 100**, và **Bảng Bạn Bè Friends Only**). Tự động ghim hàng **"Hạng Của Bạn" (`pinnedEntry`)** ở đáy bảng khi người chơi nằm ngoài Top 100.
+- **Hệ Thống Bảng Xếp Hạng Realtime (`LeaderboardScreen`)**: Tải dữ liệu xếp hạng thực tế từ Supabase Cloud. Hỗ trợ lọc theo 5 thể loại game (`number`, `alphabet`, `grid`, `sequence`, `color`), 2 tiêu chí sắp xếp (**Điểm Elo** vs **Điểm Kỷ Lục**), và cả 6 tab board đều đã nối đúng dữ liệu (**Global All-Time, Weekly, Monthly, Friends, Top 100, Endless** — xem mục 18). Tự động ghim hàng **"Hạng Của Bạn" (`pinnedEntry`)** ở đáy bảng khi người chơi nằm ngoài Top 100. **Sửa bug**: `score` từng fallback về `practice_score` khi `ranked_score` bằng 0 — khiến người chỉ chơi Practice/Endless lọt vào bảng xếp hạng Score dù docs quy định "Only Ranked games count toward records/leaderboard"; đã bỏ fallback này. **Tab `Endless`**: trước đó dùng chung `ranked_score`/`category_elo` (sai hoàn toàn — Endless không ghi 2 cột này); giờ tổng hợp `MAX(rounds_cleared)` mỗi người chơi từ `match_history` (mode `solo_endless`) theo category. **Tab `Weekly`/`Monthly`**: trước đó không lọc thời gian, ra y hệt Global All-time; giờ lọc `match_history.played_at` theo tuần/tháng lịch UTC (xem mục 18 — mốc reset là giả định, chưa xác nhận thiết kế).
 - **Shared Component `<CollapsibleCard>` UI Kit**: Tách thành phần Card thu gọn/mở rộng thành Component Dùng Chung (`components/ui/card/CollapsibleCard.tsx`), tích hợp **Icon SVG Chevron (`IconChevronDown`)** xoay 90° mượt mà, áp dụng cho `EloCard`, `BestScoresCard`, `RecordStatsCard`, `FriendsCard`, `MatchHistoryCard`, `AvailableRoomsCard`.
 - **Trang Chỉnh Sửa Hồ Sơ (`EditProfileScreen`)**: Đã hoàn thiện giao diện và luồng chỉnh sửa thông tin cá nhân (Tên người chơi, Handle, Bio và Avatar cá nhân), cập nhật đồng bộ lên Supabase Cloud (`profiles` table).
 - **Điều Khoản Dịch Vụ & Chính Sách Bảo Mật (`TermsOfServiceModal`, `PrivacyPolicyModal`)**: Đã hoàn thiện giao diện hiển thị văn bản Điều khoản dịch vụ và Chính sách bảo mật chi tiết, mở trực tiếp từ Trang Cài Đặt hoặc Hồ Sơ mà không còn thông báo tạm thời.
@@ -356,16 +359,26 @@ kết quả Versus hiện vẫn phụ thuộc mô phỏng client (xem mục 1).
 
 ---
 
-## 6. Guest → tài khoản thật: merge chỉ là UI, chưa merge gì thật
+## 6. Guest → tài khoản thật: chưa merge, đã bỏ hẳn UI (quyết định có chủ đích)
 
-`LoginScreen.tsx` có `MergeDialog` (khi `fromGuest`), nhưng `handleMerge()`
-chỉ đóng dialog rồi gọi `onSuccess()` — không có logic thật so sánh/merge
-progress đã lưu local (localStorage) với tài khoản vừa đăng nhập. Docs:
+**Cập nhật:** trước đây `LoginScreen.tsx` có `MergeDialog` (khi `fromGuest`)
+nhưng chỉ là UI rỗng — `handleMerge()` đóng dialog rồi gọi `onSuccess()`,
+không so sánh/merge progress local nào thật. Đã quyết định **gỡ hẳn**
+`MergeDialog`/`showMergeDialog`/`handleMerge`/`handleSkip` khỏi
+`LoginScreen.tsx` thay vì giữ lại một UI không làm gì — không triển khai
+merge ở bản hiện tại. `onSuccess()` giờ gọi thẳng sau khi login/register
+thành công, bất kể `fromGuest`.
 
-> Guest progress/config is stored in `localStorage`; synced to the server on
-> login.
+Component `MergeDialog.tsx` vẫn còn trong `pages/auth/components/` (không
+xoá file) để tái sử dụng khi merge thật được làm.
 
-Chưa có bước sync/merge thật nào xảy ra.
+Docs (`docs/gameplay/README.md` § Onboarding):
+
+> On Guest → account conversion: offer to merge local best score/level (keep
+> the higher value).
+
+Dòng trên **chưa được triển khai** — không có bước sync/merge nào xảy ra khi
+guest chuyển sang tài khoản thật, kể cả ở mức UI.
 
 ---
 
@@ -722,3 +735,56 @@ lúc `auth.uid()` còn hợp lệ. Trận `in_progress` vẫn phải đi qua đ�
 
 Migration: `database/migrations/20260804_waiting_room_ttl.sql`.
 Smoke coverage: `database/tests/waiting_room_ttl.smoke.sql`.
+
+---
+
+## 17. Game Select — Starting Level selector: mới, chưa nối Versus
+
+`GameSelectScreen` (Solo Practice/Ranked) có bộ chọn "cấp độ bắt đầu" (1 →
+`highestLevel` đã đạt), truyền qua `App.tsx`'s `session.startLevel` →
+`GameplayScreen`'s `initialLevel` prop. Chưa có trong bất kỳ doc UI/gameplay
+nào (`docs/ui/screen-interface-spec.md` § Game Select chưa nhắc tới) — cần
+viết doc chính thức nếu giữ tính năng này lâu dài.
+
+- Chỉ hiện cho Solo Practice/Ranked (`!currentMode.versusFlow &&
+  selectedMode !== SOLO_ENDLESS`) — ẩn hẳn ở Versus vì **chưa wire**:
+  `VersusGameplayScreen` không nhận `initialLevel`, chọn gì cũng không có
+  tác dụng nếu lỡ hiện ra.
+- `GameplayScreen` ưu tiên `initialLevel` tường minh hơn checkpoint cũ — nếu
+  checkpoint đang dở ở level khác, chọn Starting Level mới sẽ **bỏ qua toàn
+  bộ checkpoint** (streak/loss/tally cũ), không chỉ đổi level, tránh trộn
+  tiến độ ván cũ với level mới chọn.
+
+---
+
+## 18. Leaderboard — Weekly/Monthly ĐÃ NỐI (giả định lịch reset UTC, cần xác nhận)
+
+**Cập nhật:** đã làm. `gameSupabaseService.getLeaderboard()` giờ có nhánh
+riêng cho `weekly`/`monthly` — tính động từ `match_history` (không snapshot),
+lọc `played_at >= mốc đầu kỳ`, chỉ tính trận Ranked (`solo_ranked`/
+`versus_ranked`, đúng "Only Ranked games count toward records/leaderboard"),
+lấy điểm cao nhất mỗi người trong kỳ (`getPeriodStart()` trong
+`game.supabase.ts`). `LeaderboardScreen`'s `effectiveMetric` giờ ép về
+`score` cho cả Weekly/Monthly (giống Endless) — khớp với `FilterRow` vốn đã
+ẩn nút chuyển Score/Elo cho 2 tab này (Elo không có khái niệm "reset theo
+tuần/tháng").
+
+**Giả định chưa xác nhận** (docs không nói rõ): mốc reset là **tuần lịch
+(Thứ 2 00:00 UTC)** và **tháng lịch (ngày 1 00:00 UTC)** — không phải giờ
+Việt Nam, không phải rolling 7 ngày. Nếu muốn giờ VN hoặc rolling window,
+cần đổi `getPeriodStart()`.
+
+Board rỗng thật (chưa ai chơi Ranked trong kỳ) giờ hiện đúng Empty state,
+không còn fallback nhầm sang danh sách toàn thời gian theo Elo.
+
+`top100` vẫn dùng chung nhánh "Sort by High Score" với `global-alltime`
+(`.limit(100)` giống nhau) — chấp nhận được nếu ý định là "Top 100 =
+All-time giới hạn 100 dòng", nhưng đang là 2 tab trùng nhau hoàn toàn, chưa
+xử lý trong lượt này.
+
+Do tính động mỗi lần tải (không cache/snapshot), quy mô lớn nên cân nhắc
+snapshot theo kỳ thay vì quét `match_history` trực tiếp mỗi lần mở màn.
+
+Ngoài ra: `pinnedEntry` (hàng ghim khi người chơi ngoài Top 100) luôn trả
+`score: 0` bất kể board/metric nào — không tính điểm thật của người chơi ở
+board đó, tồn tại từ trước, chưa sửa trong lượt này.

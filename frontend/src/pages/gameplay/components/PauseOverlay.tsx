@@ -138,41 +138,27 @@ export function PauseOverlay({
           </button>
         </div>
 
-        {/* Resume */}
-        <button
-          type="button"
-          onClick={onResume}
-          className="flex w-full items-center justify-center gap-2 rounded-2xl py-4 text-[15px] font-semibold transition-all active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ma-ring)]"
-          style={{
-            background: 'var(--ma-brand)',
-            color: 'var(--ma-brand-fg)',
-            boxShadow: 'var(--ma-shadow-md)',
-          }}
-        >
-          <IconPlay />
-          {t.pauseOverlay.resume}
-        </button>
-
-        {/* Reset */}
-        <button
-          type="button"
-          onClick={() => setConfirmation('reset')}
-          className="flex w-full items-center justify-center gap-2 rounded-2xl py-3.5 text-[15px] font-semibold transition-all active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ma-ring)]"
-          style={{
-            background: 'var(--ma-surface-raised)',
-            border: '1px solid var(--ma-border)',
-            color: 'var(--ma-fg)',
-          }}
-        >
-          <IconRefresh />
-          {t.pauseOverlay.resetRound}
-        </button>
-
-        {/* Settings — Solo only */}
-        {isSolo && (
+        {/* Resume / Reset / Settings / Quit — 2 columns x 2 rows */}
+        <div className="grid grid-cols-2 gap-3">
+          {/* Resume */}
           <button
             type="button"
-            onClick={() => setShowSettings(true)}
+            onClick={onResume}
+            className="flex w-full items-center justify-center gap-2 rounded-2xl py-4 text-[15px] font-semibold transition-all active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ma-ring)]"
+            style={{
+              background: 'var(--ma-brand)',
+              color: 'var(--ma-brand-fg)',
+              boxShadow: 'var(--ma-shadow-md)',
+            }}
+          >
+            <IconPlay />
+            {t.pauseOverlay.resume}
+          </button>
+
+          {/* Reset */}
+          <button
+            type="button"
+            onClick={() => setConfirmation('reset')}
             className="flex w-full items-center justify-center gap-2 rounded-2xl py-3.5 text-[15px] font-semibold transition-all active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ma-ring)]"
             style={{
               background: 'var(--ma-surface-raised)',
@@ -180,25 +166,42 @@ export function PauseOverlay({
               color: 'var(--ma-fg)',
             }}
           >
-            <IconSettings />
-            {t.pauseOverlay.settings}
+            <IconRefresh />
+            {t.pauseOverlay.resetRound}
           </button>
-        )}
 
-        {/* Quit */}
-        <button
-          type="button"
-          onClick={() => setConfirmation('quit')}
-          className="flex w-full items-center justify-center gap-2 rounded-2xl py-3.5 text-[15px] font-semibold transition-all active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ma-ring)]"
-          style={{
-            background: 'oklch(0.62 0.19 22 / 0.10)',
-            border: '1px solid oklch(0.62 0.19 22 / 0.25)',
-            color: 'var(--ma-danger)',
-          }}
-        >
-          <IconX />
-          {t.pauseOverlay.quitGame}
-        </button>
+          {/* Settings — Solo only */}
+          {isSolo && (
+            <button
+              type="button"
+              onClick={() => setShowSettings(true)}
+              className="flex w-full items-center justify-center gap-2 rounded-2xl py-3.5 text-[15px] font-semibold transition-all active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ma-ring)]"
+              style={{
+                background: 'var(--ma-surface-raised)',
+                border: '1px solid var(--ma-border)',
+                color: 'var(--ma-fg)',
+              }}
+            >
+              <IconSettings />
+              {t.pauseOverlay.settings}
+            </button>
+          )}
+
+          {/* Quit */}
+          <button
+            type="button"
+            onClick={() => setConfirmation('quit')}
+            className="flex w-full items-center justify-center gap-2 rounded-2xl py-3.5 text-[15px] font-semibold transition-all active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ma-ring)]"
+            style={{
+              background: 'oklch(0.62 0.19 22 / 0.10)',
+              border: '1px solid oklch(0.62 0.19 22 / 0.25)',
+              color: 'var(--ma-danger)',
+            }}
+          >
+            <IconX />
+            {t.pauseOverlay.quitGame}
+          </button>
+        </div>
         </Card>
       </div>
       <ConfirmDialog

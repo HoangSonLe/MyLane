@@ -1,8 +1,11 @@
 import { getSupabaseClient } from './supabase.client'
 import type { GameResultInput, ResultData } from '../result/result.interface'
 import type { BoardType, Category, LeaderboardBoard, LeaderboardEntry, SortMetric } from '../leaderboard/leaderboard.interface'
+import type { GameStats } from '../game-select/game-select.interface'
 import { computeScore } from '../gameplay/game-rules'
 import { ModeId, GameId } from '@/configs/enum'
+
+const ALL_CATEGORIES = [GameId.NUMBER, GameId.ALPHABET, GameId.GRID, GameId.SEQUENCE, GameId.COLOR]
 
 const GAME_LABELS: Record<string, string> = {
   number: 'Number Memory',
@@ -23,6 +26,16 @@ function throwIfSupabaseError(error: any, context: string): void {
   if (error) throw new Error(`${context}: ${error.message || error.details || 'Supabase request failed'}`)
 }
 
+/** Calendar-week (Monday 00:00 UTC) / calendar-month (1st 00:00 UTC) reset boundary — see getLeaderboard's weekly/monthly branch. */
+function getPeriodStart(board: 'weekly' | 'monthly'): string {
+  const now = new Date()
+  if (board === 'monthly') {
+    return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1)).toISOString()
+  }
+  const dayIndex = (now.getUTCDay() + 6) % 7 // Mon=0 .. Sun=6
+  return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() - dayIndex)).toISOString()
+}
+
 export const gameSupabaseService = {
   /**
    * Submit game result to Supabase `match_history`, `category_bests`, `category_elo`, and `profiles`
@@ -31,7 +44,12 @@ export const gameSupabaseService = {
     const supabase = getSupabaseClient()
     const usesRankedScoring = input.mode === ModeId.SOLO_RANKED || input.mode === ModeId.VERSUS_RANKED
     const isVersusRanked = input.mode === ModeId.VERSUS_RANKED
-    const shouldPersist = usesRankedScoring
+    // Practice and Endless also update category_bests (practice_score/
+    // practice_level, and highest_level for the Level-10 Endless unlock +
+    // Game Select's Starting Level picker) — just never category_elo, which
+    // stays exclusively Versus Ranked (isVersusRanked below), per
+    // docs/gameplay/README.md "Elo ... calculated only for Versus Ranked".
+    const shouldPersist = usesRankedScoring || input.mode === ModeId.SOLO_PRACTICE || input.mode === ModeId.SOLO_ENDLESS
     const breakdown = computeScore({ ...input, isRanked: usesRankedScoring })
 
     let previousBestScore: number | null = null
@@ -204,6 +222,43 @@ export const gameSupabaseService = {
   },
 
   /**
+   * Fetch per-category Elo/best-score/highest-level for Game Select. Only
+   * Ranked play ever writes `category_bests`/`category_elo` (see
+   * submitResult's `shouldPersist` gate above — docs/gameplay/README.md
+   * "Only Ranked games count toward records/leaderboard"), so a category
+   * with no row here genuinely has no Ranked history yet: bestScore/
+   * highestLevel come back `null` rather than a fabricated number —
+   * GameCard/ModeChip already render that as "—" / "Level 1".
+   */
+  async getStats(): Promise<GameStats[]> {
+    const supabase = getSupabaseClient()
+    if (!supabase) return []
+
+    const { data: userData } = await supabase.auth.getUser()
+    const userId = userData?.user?.id
+    if (!userId) return []
+
+    const [{ data: eloRows }, { data: bestRows }] = await Promise.all([
+      supabase.from('category_elo').select('*').eq('user_id', userId),
+      supabase.from('category_bests').select('*').eq('user_id', userId),
+    ])
+
+    const eloMap = new Map((eloRows || []).map((e: any) => [e.category, e]))
+    const bestMap = new Map((bestRows || []).map((b: any) => [b.category, b]))
+
+    return ALL_CATEGORIES.map((id) => {
+      const elo = eloMap.get(id)
+      const best = bestMap.get(id)
+      return {
+        id,
+        elo: elo?.elo || 1000,
+        bestScore: best?.ranked_score ?? null,
+        highestLevel: best?.highest_level ?? null,
+      }
+    })
+  },
+
+  /**
    * Fetch Leaderboard Rankings from Supabase
    */
   async getLeaderboard(params: {
@@ -237,13 +292,90 @@ export const gameSupabaseService = {
 
     let entries: LeaderboardEntry[] = []
 
-    if (params.metric === 'elo') {
-      // Sort by Elo Rating
+    // docs/gameplay/README.md § Endless Mode: "Has its own leaderboard
+    // (ranked by highest item count / beginCount reached)" — that depth
+    // lives in match_history.rounds_cleared per Endless run, not in
+    // category_bests (which Endless never advances beyond its unlock
+    // level for). No pre-aggregated "best Endless depth" column exists yet,
+    // so this aggregates client-side over recent Endless runs; a
+    // category_bests column updated at submit-time would scale better if
+    // this list ever needs to look further back than the last ~500 runs.
+    if (params.board === 'endless') {
+      const { data: rows } = await supabase
+        .from('match_history')
+        .select('user_id, rounds_cleared, profiles!inner(name, handle, avatar_url)')
+        .eq('category', params.category)
+        .eq('mode', 'solo_endless')
+        .order('rounds_cleared', { ascending: false })
+        .limit(500)
+
+      const bestPerUser = new Map<string, any>()
+      for (const row of rows || []) {
+        if (!bestPerUser.has(row.user_id)) bestPerUser.set(row.user_id, row)
+      }
+
+      entries = [...bestPerUser.values()]
+        .slice(0, 100)
+        .map((row: any, index: number) => ({
+          rank: index + 1,
+          userId: row.user_id,
+          username: row.profiles?.name || 'Player',
+          handle: row.profiles?.handle || 'player',
+          avatarUrl: row.profiles?.avatar_url || undefined,
+          score: row.rounds_cleared || 0,
+          elo: 1000,
+          isCurrentUser: row.user_id === currentUserId,
+        }))
+    } else if (params.board === 'weekly' || params.board === 'monthly') {
+      // docs/gameplay/README.md: "Weekly (resets weekly), Monthly (resets
+      // monthly)" — reset boundary assumed calendar week (Mon 00:00 UTC) /
+      // calendar month (1st 00:00 UTC); not specified further in docs, so
+      // this is a judgment call, not a confirmed design decision. Only
+      // Ranked matches count (same "Only Ranked ... records/leaderboard"
+      // rule as Global All-time), best single score per user within the
+      // period — computed from match_history since category_bests only
+      // tracks all-time bests, not a rolling window.
+      const periodStart = getPeriodStart(params.board)
+      let query = supabase
+        .from('match_history')
+        .select('user_id, score, profiles!inner(name, handle, avatar_url)')
+        .eq('category', params.category)
+        .in('mode', ['solo_ranked', 'versus_ranked'])
+        .gte('played_at', periodStart)
+        .order('score', { ascending: false })
+        .limit(500)
+
+      if (allowedUserIds) {
+        query = query.in('user_id', allowedUserIds)
+      }
+
+      const { data: rows } = await query
+
+      const bestPerUser = new Map<string, any>()
+      for (const row of rows || []) {
+        if (!bestPerUser.has(row.user_id)) bestPerUser.set(row.user_id, row)
+      }
+
+      entries = [...bestPerUser.values()]
+        .slice(0, 100)
+        .map((row: any, index: number) => ({
+          rank: index + 1,
+          userId: row.user_id,
+          username: row.profiles?.name || 'Player',
+          handle: row.profiles?.handle || 'player',
+          avatarUrl: row.profiles?.avatar_url || undefined,
+          score: row.score || 0,
+          elo: 1000,
+          isCurrentUser: row.user_id === currentUserId,
+        }))
+    } else if (params.metric === 'elo') {
+      // Sort by Elo Rating (primary: elo DESC, secondary tie-breaker: user_id ASC)
       let query = supabase
         .from('category_elo')
         .select('user_id, elo, profiles!inner(name, handle, avatar_url)')
         .eq('category', params.category)
         .order('elo', { ascending: false })
+        .order('user_id', { ascending: true })
         .limit(100)
 
       if (allowedUserIds) {
@@ -263,12 +395,13 @@ export const gameSupabaseService = {
         isCurrentUser: row.user_id === currentUserId,
       }))
     } else {
-      // Sort by High Score
+      // Sort by High Score (primary: ranked_score DESC, secondary tie-breaker: user_id ASC)
       let query = supabase
         .from('category_bests')
-        .select('user_id, ranked_score, practice_score, profiles!inner(name, handle, avatar_url), category_elo(elo)')
+        .select('user_id, ranked_score, profiles!inner(name, handle, avatar_url), category_elo(elo)')
         .eq('category', params.category)
         .order('ranked_score', { ascending: false })
+        .order('user_id', { ascending: true })
         .limit(100)
 
       if (allowedUserIds) {
@@ -288,19 +421,29 @@ export const gameSupabaseService = {
           username: row.profiles?.name || 'Player',
           handle: row.profiles?.handle || 'player',
           avatarUrl: row.profiles?.avatar_url || undefined,
-          score: row.ranked_score || row.practice_score || 0,
+          // docs/gameplay/README.md: "Only Ranked games count toward
+          // records/leaderboard" — practice_score must never leak in here,
+          // even as a fallback (a Practice-only player showing their
+          // practice_score at a low rank reads as a data bug, not a
+          // feature).
+          score: row.ranked_score || 0,
           elo: eloVal,
           isCurrentUser: row.user_id === currentUserId,
         }
       })
     }
 
-    // Fallback: If no records found for specific category metric, query profiles table directly
-    if (entries.length === 0) {
+    // Fallback: If no records found for specific category metric, query profiles table directly.
+    // Not for Endless/Weekly/Monthly — an empty board there must stay empty
+    // (docs: proper "no data yet" empty state), not silently substitute a
+    // generic all-time Elo-sorted profile list mislabeled as that board.
+    const isPeriodOrEndlessBoard = params.board === 'endless' || params.board === 'weekly' || params.board === 'monthly'
+    if (entries.length === 0 && !isPeriodOrEndlessBoard) {
       let profileQuery = supabase
         .from('profiles')
         .select('id, name, handle, avatar_url, overall_elo')
         .order('overall_elo', { ascending: false })
+        .order('id', { ascending: true })
         .limit(100)
 
       if (allowedUserIds) {

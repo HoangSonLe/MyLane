@@ -683,7 +683,6 @@ export default function App() {
         return (
           <LeaderboardScreen
             onBack={() => back('home')}
-            onViewProfile={() => push('profile')}
             onNavigate={(id) => {
               if (id === 'login') goTo('login')
               else if (id === 'home') resetTo('home')
