@@ -23,7 +23,7 @@ export function BeginnerGuideModal({ visible, onClose }: Props) {
   return (
     <ModalBackdrop show={visible} onClose={onClose}>
       <div
-        className="w-[calc(100vw-2rem)] sm:w-full sm:max-w-lg max-h-[85vh] flex flex-col overflow-hidden p-4 sm:p-5 transition-all relative"
+        className="w-[calc(100vw-2rem)] sm:w-full sm:max-w-lg max-h-[78dvh] sm:max-h-[85vh] flex flex-col overflow-hidden p-4 sm:p-5 transition-all relative"
         style={{
           borderRadius: 'var(--radius-2xl)',
           background: 'var(--ma-surface-raised)',

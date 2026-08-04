@@ -97,35 +97,36 @@ export function HomeScreen({
         message={t.home.offlineBanner}
       />
 
+      {/* Dropdown Menu */}
+      <HeaderProfileMenu
+        visible={menuVisible}
+        unreadCount={unreadRequestsCount}
+        isGuest={isGuest}
+        onClose={() => setMenuVisible(false)}
+        onNavigateProfile={() => onNavigate?.('profile')}
+        onAddFriend={() => setAddFriendModalVisible(true)}
+        onNotifications={() => setNotificationsModalVisible(true)}
+        onNavigateSettings={() => onNavigate?.('settings')}
+        onLogOut={onLogOut}
+      />
+
       <ScreenMain bottomPadding="pb-32" offline={isOffline}>
-        {/* Header */}
-        <HomeHeader
-          skeleton={isLoading}
-          isGuest={isGuest}
-          playerName={user?.name}
-          onProfile={() => setMenuVisible((prev) => !prev)}
-          unreadNotificationsCount={unreadRequestsCount}
-        />
-
-        {/* Dropdown Menu */}
-        <HeaderProfileMenu
-          visible={menuVisible}
-          unreadCount={unreadRequestsCount}
-          isGuest={isGuest}
-          onClose={() => setMenuVisible(false)}
-          onNavigateProfile={() => onNavigate?.('profile')}
-          onAddFriend={() => setAddFriendModalVisible(true)}
-          onNotifications={() => setNotificationsModalVisible(true)}
-          onNavigateSettings={() => onNavigate?.('settings')}
-          onLogOut={onLogOut}
-        />
-
-        {/* Divider */}
-        <div
-          className="mx-4"
-          style={{ height: '1px', background: 'var(--ma-border-subtle)' }}
-          aria-hidden="true"
-        />
+        {/* Header & Divider */}
+        <div>
+          <HomeHeader
+            skeleton={isLoading}
+            isGuest={isGuest}
+            playerName={user?.name}
+            playerAvatarUrl={user?.avatarUrl}
+            onProfile={() => setMenuVisible((prev) => !prev)}
+            unreadNotificationsCount={unreadRequestsCount}
+          />
+          <div
+            className="mx-4 mt-1.5"
+            style={{ height: '1px', background: 'var(--ma-border-subtle)' }}
+            aria-hidden="true"
+          />
+        </div>
 
         {/* Primary Play CTA — always usable, even if the rest of Home failed to load */}
         <PlayCta

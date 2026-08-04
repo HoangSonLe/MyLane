@@ -16,7 +16,7 @@ export function TermsOfServiceModal({ visible, onClose }: Props) {
   return (
     <ModalBackdrop show={visible} onClose={onClose}>
       <div
-        className="w-[calc(100vw-2rem)] sm:w-full sm:max-w-xl max-h-[88vh] flex flex-col overflow-hidden p-4 sm:p-6 transition-all"
+        className="w-[calc(100vw-2rem)] sm:w-full sm:max-w-xl max-h-[78dvh] sm:max-h-[88vh] flex flex-col overflow-hidden p-4 sm:p-6 transition-all"
         style={{
           borderRadius: 'var(--radius-2xl)',
           background: 'var(--ma-surface-raised)',

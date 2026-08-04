@@ -238,22 +238,22 @@ export function ConfirmDialog({
           {message}
         </p>
 
-        {/* ── Actions ──────────────────────────────────────────────────── */}
-        <div className="flex flex-col gap-3">
-          {/* Primary — confirm */}
+        {/* ── Actions — Side-by-side layout (Confirm on left, Cancel on right) ── */}
+        <div className="grid grid-cols-2 gap-2.5">
+          {/* Primary — confirm (left) */}
           <button
             type="button"
             onClick={onConfirm}
             disabled={busy}
             className={[
-              'flex h-12 w-full items-center justify-center gap-2',
-              'text-[15px] font-semibold',
+              'flex h-11 w-full items-center justify-center gap-2',
+              'text-[14px] font-bold',
               'transition-transform duration-[var(--ma-duration-micro)]',
               'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ma-ring)]',
               busy ? 'cursor-not-allowed opacity-60' : 'active:scale-[0.97]',
             ].join(' ')}
             style={{
-              borderRadius: 'var(--radius-2xl)',
+              borderRadius: 'var(--radius-xl)',
               background:   cfg.confirmBg,
               color:        cfg.confirmColor,
             }}
@@ -262,20 +262,20 @@ export function ConfirmDialog({
             {busy ? `${confirmLabel}…` : confirmLabel}
           </button>
 
-          {/* Secondary — cancel */}
+          {/* Secondary — cancel (right) */}
           <button
             type="button"
             onClick={onCancel}
             disabled={busy}
             className={[
-              'flex h-12 w-full items-center justify-center',
-              'text-[15px] font-semibold',
+              'flex h-11 w-full items-center justify-center',
+              'text-[14px] font-bold',
               'transition-transform duration-[var(--ma-duration-micro)]',
               'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ma-ring)]',
               busy ? 'cursor-not-allowed opacity-60' : 'active:scale-[0.97]',
             ].join(' ')}
             style={{
-              borderRadius: 'var(--radius-2xl)',
+              borderRadius: 'var(--radius-xl)',
               background:   'var(--ma-surface-raised)',
               color:        'var(--ma-fg)',
               border:       '1px solid var(--ma-border)',

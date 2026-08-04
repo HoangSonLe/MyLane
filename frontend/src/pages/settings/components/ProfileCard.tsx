@@ -77,7 +77,7 @@ export function ProfileCard({ skeleton, user }: ProfileCardProps) {
                 {isGuest ? t.settings.guestBadgeLabel : 'ELO'}
               </span>
               <span className="text-[13px] font-semibold text-[var(--ma-fg)]">
-                {isGuest ? t.settings.guestBadgeValue : (user?.elo ?? 0).toLocaleString()}
+                {isGuest ? t.settings.guestBadgeValue : (user?.elo ?? 1000).toLocaleString()}
               </span>
             </div>
           )}

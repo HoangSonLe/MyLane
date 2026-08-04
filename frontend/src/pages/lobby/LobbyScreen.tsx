@@ -286,27 +286,30 @@ export function LobbyScreen({
       />
 
       <ScreenMain bottomPadding="pb-32" offline={isOffline}>
-        {/* Header */}
-        <LobbyHeader
-          skeleton={isLoading}
-          onBack={onBack}
-          onProfile={() => setHeaderMenuVisible((v) => !v)}
-          unreadNotificationsCount={incomingRequestsCount}
-        />
-
-        {/* Divider */}
-        <div
-          className="mx-4"
-          style={{ height: '1px', background: 'var(--ma-border-subtle)' }}
-          aria-hidden="true"
-        />
+        {/* Header & Divider */}
+        <div>
+          <LobbyHeader
+            skeleton={isLoading}
+            onBack={onBack}
+            onProfile={() => setHeaderMenuVisible((v) => !v)}
+            unreadNotificationsCount={incomingRequestsCount}
+            userName={user?.name ?? ''}
+            userAvatarUrl={user?.avatarUrl}
+          />
+          <div
+            className="mx-4 mt-1.5"
+            style={{ height: '1px', background: 'var(--ma-border-subtle)' }}
+            aria-hidden="true"
+          />
+        </div>
 
         {/* Player Elo context — shown when logged in */}
         {!isGuest && (
           <EloContextBadge
             skeleton={isLoading}
-            elo={user?.elo ?? 0}
+            elo={user?.elo ?? 1000}
             name={user?.name ?? ''}
+            avatarUrl={user?.avatarUrl}
           />
         )}
 

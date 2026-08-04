@@ -5,7 +5,7 @@ import { calculateOverallElo } from '@/lib/utils'
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
 
 function resolvePresenceStatus(rawStatus: unknown, updatedAt?: string | null): Friend['status'] {
-  if (!updatedAt) return 'offline'
+  if (!updatedAt || rawStatus === 'offline') return 'offline'
 
   const lastSeen = new Date(updatedAt).getTime()
   if (!Number.isFinite(lastSeen) || Date.now() - lastSeen >= 2 * 60 * 1000) {
@@ -166,7 +166,7 @@ export const lobbySupabaseService = {
       records[row.category] = {
         bestScore,
         highestLevel,
-        elo: eloByCategory.get(row.category),
+        elo: eloByCategory.get(row.category) ?? 1000,
       }
     })
 
@@ -434,6 +434,15 @@ export const lobbySupabaseService = {
           schema: 'public',
           table: 'friendships',
           filter: `requester_id=eq.${userId}`,
+        },
+        () => callback()
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'profiles',
         },
         () => callback()
       )

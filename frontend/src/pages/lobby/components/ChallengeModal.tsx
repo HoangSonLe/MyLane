@@ -75,6 +75,11 @@ export function ChallengeModal({ friend, show, onClose, onAccepted }: Props) {
     { id: 'versus_unranked', label: getLocalizedModeLabel(t, 'versus_unranked') },
   ]
 
+  const inviteStateRef = useRef(inviteState)
+  useEffect(() => {
+    inviteStateRef.current = inviteState
+  }, [inviteState])
+
   // 30s Countdown timer when waiting for opponent
   useEffect(() => {
     if (!inviteState) return
@@ -83,7 +88,11 @@ export function ChallengeModal({ friend, show, onClose, onAccepted }: Props) {
       setCountdown((prev) => {
         if (prev <= 1) {
           clearInterval(interval)
-          handleCancel()
+          const current = inviteStateRef.current
+          if (current) {
+            void matchInviteService.cancelChallengeInvite(current.inviteId, current.roomCode).catch(() => {})
+          }
+          setInviteState(null)
           setDeclineReason(t.challenge?.inviteTimeout || 'Lời mời thách đấu đã hết thời gian chờ (30s).')
           return 0
         }
@@ -92,7 +101,7 @@ export function ChallengeModal({ friend, show, onClose, onAccepted }: Props) {
     }, 1000)
 
     return () => clearInterval(interval)
-  }, [handleCancel, inviteState, t.challenge?.inviteTimeout])
+  }, [inviteState, t.challenge?.inviteTimeout])
 
   // Realtime subscription & 2s Polling for challenger waiting for opponent's response
   useEffect(() => {

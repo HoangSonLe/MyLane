@@ -87,6 +87,57 @@ export function StoryBookCard({
     setTransitionPhase(direction === 'next' ? 'out-next' : 'out-prev')
   }
 
+  const pointerStartRef = useRef<{ x: number; y: number; time: number } | null>(null)
+
+  const handlePointerDown = (e: React.PointerEvent) => {
+    if ((e.target as HTMLElement).closest('button, a, input, select, textarea')) return
+    pointerStartRef.current = { x: e.clientX, y: e.clientY, time: Date.now() }
+  }
+
+  const handlePointerUp = (e: React.PointerEvent) => {
+    if (!pointerStartRef.current || isBusy) return
+    const deltaX = e.clientX - pointerStartRef.current.x
+    const deltaY = e.clientY - pointerStartRef.current.y
+    const elapsed = Date.now() - pointerStartRef.current.time
+    pointerStartRef.current = null
+
+    if (elapsed < 800 && Math.abs(deltaX) > 40 && Math.abs(deltaX) > Math.abs(deltaY) * 1.2) {
+      if (deltaX < 0) {
+        startTransition('next')
+      } else {
+        startTransition('prev')
+      }
+    }
+  }
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (e.touches.length !== 1) return
+    if ((e.target as HTMLElement).closest('button, a, input, select, textarea')) return
+    pointerStartRef.current = {
+      x: e.touches[0].clientX,
+      y: e.touches[0].clientY,
+      time: Date.now(),
+    }
+  }
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (!pointerStartRef.current || isBusy) return
+    if (e.changedTouches.length !== 1) return
+    const touch = e.changedTouches[0]
+    const deltaX = touch.clientX - pointerStartRef.current.x
+    const deltaY = touch.clientY - pointerStartRef.current.y
+    const elapsed = Date.now() - pointerStartRef.current.time
+    pointerStartRef.current = null
+
+    if (elapsed < 800 && Math.abs(deltaX) > 40 && Math.abs(deltaX) > Math.abs(deltaY) * 1.2) {
+      if (deltaX < 0) {
+        startTransition('next')
+      } else {
+        startTransition('prev')
+      }
+    }
+  }
+
   const handleAnimationEnd = (event: AnimationEvent<HTMLElement>) => {
     if (event.currentTarget !== event.target) return
     advanceTransition()
@@ -115,7 +166,11 @@ export function StoryBookCard({
       aria-busy={isBusy}
       aria-live="polite"
       onAnimationEnd={handleAnimationEnd}
-      className={`relative isolate mx-auto w-full max-w-5xl overflow-hidden rounded-3xl border border-border-subtle bg-surface-raised shadow-xl ${transitionClass}`}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+      onPointerDown={handlePointerDown}
+      onPointerUp={handlePointerUp}
+      className={`relative isolate mx-auto w-full max-w-5xl overflow-hidden rounded-3xl border border-border-subtle bg-surface-raised shadow-xl touch-pan-y ${transitionClass}`}
     >
       <div className="grid min-w-0 md:grid-cols-[minmax(0,1.05fr)_minmax(20rem,0.95fr)]">
         <div className="relative aspect-[16/10] min-h-0 overflow-hidden bg-surface md:aspect-auto md:min-h-[32rem]">

@@ -108,7 +108,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 
   logout: async () => {
-    set({ isLoading: true })
+    set({ user: null, isLoading: true })
     try {
       await authService.logout()
     } catch {

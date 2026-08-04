@@ -33,7 +33,7 @@ async function mapInviteRow(supabase: any, row: any): Promise<MatchInviteData> {
     inviterId: row.inviter_id,
     inviterName: inviterProfile?.name || 'Bạn bè',
     inviterHandle: inviterProfile?.handle || 'friend',
-    inviterElo: categoryElo?.elo ?? 1000,
+    inviterElo: categoryElo?.elo ?? inviterProfile?.overall_elo ?? 1000,
     inviteeId: row.invitee_id,
     category: row.category as GameId,
     difficulty: row.difficulty || 'medium',

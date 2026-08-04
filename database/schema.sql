@@ -18,6 +18,7 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   avatar_url TEXT,
   overall_elo INTEGER DEFAULT 1000,
   is_guest BOOLEAN DEFAULT false,
+  is_admin BOOLEAN DEFAULT false,
   joined_label TEXT DEFAULT 'Joined recently',
   status TEXT CHECK (status IN ('online', 'offline', 'in_game', 'in-game', 'in_room')) DEFAULT 'offline',
   last_active_at TIMESTAMPTZ DEFAULT NOW(),
@@ -340,3 +341,27 @@ ALTER PUBLICATION supabase_realtime ADD TABLE public.match_invites;
 ALTER PUBLICATION supabase_realtime ADD TABLE public.invite_mutes;
 ALTER PUBLICATION supabase_realtime ADD TABLE public.versus_rooms;
 ALTER PUBLICATION supabase_realtime ADD TABLE public.matchmaking_queue;
+
+-- --------------------------------------------------------------------
+-- 10. Access Logs Table (Nhật ký truy cập người dùng)
+-- --------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS public.access_logs (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
+  user_name TEXT NOT NULL,
+  user_email TEXT,
+  is_guest BOOLEAN DEFAULT false,
+  user_agent TEXT,
+  device_type TEXT DEFAULT 'Desktop',
+  page_path TEXT DEFAULT '/',
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_access_logs_created_at ON public.access_logs(created_at DESC);
+ALTER TABLE public.access_logs ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Anyone can insert access log entries" ON public.access_logs FOR INSERT WITH CHECK (true);
+CREATE POLICY "Only admins can view access logs" ON public.access_logs FOR SELECT USING (
+  EXISTS (SELECT 1 FROM public.profiles WHERE profiles.id = auth.uid() AND profiles.is_admin = true)
+);
+

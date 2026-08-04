@@ -40,7 +40,7 @@ export function WelcomeOnboardingModal({ visible, onClose, onStartPlaying }: Pro
   return (
     <ModalBackdrop show={visible} onClose={onClose}>
       <div
-        className="w-[calc(100vw-2rem)] sm:w-full sm:max-w-md max-h-[85vh] flex flex-col overflow-hidden p-4 sm:p-5 transition-all relative"
+        className="w-[calc(100vw-2rem)] sm:w-full sm:max-w-md max-h-[78dvh] sm:max-h-[85vh] flex flex-col overflow-hidden p-4 sm:p-5 transition-all relative"
         style={{
           borderRadius: 'var(--radius-2xl)',
           background: 'var(--ma-surface-raised)',
@@ -70,7 +70,7 @@ export function WelcomeOnboardingModal({ visible, onClose, onStartPlaying }: Pro
             onClick={handleSkip}
             className="text-[12px] font-semibold text-[var(--ma-fg-subtle)] hover:text-[var(--ma-fg)] transition-colors px-2 py-1 rounded-lg"
           >
-            {t.common.skip || 'Bỏ qua'}
+            {(t.common as Record<string, string>).skip || 'Bỏ qua'}
           </button>
         </div>
 

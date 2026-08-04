@@ -1,5 +1,5 @@
 import { ScreenHeaderWithBack, ScreenHeaderAction } from '@/components/ui/layout'
-import { IconUser } from '@/components/ui/icons'
+import { Avatar } from '@/components/ui/Avatar'
 import { useTranslation } from '@/i18n/useTranslation'
 
 interface LobbyHeaderProps {
@@ -7,6 +7,8 @@ interface LobbyHeaderProps {
   onBack?: () => void
   onProfile?: () => void
   unreadNotificationsCount?: number
+  userName?: string
+  userAvatarUrl?: string
 }
 
 export function LobbyHeader({
@@ -14,6 +16,8 @@ export function LobbyHeader({
   onBack,
   onProfile,
   unreadNotificationsCount = 0,
+  userName = 'Player',
+  userAvatarUrl,
 }: LobbyHeaderProps) {
   const { t } = useTranslation()
 
@@ -30,13 +34,11 @@ export function LobbyHeader({
               onClick={onProfile}
               ariaLabel={t.home.goToProfile}
               icon={
-                <span aria-hidden="true" style={{ color: 'var(--ma-fg-muted)' }}>
-                  <IconUser />
-                </span>
+                <Avatar name={userName} imageUrl={userAvatarUrl} size="2.5rem" fontSize="14px" />
               }
             />
             {unreadNotificationsCount > 0 && (
-              <span className="absolute -top-1 -right-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white shadow-sm animate-pulse">
+              <span className="absolute -top-1 -right-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white shadow-sm animate-pulse z-10">
                 {unreadNotificationsCount}
               </span>
             )}

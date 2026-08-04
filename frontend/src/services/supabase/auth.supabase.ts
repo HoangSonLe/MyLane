@@ -113,6 +113,20 @@ export const authSupabaseService = {
   async logout(): Promise<void> {
     const supabase = getSupabaseClient()
     if (supabase) {
+      try {
+        const { data: userData } = await supabase.auth.getUser()
+        if (userData?.user?.id) {
+          await supabase
+            .from('profiles')
+            .update({
+              status: 'offline',
+              updated_at: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
+            })
+            .eq('id', userData.user.id)
+        }
+      } catch {
+        // Best-effort presence update on logout
+      }
       await supabase.auth.signOut()
     }
   },

@@ -37,6 +37,7 @@ import { BeginnerGuideModal } from '@/components/ui/modal/BeginnerGuideModal'
 import { PrivacyPolicyModal } from '@/components/ui/modal/PrivacyPolicyModal'
 import { TermsOfServiceModal } from '@/components/ui/modal/TermsOfServiceModal'
 import { AppVersionModal } from '@/components/ui/modal/AppVersionModal'
+import { AdminAccessLogsModal } from '@/components/ui/modal/AdminAccessLogsModal'
 
 // ─── Main component ────────────────────────────────────────────
 export function SettingsScreen({
@@ -87,6 +88,7 @@ export function SettingsScreen({
   const [privacyPolicyModalVisible, setPrivacyPolicyModalVisible] = useState(false)
   const [termsOfServiceModalVisible, setTermsOfServiceModalVisible] = useState(false)
   const [appVersionModalVisible, setAppVersionModalVisible] = useState(false)
+  const [adminLogsModalVisible, setAdminLogsModalVisible] = useState(false)
 
   const showToast = useCallback((message: string) => {
     if (toastTimer.current) clearTimeout(toastTimer.current)
@@ -379,6 +381,19 @@ export function SettingsScreen({
             </SettingsSection>
           )}
 
+          {/* Admin Zone — Only visible to Admin users */}
+          {user?.isAdmin && (
+            <SettingsSection title="Quản Trị Viên (Admin Zone)">
+              <SettingsRow
+                icon={<IconShield />}
+                label="Nhật ký truy cập (Access Logs)"
+                description="Xem danh sách người dùng & khách đã vào web"
+                variant="nav"
+                onClick={() => setAdminLogsModalVisible(true)}
+              />
+            </SettingsSection>
+          )}
+
           {/* Session / Log out */}
           {!isLoading && (
             <SettingsSection title={t.settings.session}>
@@ -424,6 +439,11 @@ export function SettingsScreen({
       <AppVersionModal
         visible={appVersionModalVisible}
         onClose={() => setAppVersionModalVisible(false)}
+      />
+
+      <AdminAccessLogsModal
+        isOpen={adminLogsModalVisible}
+        onClose={() => setAdminLogsModalVisible(false)}
       />
 
       {/* ── NAVIGATION ── */}

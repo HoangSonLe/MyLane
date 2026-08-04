@@ -1,4 +1,4 @@
-import { IconUser } from '@/components/ui/icons'
+import { Avatar } from '@/components/ui/Avatar'
 import { Card } from '@/components/ui/card'
 import { useTranslation } from '@/i18n/useTranslation'
 
@@ -6,9 +6,10 @@ interface EloContextBadgeProps {
   skeleton?: boolean
   elo: number
   name: string
+  avatarUrl?: string
 }
 
-export function EloContextBadge({ skeleton, elo, name }: EloContextBadgeProps) {
+export function EloContextBadge({ skeleton, elo, name, avatarUrl }: EloContextBadgeProps) {
   const { t } = useTranslation()
   if (skeleton) {
     return (
@@ -23,20 +24,7 @@ export function EloContextBadge({ skeleton, elo, name }: EloContextBadgeProps) {
     <Card className="mx-4 flex items-center justify-between" padding="0.75rem 1rem">
       <div className="flex items-center gap-2.5">
         {/* Avatar */}
-        <div
-          className="flex shrink-0 items-center justify-center"
-          style={{
-            height: '2rem',
-            width: '2rem',
-            borderRadius: 'var(--radius-lg)',
-            background: 'var(--ma-icon-bg)',
-            border: '1px solid var(--ma-border)',
-            color: 'var(--ma-fg-muted)',
-          }}
-          aria-hidden="true"
-        >
-          <IconUser />
-        </div>
+        <Avatar name={name} imageUrl={avatarUrl} size="2.5rem" fontSize="14px" />
         <div>
           <p className="text-[13px] font-semibold leading-none" style={{ color: 'var(--ma-fg)' }}>
             {name}

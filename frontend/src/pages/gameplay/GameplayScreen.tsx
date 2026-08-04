@@ -143,7 +143,7 @@ export function GameplayScreen({
   // Elo does not change here — docs/gameplay/README.md: "Elo System ...
   // calculated only for Versus Ranked matches." This screen is Solo only
   // (Versus has its own VersusGameplayScreen). Shown as read-only info.
-  const elo = user?.elo ?? 1240
+  const elo = user?.elo ?? 1000
   const [timer, setTimer] = useState(30)
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const timeoutTaskRef = useRef<PausableTimeoutTask | null>(null)

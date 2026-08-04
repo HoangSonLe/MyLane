@@ -12,9 +12,11 @@ import type { MatchInviteData } from '@/services/match-invite/match-invite.inter
 import { normalizeRoomCode, versusRoomService } from '@/services/versus-room/versus-room.service'
 import { isSupabaseConfigured } from '@/services/backend-config'
 import { supabaseService } from '@/services/supabase'
+import { accessLogService } from '@/services/access-log/access-log.service'
 import { IncomingInviteModal, type IncomingInviteData } from '@/pages/lobby/components/IncomingInviteModal'
 import { MuteInviteModal } from '@/pages/lobby/components/MuteInviteModal'
 import { WelcomeOnboardingModal } from '@/components/ui/modal/WelcomeOnboardingModal'
+import { LogOutDialog } from '@/pages/settings/components/LogOutDialog'
 import { LandingScreen } from '@/pages/landing/LandingScreen'
 import { LoginScreen } from '@/pages/auth/LoginScreen'
 import { HomeScreen } from '@/pages/home/HomeScreen'
@@ -92,6 +94,7 @@ export default function App() {
 
   const syncFromServer = useLocaleStore((s) => s.syncFromServer)
   const user = useAuthStore((s) => s.user)
+  const isInitialized = useAuthStore((s) => s.isInitialized)
   const inviteAccountId = user && !user.isGuest ? user.id : null
   const isInviteMuted = useInviteMuteStore((state) => state.isMuted)
   const muteInviter = useInviteMuteStore((state) => state.muteUser)
@@ -141,6 +144,12 @@ export default function App() {
     }
     setWelcomeModalVisible(false)
   }, [user?.id])
+
+  // Log user / visitor access on page/screen navigation (Only AFTER auth session is initialized)
+  useEffect(() => {
+    if (!isInitialized) return
+    void accessLogService.logAccess({ user, pagePath: `/${screen}` })
+  }, [isInitialized, user?.id, screen])
 
   /** Hydrate account-scoped mutes before incoming invite listeners start. */
   useEffect(() => {
@@ -368,11 +377,24 @@ export default function App() {
     setMatchedVersusRoom(null)
   }
 
-  async function logOutFromHeader() {
-    await leaveActiveWaitingRoom()
-    await lobbyService.updatePresence('offline').catch(() => {})
-    await useAuthStore.getState().logout()
-    resetTo('landing')
+  const [headerLogOutDialogVisible, setHeaderLogOutDialogVisible] = useState(false)
+  const [headerLogOutBusy, setHeaderLogOutBusy] = useState(false)
+
+  function logOutFromHeader() {
+    setHeaderLogOutDialogVisible(true)
+  }
+
+  async function handleConfirmHeaderLogOut() {
+    setHeaderLogOutBusy(true)
+    try {
+      await leaveActiveWaitingRoom()
+      await lobbyService.updatePresence('offline').catch(() => {})
+      await useAuthStore.getState().logout()
+      resetTo('landing')
+    } finally {
+      setHeaderLogOutBusy(false)
+      setHeaderLogOutDialogVisible(false)
+    }
   }
 
   function handleTabNav(id: string) {
@@ -741,8 +763,15 @@ export default function App() {
         visible={welcomeModalVisible}
         onClose={handleCloseWelcomeModal}
         onStartPlaying={() => {
-          handleNavigate('game-select')
+          goTo('game-select')
         }}
+      />
+
+      <LogOutDialog
+        visible={headerLogOutDialogVisible}
+        busy={headerLogOutBusy}
+        onConfirm={handleConfirmHeaderLogOut}
+        onCancel={() => setHeaderLogOutDialogVisible(false)}
       />
     </>
   )

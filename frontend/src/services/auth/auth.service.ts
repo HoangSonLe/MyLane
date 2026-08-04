@@ -10,6 +10,7 @@ export interface UserSession {
   name: string
   email?: string
   isGuest: boolean
+  isAdmin?: boolean
   avatarUrl?: string
   elo: number
 }
@@ -43,7 +44,7 @@ export const authService = {
           if (data?.user) {
             const userId = data.user.id
             const [{ data: profile }, { data: eloRows }] = await Promise.all([
-              supabase.from('profiles').select('name, avatar_url, overall_elo').eq('id', userId).maybeSingle(),
+              supabase.from('profiles').select('name, avatar_url, overall_elo, is_admin').eq('id', userId).maybeSingle(),
               supabase.from('category_elo').select('category, elo').eq('user_id', userId),
             ])
 
@@ -54,6 +55,7 @@ export const authService = {
               name: profile?.name || data.user.user_metadata?.full_name || data.user.email?.split('@')[0] || 'Player',
               email: data.user.email,
               isGuest: false,
+              isAdmin: Boolean(profile?.is_admin),
               avatarUrl: profile?.avatar_url || data.user.user_metadata?.avatar_url || undefined,
               elo: overallElo,
             }

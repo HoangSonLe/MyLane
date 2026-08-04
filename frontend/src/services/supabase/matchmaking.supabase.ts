@@ -47,7 +47,15 @@ export const matchmakingSupabaseService = {
       .maybeSingle()
 
     if (error) throwRpcError(error)
-    return data?.elo ?? 1000
+    if (data?.elo !== undefined && data?.elo !== null) return data.elo
+
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('overall_elo')
+      .eq('id', userId)
+      .maybeSingle()
+
+    return profile?.overall_elo ?? 1000
   },
 
   async enterQueue(input: {

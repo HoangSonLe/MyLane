@@ -7,6 +7,14 @@
  */
 import { DifficultyId, GameId } from '@/configs/enum'
 
+export const GAME_LABELS: Record<string, string> = {
+  [GameId.NUMBER]: 'Number Memory',
+  [GameId.ALPHABET]: 'Alphabet Memory',
+  [GameId.GRID]: 'Grid Memory',
+  [GameId.SEQUENCE]: 'Sequence Memory',
+  [GameId.COLOR]: 'Color Memory',
+}
+
 /** docs/gameplay/*.md "Difficulty Modes" — added to answerTime for all games and to viewTime for Number/Alphabet. */
 export const DIFFICULTY_SECONDS: Record<DifficultyId, number> = {
   [DifficultyId.EASY]: 5,

@@ -311,7 +311,7 @@ export const versusSupabaseService = {
         id: roomRow.host_id,
         name: roomRow.host?.name || 'Host Player',
         handle: roomRow.host?.handle || 'host',
-        elo: eloByUser.get(roomRow.host_id) ?? 1000,
+        elo: eloByUser.get(roomRow.host_id) ?? roomRow.host?.overall_elo ?? 1000,
         ready: !!roomRow.host_ready,
       },
       opponent: roomRow.guest_id
@@ -319,7 +319,7 @@ export const versusSupabaseService = {
             id: roomRow.guest_id,
             name: roomRow.guest?.name || 'Guest Player',
             handle: roomRow.guest?.handle || 'guest',
-            elo: eloByUser.get(roomRow.guest_id) ?? 1000,
+            elo: eloByUser.get(roomRow.guest_id) ?? roomRow.guest?.overall_elo ?? 1000,
             ready: !!roomRow.guest_ready,
           }
         : null,

@@ -17,7 +17,7 @@ export function ScreenHeader({
 }) {
   return (
     <header
-      className={['flex items-center justify-between px-4 pb-2 pt-6', className]
+      className={['flex items-center justify-between px-4 pb-1 pt-5 sm:pt-6', className]
         .filter(Boolean)
         .join(' ')}
     >
@@ -51,7 +51,7 @@ export function ScreenHeaderTitle({
   )
 }
 
-/** ScreenHeaderAction — the 36px trailing icon button (avatar/invite/settings), identical shape across Home/Lobby/Profile. */
+/** ScreenHeaderAction — the 40px trailing icon button (avatar/invite/settings), identical shape across Home/Lobby/Profile. */
 export function ScreenHeaderAction({
   skeleton,
   onClick,
@@ -67,7 +67,7 @@ export function ScreenHeaderAction({
     return (
       <div
         className="skeleton"
-        style={{ height: '2.25rem', width: '2.25rem', borderRadius: 'var(--radius-2xl)' }}
+        style={{ height: '2.5rem', width: '2.5rem', borderRadius: 'var(--radius-2xl)' }}
       />
     )
   }
@@ -77,7 +77,7 @@ export function ScreenHeaderAction({
       onClick={onClick}
       aria-label={ariaLabel}
       className={[
-        'flex h-9 w-9 items-center justify-center',
+        'flex h-10 w-10 items-center justify-center overflow-hidden',
         'transition-transform duration-[var(--ma-duration-micro)] active:scale-95',
         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ma-ring)]',
       ].join(' ')}
@@ -115,7 +115,7 @@ export function ScreenHeaderWithBack({
 }) {
   return (
     <header
-      className={['grid grid-cols-[1fr_auto_1fr] items-center px-4 pb-2 pt-6', className]
+      className={['grid grid-cols-[1fr_auto_1fr] items-center px-4 pb-1 pt-5 sm:pt-6', className]
         .filter(Boolean)
         .join(' ')}
     >
@@ -126,7 +126,7 @@ export function ScreenHeaderWithBack({
         {title}
       </ScreenHeaderTitle>
       <div className="flex justify-end">
-        {trailing ?? <div className="h-9 w-9 shrink-0" />}
+        {trailing ?? <div className="h-10 w-10 shrink-0" />}
       </div>
     </header>
   )

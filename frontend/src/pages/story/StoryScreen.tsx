@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 import { BackButton } from '@/components/ui/BackButton'
 import { ScreenMain, ScreenShell } from '@/components/ui/layout'
@@ -16,6 +16,15 @@ export function StoryScreen({ onBack, onPlay }: StoryScreenProps) {
   const hapticsEnabled = useHapticsStore((state) => state.enabled)
   const [currentChapterIndex, setCurrentChapterIndex] = useState(0)
   const [isTransitioning, setIsTransitioning] = useState(false)
+
+  // Scroll to top whenever chapter changes
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'instant' })
+    document.documentElement.scrollTop = 0
+    document.body.scrollTop = 0
+    const mainEl = document.getElementById('main-content')
+    if (mainEl) mainEl.scrollTop = 0
+  }, [currentChapterIndex])
 
   const storyData = t.story
   const chapters: ChapterData[] = storyData.chapters
@@ -48,23 +57,24 @@ export function StoryScreen({ onBack, onPlay }: StoryScreenProps) {
   return (
     <ScreenShell className="overflow-x-hidden">
       <ScreenMain bottomPadding="pb-24" gap={false}>
-        <header className="mx-auto grid w-full max-w-5xl grid-cols-[2.25rem_minmax(0,1fr)_2.25rem] items-start px-4 pb-4 pt-4 sm:px-6 sm:pt-6">
-          <BackButton onBack={onBack} iconOnly />
-          <div className="min-w-0 px-2 text-center">
-            <p className="text-[11px] font-bold tracking-[0.18em] text-brand">
+        <header className="relative mx-auto flex w-full max-w-5xl items-center justify-between px-2 pt-3 pb-3 sm:px-4 sm:pt-5 sm:pb-4">
+          <div className="absolute left-2 top-3 z-10 sm:left-4 sm:top-4">
+            <BackButton onBack={onBack} iconOnly />
+          </div>
+          <div className="w-full px-10 text-center sm:px-14">
+            <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-brand">
               {storyData.eyebrow}
             </p>
-            <h1 className="mt-1 text-2xl font-bold leading-tight tracking-tight text-foreground sm:text-3xl">
+            <h1 className="mt-0.5 text-xl font-bold leading-tight tracking-tight text-foreground sm:text-2xl md:text-3xl">
               {storyData.title}
             </h1>
-            <p className="mx-auto mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
+            <p className="mx-auto mt-1 max-w-2xl text-xs font-medium leading-relaxed text-muted-foreground sm:text-sm sm:leading-6">
               {storyData.subtitle}
             </p>
           </div>
-          <div aria-hidden="true" />
         </header>
 
-        <section className="mx-auto w-full max-w-5xl px-3 sm:px-6">
+        <section className="mx-auto w-full max-w-5xl px-2 sm:px-4">
           <div
             role="tablist"
             aria-label={storyData.title}

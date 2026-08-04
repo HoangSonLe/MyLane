@@ -9,7 +9,7 @@ Tài liệu này là nguồn chuẩn duy nhất (Single Source of Truth) phục 
 ### 1.1 Màn Hình Điều Hướng Chính
 - **`LandingScreen`**: Màn hình mở ứng dụng lần đầu hoặc dành cho người dùng chưa đăng nhập (cung cấp tùy chọn Chơi Guest hoặc Đăng nhập).
 - **`LoginScreen`**: Màn hình xác thực tài khoản dùng chung component system nhưng có hai mode rõ ràng: Đăng nhập và Tạo tài khoản. Email/Password gọi hai flow riêng; Google/Discord dùng cùng hành động “Tiếp tục với…” cho người mới và người cũ.
-- **`HomeScreen`**: Dashboard mặc định sau khi đăng nhập, tập trung vào chế độ chơi đơn cá nhân và tiến trình hàng ngày.
+- **`HomeScreen`**: Dashboard mặc định sau khi đăng nhập, hiển thị Brand Badge `MY LANE • GAMEBOARD`, tập trung vào chế độ chơi đơn cá nhân và tiến trình hàng ngày.
 - **`LobbyScreen`**: Trung tâm tính năng xã hội, duyệt danh sách phòng công khai, danh sách bạn bè và nhận lời mời thách đấu.
 - **`ProfileScreen`**: Màn hình thông tin cá nhân hiển thị avatar, điểm ELO, lịch sử đấu, thống kê tổng thể; cung cấp lối vào chỉnh sửa hồ sơ, QR kết bạn và modal gửi lời mời thách đấu 1v1.
 - **`EditProfileScreen`**: Màn hình riêng để cập nhật ảnh đại diện, tên hiển thị và handle.
