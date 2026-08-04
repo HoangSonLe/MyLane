@@ -4,7 +4,7 @@ import { MOCK_SETTINGS } from '@/services/settings/settings.mock'
 import type { SettingsData } from '@/services/settings/settings.interface'
 import type { Locale } from '@/stores/locale.store'
 
-const GUEST_SETTINGS: SettingsData = { linkedMethods: [], notifications: true, sounds: true, haptics: false, locale: 'en' }
+const GUEST_SETTINGS: SettingsData = { linkedMethods: [], notifications: true, sounds: true, haptics: false, locale: 'vi', theme: 'light' }
 
 /**
  * In-memory locale store — simulates the database row for each user.

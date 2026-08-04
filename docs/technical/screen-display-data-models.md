@@ -73,6 +73,7 @@ const landingScreenModel: LandingScreenModel = {
 ```ts
 const loginScreenModel: LoginScreenModel = {
   status: { state: 'ready' },
+  mode: 'login',
   providers: [
     { id: 'google', label: 'Continue with Google', enabled: true },
     { id: 'discord', label: 'Continue with Discord', enabled: true },
@@ -291,7 +292,7 @@ const resultScreenModel: ResultScreenModel = {
 ```ts
 const profileScreenModel: ProfileScreenModel = {
   status: { state: 'ready' },
-  player: { id: 'u1', username: 'Alex', authState: 'authenticated', isGuest: false, badgeLabel: 'Level 12' },
+  player: { id: 'u1', username: 'Alex', avatarUrl: 'https://project.supabase.co/storage/v1/object/public/avatars/u1/avatar.webp', authState: 'authenticated', isGuest: false, badgeLabel: 'Level 12' },
   summaryStats: { totalGames: 182, wins: 96, losses: 73, draws: 13, overallElo: 1288 },
   perGameStats: [
     { gameId: 'number', title: 'Number Memory', summary: { bestScore: 1240, highestLevel: 9, currentElo: 1220, peakElo: 1248 } },
@@ -302,10 +303,11 @@ const profileScreenModel: ProfileScreenModel = {
     { id: 'f2', username: 'Ken', online: false, inviteEnabled: false },
   ],
   matchHistory: [
-    { id: 'm1', mode: 'versus-ranked', gameId: 'grid', resultLabel: 'Win', createdAt: '2026-07-31T10:10:00Z', score: 980, eloDelta: 24 },
+    { id: 'm1', mode: 'versus-ranked', gameId: 'grid', resultLabel: 'Win', createdAt: '2026-07-31T10:10:00Z', score: 980, playerRoundScore: 4, opponentRoundScore: 3, eloDelta: 24 },
     { id: 'm2', mode: 'solo-ranked', gameId: 'sequence', resultLabel: 'New best score', createdAt: '2026-07-31T09:20:00Z', score: 1420 },
   ],
   editProfileActionLabel: 'Edit Profile',
+  friendQrActionLabel: 'Friend QR',
 }
 ```
 
@@ -477,7 +479,11 @@ interface MatchSummary {
   resultLabel: string
   createdAt: string
   endedAt?: string
+  /** Calculated game points earned in the run. */
   score?: number
+  /** Versus-only correct-round tally, always from the current player's perspective. */
+  playerRoundScore?: number
+  opponentRoundScore?: number
   eloDelta?: number
 }
 ```
@@ -542,12 +548,13 @@ Data source:
 ```ts
 interface LoginScreenModel {
   status: ScreenStatusMeta
+  mode: 'login' | 'register'
   providers: Array<{
     id: 'google' | 'discord' | 'email'
     label: string
     enabled: boolean
   }>
-  emailLogin?: {
+  emailAuth?: {
     email?: string
     password?: string
   }
@@ -774,6 +781,18 @@ interface ProfileScreenModel {
   friends: FriendSummary[]
   matchHistory: MatchSummary[]
   editProfileActionLabel: string
+  friendQrActionLabel: string
+}
+
+interface EditProfileInput {
+  username: string
+  handle: string
+  avatarUrl?: string
+}
+
+interface FriendCodePayload {
+  version: 1
+  profileId: string
 }
 ```
 
@@ -781,6 +800,8 @@ Data source:
 - Player profile service.
 - Match history service.
 - Friend list.
+- Supabase Storage public avatar URL; authenticated writes are scoped to the current user's folder.
+- QR/deep-link carries only version + profile ID. The friend/profile service resolves current profile and friendship status before any request is sent.
 
 ### Settings
 
@@ -886,8 +907,9 @@ Data source:
 ### Login / Auth
 
 - `LoginScreenModel`: gom tất cả input và provider của màn auth vào một model duy nhất.
+- `mode`: thể hiện intent đăng nhập hay đăng ký; UI dùng chung layout nhưng gọi service riêng.
 - `providers`: cho phép UI bật/tắt Google, Discord, Email theo môi trường mà không đổi layout.
-- `emailLogin`: giữ state của form email/password mà không trộn với provider buttons.
+- `emailAuth`: giữ state của form email/password mà không trộn với provider buttons.
 - `guestContinueLabel`: cho phép màn login có đường quay lại guest một cách rõ ràng.
 - `mergeGuestPrompt`: chỉ xuất hiện khi guest đang chuyển sang account thật; đây là prompt quan trọng vì nó quyết định data merge.
 
@@ -966,6 +988,7 @@ Data source:
 - `friends`: hiển thị social layer ngay trong profile thay vì tách sang màn khác.
 - `matchHistory`: lịch sử các trận gần đây, đủ nhẹ để load nhanh nhưng đủ đầy để drill-down.
 - `editProfileActionLabel`: `screen-interface-spec.md` chốt Edit Profile là primary action của màn này; model trước đây thiếu field cho action đó.
+- `friendQrActionLabel`: mở mã QR cá nhân; scan result chỉ dùng `profileId` để resolve lại dữ liệu hiện hành, không tin dữ liệu hồ sơ từ QR.
 
 ### Settings
 

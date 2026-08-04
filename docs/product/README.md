@@ -39,11 +39,11 @@ Source: [`00-project-overview.md`](../design/design-bible/00-project-overview.md
 
 **Games**
 
+- Color Memory
 - Sequence Memory
 - Number Memory
 - Alphabet Memory
 - Grid Memory
-- Color Memory
 
 > **Note:** [`MY_LANE_GAME_DESIGN.md`](../../MY_LANE_GAME_DESIGN.md) — the detailed Game Design Document — only defines 3 of these 5 games (Number, Alphabet, Grid Memory). Sequence Memory and Color Memory's rules were authored separately for this project — see [`docs/gameplay/sequence-memory.md`](../gameplay/sequence-memory.md) and [`docs/gameplay/color-memory.md`](../gameplay/color-memory.md) — and are confirmed as original core games, on equal footing with the other 3.
 
@@ -107,6 +107,10 @@ Answered by [`MY_LANE_GAME_DESIGN.md`](../../MY_LANE_GAME_DESIGN.md) (repo root)
 
 - Login required for full features (Versus, saved records, Elo, friends, leaderboard); supported methods: Google, Discord, Email/Password.
 - Guest mode exists: Solo Practice only, no server-side save, no Versus.
+- On a browser with no saved preferences, the first-run defaults are Vietnamese and the light theme; later user choices remain persisted and take precedence.
+- Color Memory is the default game and appears first anywhere the player chooses a game/category. Game, mode, and difficulty names are resolved from the active locale instead of persisted display strings.
+- Signed-in players can edit display name, unique handle, and avatar; avatar files are resized client-side and stored in Supabase Storage.
+- Players can share a personal QR/link or scan a QR with the camera/uploaded image to preview a profile and send a friend request. Guests are sent through login before the shared friend profile opens.
 - Game modes: Solo Practice, Solo Ranked, Versus Ranked, Versus Unranked.
 - Room Rules & Features:
   - **Host Transfer**: Confirm modal when Host leaves; Host role automatically passes to the remaining player.
@@ -115,9 +119,14 @@ Answered by [`MY_LANE_GAME_DESIGN.md`](../../MY_LANE_GAME_DESIGN.md) (repo root)
   - **Quick Match vs Quick Join Distinction**:
     - **Quick Match**: Elo-based matchmaking for Ranked play (`MatchmakingScreen` queue).
     - **Quick Join**: Instant 1-click entry into open custom Public rooms (`VersusRoomScreen` direct join).
+  - **Lifecycle Timeouts**:
+    - Quick Match queue attempts expire after **60 seconds**; pending challenge invitations expire after **30 seconds**.
+    - A Versus room that remains in `waiting` expires after **10 minutes** without an authenticated participant heartbeat or a successful room-state change (join, leave/host transfer, ready, or privacy change).
+    - `VersusRoomScreen` sends a dedicated heartbeat every 60 seconds while a participant is actively viewing the waiting room. Read polling, Realtime events, and Presence reads do not refresh the deadline. Rooms in `in_progress` or `finished` are exempt.
   - **Match Challenge Invitations & Temporary Mute**:
     - **Incoming Invite Toast/Modal**: When challenged by a friend/player, a floating card displays inviter info, game category, and 3 actions: Accept, Decline, or Mute Invites.
     - **Temporary Mute Invites**: Players can choose to temporarily ignore/mute invitations from a specific player for 5 minutes, 15 minutes, 30 minutes, or until the end of the current session.
+    - **Account Sync**: Timed mutes (5/15/30 minutes) follow the signed-in account across devices through Supabase Realtime. "End of session" remains scoped to the current app session.
   - **Public Friend Profile Popup**:
     - Clicking any friend in the Lobby or online friends list pops up a detailed public profile displaying their Avatar, Display Name, Handle, Presence Status, Overall Elo, Games Played, Win Rate, and Top Game Records, along with Challenge and Mute action buttons.
   - **Automated Versus 1v1 Gameplay Simulation**:
@@ -130,12 +139,19 @@ Answered by [`MY_LANE_GAME_DESIGN.md`](../../MY_LANE_GAME_DESIGN.md) (repo root)
     - Versus results add a compact two-player comparison card; forfeits include a clear non-blocking notice explaining why the match ended.
   - **Live Profile Match History Sync**:
     - Finished game runs automatically record new match entries and update personal category records in the signed-in user's Profile stats (`ProfileScreen.tsx`).
+    - Versus history keeps calculated points separate from the final head-to-head round score, and shows the opponent plus the player's Elo change for ranked matches.
   - **Central Modal Overlay Layer (`ModalBackdrop`)**:
     - All dialogs and popups (including `WrongToast`) utilize a unified backdrop primitive (`ModalBackdrop`) that centralizes click-through prevention, event propagation isolation, and backdrop dismissal across all screens.
   - **Haptic Vibration Feedback**:
     - Tactical haptic vibration pulse (`navigator.vibrate`) triggers when players select answer buttons or interact with game grid tiles across all game modes (Sequence, Grid, Number, Color, Alphabet Memory). Can be enabled or disabled at any time in **Settings > Haptic Feedback**.
   - **Web Audio Sound Effects**:
     - Synthesized audio sound effects (`Web Audio API`) trigger on answer button taps, level completions, and wrong inputs across all 5 memory game modes. Can be enabled or disabled at any time in **Settings > Sound Effects**.
+  - **Brain Reset Story**:
+    - Home links to a five-chapter, localized story following a modern city resident who recognizes the effects of constant notifications, short-form content, and task switching, then rebuilds a steadier attention rhythm through short memory-game sessions.
+    - The story defines “brain rot” as informal internet slang rather than a medical diagnosis, avoids treatment claims, and leads to Game Select through a clear **Start Training** action.
+    - The consequence arc covers late-night scrolling, lost intentions after interruptions, divided attention during conversation, and the practical work of returning to one task. Research associations are described cautiously and never presented as proof that one app causes every outcome.
+    - Each chapter uses a grounded contemporary illustration that directly depicts its story beat; the feature contains no fantasy, supernatural, mythological, or medical framing.
+    - Editorial evidence and claim boundaries are recorded in [`brain-reset-research.md`](brain-reset-research.md).
 
 ## Open Questions
 

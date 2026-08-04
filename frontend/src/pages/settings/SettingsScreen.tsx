@@ -21,6 +21,7 @@ import {
   IconLogOut,
   IconBack,
 } from './components/icons'
+import { IconBook, IconSparkles } from '@/components/ui/icons'
 import { settingsService } from '@/services/settings/settings.service'
 import { isSupabaseConfigured } from '@/services/backend-config'
 import { supabaseService } from '@/services/supabase'
@@ -31,15 +32,23 @@ import { useHapticsStore } from '@/stores/haptics.store'
 import { useSoundsStore } from '@/stores/sounds.store'
 import { useNetworkStatus } from '@/lib/hooks/useNetworkStatus'
 import { useTranslation } from '@/i18n/useTranslation'
+import { ScoringRulesModal } from '@/components/ui/modal/ScoringRulesModal'
+import { BeginnerGuideModal } from '@/components/ui/modal/BeginnerGuideModal'
+import { PrivacyPolicyModal } from '@/components/ui/modal/PrivacyPolicyModal'
+import { TermsOfServiceModal } from '@/components/ui/modal/TermsOfServiceModal'
+import { AppVersionModal } from '@/components/ui/modal/AppVersionModal'
 
 // ─── Main component ────────────────────────────────────────────
 export function SettingsScreen({
   onBack,
+  onBeforeLogOut,
   onLogOut,
   onNavigate,
 }: {
   /** Navigate back to wherever the player came from. */
   onBack?: () => void
+  /** Called right before sign-out — e.g. leave any 'waiting' versus room. */
+  onBeforeLogOut?: () => Promise<void>
   /** Called after log-out is confirmed — navigate to Landing / First Run. */
   onLogOut?: () => void
   /** Bottom nav tab taps ('home' / 'play' / 'stats' / 'settings'). */
@@ -48,6 +57,7 @@ export function SettingsScreen({
   const { isOffline } = useNetworkStatus()
   const logout = useAuthStore((s) => s.logout)
   const user = useAuthStore((s) => s.user)
+  const checkSession = useAuthStore((s) => s.checkSession)
   const { t, locale, setLocale } = useTranslation()
   const theme = useThemeStore((s) => s.theme)
   const toggleTheme = useThemeStore((s) => s.toggleTheme)
@@ -72,6 +82,11 @@ export function SettingsScreen({
   // Log-out dialog
   const [logOutDialogVisible, setLogOutDialogVisible] = useState(false)
   const [logOutBusy, setLogOutBusy] = useState(false)
+  const [scoringRulesModalVisible, setScoringRulesModalVisible] = useState(false)
+  const [beginnerGuideModalVisible, setBeginnerGuideModalVisible] = useState(false)
+  const [privacyPolicyModalVisible, setPrivacyPolicyModalVisible] = useState(false)
+  const [termsOfServiceModalVisible, setTermsOfServiceModalVisible] = useState(false)
+  const [appVersionModalVisible, setAppVersionModalVisible] = useState(false)
 
   const showToast = useCallback((message: string) => {
     if (toastTimer.current) clearTimeout(toastTimer.current)
@@ -101,6 +116,7 @@ export function SettingsScreen({
     setIsLoading(true)
     setIsError(false)
     try {
+      await checkSession()
       if (isSupabaseConfigured()) {
         const remote = await supabaseService.getSettings()
         if (remote) {
@@ -121,7 +137,7 @@ export function SettingsScreen({
     } finally {
       setIsLoading(false)
     }
-  }, [setLocale, setSoundsEnabled, setHapticEnabled])
+  }, [checkSession, setLocale, setSoundsEnabled, setHapticEnabled])
 
   useEffect(() => {
     load()
@@ -141,6 +157,7 @@ export function SettingsScreen({
 
   async function handleLogOutConfirm() {
     setLogOutBusy(true)
+    await onBeforeLogOut?.().catch(() => {})
     await logout()
     setLogOutBusy(false)
     setLogOutDialogVisible(false)
@@ -157,6 +174,12 @@ export function SettingsScreen({
         busy={logOutBusy}
         onConfirm={handleLogOutConfirm}
         onCancel={() => setLogOutDialogVisible(false)}
+      />
+
+      {/* Scoring rules explanation modal */}
+      <ScoringRulesModal
+        visible={scoringRulesModalVisible}
+        onClose={() => setScoringRulesModalVisible(false)}
       />
 
       {/* ── HEADER ── */}
@@ -273,6 +296,22 @@ export function SettingsScreen({
               }}
               skeleton={isLoading}
             />
+            <SettingsRow
+              icon={<IconSparkles width={18} height={18} />}
+              label={t.settings.beginnerGuide}
+              description={t.settings.beginnerGuideDesc}
+              variant="nav"
+              onClick={() => setBeginnerGuideModalVisible(true)}
+              skeleton={isLoading}
+            />
+            <SettingsRow
+              icon={<IconBook />}
+              label={t.settings.scoringRules}
+              description={t.settings.scoringRulesDesc}
+              variant="nav"
+              onClick={() => setScoringRulesModalVisible(true)}
+              skeleton={isLoading}
+            />
           </SettingsSection>
 
           {/* Display */}
@@ -308,20 +347,21 @@ export function SettingsScreen({
               label={t.settings.appVersion}
               variant="value"
               value="1.1.0"
+              onClick={() => setAppVersionModalVisible(true)}
               skeleton={isLoading}
             />
             <SettingsRow
               icon={<IconShield />}
               label={t.settings.privacyPolicy}
               variant="nav"
-              onClick={notImplemented}
+              onClick={() => setPrivacyPolicyModalVisible(true)}
               skeleton={isLoading}
             />
             <SettingsRow
               icon={<IconDocument />}
               label={t.settings.termsOfService}
               variant="nav"
-              onClick={notImplemented}
+              onClick={() => setTermsOfServiceModalVisible(true)}
               skeleton={isLoading}
             />
           </SettingsSection>
@@ -359,6 +399,32 @@ export function SettingsScreen({
 
         </div>
       </ScreenMain>
+
+      {/* Modals */}
+      <BeginnerGuideModal
+        visible={beginnerGuideModalVisible}
+        onClose={() => setBeginnerGuideModalVisible(false)}
+      />
+
+      <ScoringRulesModal
+        visible={scoringRulesModalVisible}
+        onClose={() => setScoringRulesModalVisible(false)}
+      />
+
+      <PrivacyPolicyModal
+        visible={privacyPolicyModalVisible}
+        onClose={() => setPrivacyPolicyModalVisible(false)}
+      />
+
+      <TermsOfServiceModal
+        visible={termsOfServiceModalVisible}
+        onClose={() => setTermsOfServiceModalVisible(false)}
+      />
+
+      <AppVersionModal
+        visible={appVersionModalVisible}
+        onClose={() => setAppVersionModalVisible(false)}
+      />
 
       {/* ── NAVIGATION ── */}
       <BottomNavBar active="settings" onNavigate={onNavigate} />

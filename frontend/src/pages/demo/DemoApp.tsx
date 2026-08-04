@@ -17,7 +17,7 @@ import type { GameResultInput } from '@/services/result/result.interface'
 
 /** Static stand-in session for previewing Result in isolation — a real run always supplies this via App.tsx. */
 const DEMO_RESULT: GameResultInput = {
-  game: GameId.SEQUENCE,
+  game: GameId.COLOR,
   mode: ModeId.SOLO_RANKED,
   difficulty: DifficultyId.MEDIUM,
   levelReached: 6,

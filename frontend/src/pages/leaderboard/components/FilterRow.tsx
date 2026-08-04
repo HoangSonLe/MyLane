@@ -2,6 +2,7 @@ import { FilterPills } from '@/components/ui/controls'
 import type { BoardType, Category, SortMetric } from '@/services/leaderboard/leaderboard.interface'
 import { CATEGORIES } from '@/services/leaderboard/leaderboard.mock'
 import { useTranslation } from '@/i18n/useTranslation'
+import { getLocalizedGameLabel } from '@/services/gameplay/gameplay-screen.types'
 
 export function FilterRow({
   activeCategory,
@@ -42,7 +43,7 @@ export function FilterRow({
 
   const categoryItems = CATEGORIES.map((cat) => ({
     id: cat.id,
-    label: cat.label,
+    label: getLocalizedGameLabel(t, cat.id),
   }))
 
   const metricItems = [

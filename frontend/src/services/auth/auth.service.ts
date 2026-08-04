@@ -3,6 +3,7 @@ import { apiClient, clearToken, getCachedUser, getToken, saveToken } from '@/ser
 import { isSupabaseConfigured } from '@/services/backend-config'
 import { authSupabaseService, getSupabaseClient } from '@/services/supabase'
 import type { AuthCredentials } from './auth.interface'
+import { calculateOverallElo } from '@/lib/utils'
 
 export interface UserSession {
   id: string
@@ -40,12 +41,21 @@ export const authService = {
         try {
           const { data } = await supabase.auth.getUser()
           if (data?.user) {
+            const userId = data.user.id
+            const [{ data: profile }, { data: eloRows }] = await Promise.all([
+              supabase.from('profiles').select('name, avatar_url, overall_elo').eq('id', userId).maybeSingle(),
+              supabase.from('category_elo').select('category, elo').eq('user_id', userId),
+            ])
+
+            const overallElo = calculateOverallElo(eloRows, profile?.overall_elo || 1000)
+
             const userSession: UserSession = {
-              id: data.user.id,
-              name: data.user.user_metadata?.full_name || data.user.email?.split('@')[0] || 'Player',
+              id: userId,
+              name: profile?.name || data.user.user_metadata?.full_name || data.user.email?.split('@')[0] || 'Player',
               email: data.user.email,
               isGuest: false,
-              elo: 1000,
+              avatarUrl: profile?.avatar_url || data.user.user_metadata?.avatar_url || undefined,
+              elo: overallElo,
             }
             saveToken('supabase_session_token', userSession)
             return userSession
@@ -56,7 +66,30 @@ export const authService = {
       }
 
       const cachedUser = getCachedUser()
-      if (cachedUser && !cachedUser.isGuest) {
+      if (cachedUser) {
+        if (supabase && cachedUser.id) {
+          try {
+            const [{ data: profile }, { data: eloRows }] = await Promise.all([
+              supabase.from('profiles').select('name, avatar_url, overall_elo').eq('id', cachedUser.id).maybeSingle(),
+              supabase.from('category_elo').select('category, elo').eq('user_id', cachedUser.id),
+            ])
+
+            if (profile) {
+              const overallElo = calculateOverallElo(eloRows, profile.overall_elo ?? cachedUser.elo ?? 1000)
+
+              const updated: UserSession = {
+                ...cachedUser,
+                name: profile.name || cachedUser.name,
+                avatarUrl: profile.avatar_url || cachedUser.avatarUrl,
+                elo: overallElo,
+              }
+              saveToken(token || 'cached_token', updated)
+              return updated
+            }
+          } catch {
+            // Keep cachedUser if query fails
+          }
+        }
         return cachedUser
       }
       return null
@@ -124,22 +157,11 @@ export const authService = {
           saveToken('supabase_session_token', user)
           return user
         }
-      } catch (err: any) {
-        if (err?.message?.toLowerCase().includes('rate limit')) {
+      } catch (err: unknown) {
+        if (err instanceof Error && err.message.toLowerCase().includes('rate limit')) {
           throw new Error('Supabase email rate limit exceeded. Please log in with an existing account or play as Guest!')
         }
-        try {
-          const user = await authSupabaseService.registerWithEmail(creds.email, creds.password, creds.email.split('@')[0])
-          if (user) {
-            saveToken('supabase_session_token', user)
-            return user
-          }
-        } catch (regErr: any) {
-          if (regErr?.message?.toLowerCase().includes('rate limit')) {
-            throw new Error('Supabase email rate limit reached (3/hour on free tier). Please log in with an existing account or play as Guest!')
-          }
-          throw new Error(regErr.message || err.message || 'Supabase authentication failed')
-        }
+        throw toFriendlyError(err, 'Invalid credentials or login failed.')
       }
     }
 
@@ -149,6 +171,40 @@ export const authService = {
       return data.user
     } catch (err) {
       throw toFriendlyError(err, 'Invalid credentials or login failed.')
+    }
+  },
+
+  /** Register a new account with email & password */
+  async registerWithEmail(creds: AuthCredentials): Promise<UserSession> {
+    if (!navigator.onLine) {
+      throw new Error('You are offline. Registration requires an active internet connection.')
+    }
+
+    if (isSupabaseConfigured()) {
+      try {
+        const user = await authSupabaseService.registerWithEmail(
+          creds.email,
+          creds.password,
+          creds.email.split('@')[0],
+        )
+        if (user) {
+          saveToken('supabase_session_token', user)
+          return user
+        }
+      } catch (err: unknown) {
+        if (err instanceof Error && err.message.toLowerCase().includes('rate limit')) {
+          throw new Error('Supabase email rate limit reached. Please try again later or play as Guest!')
+        }
+        throw toFriendlyError(err, 'Account registration failed.')
+      }
+    }
+
+    try {
+      const { data } = await apiClient.post<AuthResponse>('/auth/register', creds)
+      saveToken(data.token, data.user)
+      return data.user
+    } catch (err) {
+      throw toFriendlyError(err, 'Account registration failed.')
     }
   },
 

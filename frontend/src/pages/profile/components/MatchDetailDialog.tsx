@@ -1,6 +1,11 @@
 import { Card, CardButton } from '@/components/ui/card'
 import { useTranslation } from '@/i18n/useTranslation'
 import type { MatchEntry } from '@/services/profile/profile.interface'
+import {
+  getLocalizedGameLabel,
+  getLocalizedModeLabel,
+} from '@/services/gameplay/gameplay-screen.types'
+import { formatMatchPlayedAt } from '@/lib/utils/match-time'
 
 export function MatchDetailDialog({
   match,
@@ -9,8 +14,19 @@ export function MatchDetailDialog({
   match: MatchEntry | null
   onClose: () => void
 }) {
-  const { t } = useTranslation()
+  const { t, locale } = useTranslation()
   if (!match) return null
+  const categoryLabel = getLocalizedGameLabel(t, match.category)
+  const modeLabel = getLocalizedModeLabel(t, match.mode)
+  const playedAtLabel = formatMatchPlayedAt(match.playedAt, locale)
+  const playerRoundScore = match.playerRoundScore
+  const opponentRoundScore = match.opponentRoundScore
+  const matchScoreValue = playerRoundScore !== undefined && opponentRoundScore !== undefined
+    ? `${playerRoundScore} – ${opponentRoundScore}`
+    : undefined
+  const matchScoreLabel = playerRoundScore !== undefined && opponentRoundScore !== undefined
+    ? t.profile.historyMatchScore(playerRoundScore, opponentRoundScore)
+    : undefined
 
   const outcomeColor =
     match.outcome === 'win'
@@ -43,7 +59,7 @@ export function MatchDetailDialog({
       <div
         role="dialog"
         aria-modal="true"
-        aria-label={`Match detail: ${match.categoryLabel} ${match.mode}`}
+        aria-label={`Match detail: ${categoryLabel} ${modeLabel}`}
         className="fixed bottom-0 left-1/2 z-50 w-full max-w-sm -translate-x-1/2 flex flex-col gap-0"
         style={{
           borderRadius: 'var(--radius-3xl) var(--radius-3xl) 0 0',
@@ -74,11 +90,13 @@ export function MatchDetailDialog({
             {match.score.toLocaleString()}
           </p>
           <p className="text-[12px]" style={{ color: 'var(--ma-fg-muted)' }}>
-            {match.categoryLabel} · {match.mode}
+            {categoryLabel} · {modeLabel}
           </p>
-          {match.opponentName && (
+          {(match.opponentName || matchScoreLabel) && (
             <p className="text-[12px]" style={{ color: 'var(--ma-fg-subtle)' }}>
-            vs {match.opponentName}
+              {match.opponentName ? `${t.profile.vs} ${match.opponentName}` : ''}
+              {match.opponentName && matchScoreLabel ? ' · ' : ''}
+              {matchScoreLabel || ''}
             </p>
           )}
         </div>
@@ -86,13 +104,16 @@ export function MatchDetailDialog({
         {/* Detail rows */}
         <Card className="mx-4 mb-4 overflow-hidden">
           {[
-            { label: t.profile.detailCategory, value: match.categoryLabel },
-            { label: t.profile.detailMode, value: match.mode },
+            { label: t.profile.detailCategory, value: categoryLabel },
+            { label: t.profile.detailMode, value: modeLabel },
             { label: t.profile.detailScore, value: match.score.toLocaleString() },
+            ...(matchScoreValue
+              ? [{ label: t.profile.detailMatchScore, value: matchScoreValue }]
+              : []),
             ...(match.eloChange !== undefined
               ? [{ label: t.profile.detailEloChange, value: `${match.eloChange >= 0 ? '+' : ''}${match.eloChange}` }]
               : []),
-            { label: t.profile.detailPlayed, value: match.playedAt },
+            { label: t.profile.detailPlayed, value: playedAtLabel },
           ].map((row, i) => (
             <div
               key={row.label}

@@ -167,7 +167,7 @@ Cũng hỗ trợ Pause và Reset giống hai game còn lại.
 
 ## 4. Hệ thống Bạn bè
 
-- Người chơi có thể tìm kiếm người khác theo **username** hoặc **ID**.
+- Người chơi có thể tìm kiếm người khác theo **username**, **ID**, hoặc quét mã QR/link kết bạn.
 - Gửi lời mời kết bạn → đối phương có thể chấp nhận hoặc từ chối.
 - Trong danh sách bạn bè hiển thị trạng thái **online / offline** gần realtime.
 - Có nút **“Mời đấu”** ngay cạnh mỗi người bạn để tạo phòng Versus nhanh chóng.
@@ -204,6 +204,11 @@ Cũng hỗ trợ Pause và Reset giống hai game còn lại.
 - Tạo phòng riêng và chia sẻ **mã phòng** hoặc **link**.
 - Sử dụng **Quick Match** (ghép tự động theo Elo).
 
+**Vòng đời phòng chờ:**
+- Một phòng còn ở trạng thái `waiting` hết hạn sau **10 phút** nếu không có heartbeat của người tham gia hoặc thay đổi trạng thái phòng thành công.
+- Màn hình phòng gửi heartbeat mỗi 60 giây khi người tham gia đang mở phòng. Poll đọc dữ liệu, Realtime và Presence không tự gia hạn; phòng `in_progress` hoặc `finished` không chịu TTL này.
+- Thời hạn này độc lập với hàng đợi Quick Match **60 giây** và lời mời thách đấu đang chờ **30 giây**.
+
 ---
 
 ## 6. Matchmaking theo Elo (Quick Match)
@@ -214,7 +219,7 @@ Khi người chơi chọn Quick Match:
 2. **Khoảng Elo ban đầu** cho phép ghép: **±100 điểm**.
 3. Nếu sau **10 giây** không tìm được đối thủ, hệ thống tự động mở rộng khoảng thêm **±50 điểm**.
 4. Cứ mỗi 10 giây không ghép được thì tiếp tục mở rộng, tối đa đến **±300 điểm**.
-5. Thời gian chờ tối đa khoảng **60–90 giây**. Hết thời gian sẽ thông báo “Không tìm thấy đối thủ” và cho phép thử lại.
+5. Thời gian chờ tối đa **60 giây**. Hết thời gian sẽ thông báo “Không tìm thấy đối thủ” và cho phép thử lại.
 6. **Ưu tiên** ghép bạn bè đang online trước nếu họ nằm trong khoảng Elo hợp lệ.
 7. Mỗi thể loại có **hàng đợi riêng** (Numbers Queue, Alphabet Queue, Grid Queue) để tránh ghép nhầm thể loại.
 
@@ -518,7 +523,7 @@ Sau khi người chơi hoàn thành **Level 10** của bất kỳ thể loại n
 
 | Thành phần      | Lựa chọn                        |
 |-----------------|---------------------------------|
-| Avatar          | Cloudflare R2                   |
+| Avatar          | Supabase Storage (`avatars`)    |
 
 ### 16.5. DevOps
 
@@ -746,7 +751,7 @@ Go chỉ xử lý: Matchmaking, Room, WebSocket, Tournament.
 | Authentication | Google OAuth + JWT              |
 | Database       | PostgreSQL                      |
 | Cache          | Redis                           |
-| Storage        | Cloudflare R2                   |
+| Storage        | Supabase Storage (avatar)       |
 | Logging        | Serilog                         |
 | PWA            | vite-plugin-pwa                 |
 | CI/CD          | GitHub Actions                  |

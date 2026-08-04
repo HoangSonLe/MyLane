@@ -2,10 +2,15 @@ import { DifficultyId, RoomEntrySource } from '@/configs/enum'
 import type { GameCategoryId, PublicRoomSummary, Room, RoundMode, VersusRoundResult } from '../versus-room/versus-room.interface'
 import {
   NoAvailableRoomsError,
+  RoomExpiredError,
   RoomFullError,
   RoomNotFoundError,
 } from '../versus-room/versus-room.service'
 import { getSupabaseClient } from './supabase.client'
+
+const WAITING_ROOM_CLEANUP_INTERVAL_MS = 60_000
+let lastWaitingRoomCleanupAt = 0
+let waitingRoomCleanupPromise: Promise<void> | null = null
 
 function requireSupabase() {
   const supabase = getSupabaseClient()
@@ -13,8 +18,27 @@ function requireSupabase() {
   return supabase
 }
 
+async function cleanupStaleWaitingRooms(): Promise<void> {
+  if (waitingRoomCleanupPromise) return waitingRoomCleanupPromise
+  if (Date.now() - lastWaitingRoomCleanupAt < WAITING_ROOM_CLEANUP_INTERVAL_MS) return
+
+  const supabase = requireSupabase()
+  waitingRoomCleanupPromise = (async () => {
+    const { error } = await supabase.rpc('expire_stale_waiting_rooms')
+    if (error) throwRoomError(error)
+    lastWaitingRoomCleanupAt = Date.now()
+  })()
+
+  try {
+    await waitingRoomCleanupPromise
+  } finally {
+    waitingRoomCleanupPromise = null
+  }
+}
+
 function throwRoomError(error: any): never {
   const message = String(error?.message || error?.details || 'Room request failed')
+  if (message.includes('ROOM_EXPIRED')) throw new RoomExpiredError('Room expired')
   if (message.includes('ROOM_NOT_FOUND')) throw new RoomNotFoundError('Room not found')
   if (message.includes('ROOM_FULL')) throw new RoomFullError('Room is full')
   throw new Error(message)
@@ -61,12 +85,14 @@ export const versusSupabaseService = {
     const { data: userData, error: authError } = await supabase.auth.getUser()
     if (authError) throwRoomError(authError)
     const currentUserId = userData?.user?.id
+    if (currentUserId) await cleanupStaleWaitingRooms()
 
     let query = supabase
       .from('versus_rooms')
       .select('code, room_name, category, mode, difficulty, player_count, max_players, host_id, privacy')
       .eq('privacy', 'public')
       .eq('status', 'waiting')
+      .gt('expires_at', new Date().toISOString())
       .lt('player_count', 2)
 
     if (currentUserId) query = query.neq('host_id', currentUserId)
@@ -150,7 +176,7 @@ export const versusSupabaseService = {
       } catch (error) {
         // Another user may have occupied this room between list and join. The
         // atomic join RPC tells us to try the next candidate safely.
-        if (!(error instanceof RoomFullError)) throw error
+        if (!(error instanceof RoomFullError) && !(error instanceof RoomExpiredError)) throw error
       }
     }
     throw new NoAvailableRoomsError('Không có phòng công khai nào đang chờ từ người chơi khác.')
@@ -163,6 +189,7 @@ export const versusSupabaseService = {
       p_code: normalizedCode,
     })
     if (error) throwRoomError(error)
+    if (!data) throw new RoomExpiredError('Room expired')
     return this.getRoom(String(data))
   },
 
@@ -178,6 +205,12 @@ export const versusSupabaseService = {
       room: await this.getRoom(result.room_code || code),
       hostTransferred: !!result.host_transferred,
     }
+  },
+
+  async heartbeatRoom(code: string): Promise<void> {
+    const supabase = requireSupabase()
+    const { error } = await supabase.rpc('heartbeat_versus_room', { p_code: code })
+    if (error) throwRoomError(error)
   },
 
   async setRoomReady(code: string, ready: boolean): Promise<Room> {
@@ -312,6 +345,56 @@ export const versusSupabaseService = {
       .channel('public_versus_rooms_changes')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'versus_rooms' }, onChange)
       .subscribe()
+    return () => { void supabase.removeChannel(channel) }
+  },
+
+  /**
+   * Pushes a re-sync signal the instant a room's row changes (round
+   * submitted, forfeit, match started/finished) — `versus_rooms` is already
+   * in the `supabase_realtime` publication (database/schema.sql), so this
+   * needs no new DB migration. The caller re-fetches via `getRoom()` rather
+   * than trusting the raw payload, keeping the host/guest/category-Elo join
+   * logic in one place.
+   */
+  subscribeToRoomUpdates(code: string, onChange: () => void): () => void {
+    const supabase = getSupabaseClient()
+    if (!supabase) return () => {}
+    const channel = supabase
+      .channel(`versus_room_updates:${code}`)
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'versus_rooms', filter: `code=eq.${code}` },
+        onChange,
+      )
+      .subscribe()
+    return () => { void supabase.removeChannel(channel) }
+  },
+
+  /**
+   * Supabase Presence for one room: each client `track()`s itself under its
+   * own user id, and `onSync` is called with the set of currently-present
+   * user ids whenever either side joins/leaves/disconnects (browser close,
+   * network drop, tab crash all fire a 'leave' automatically — no polling,
+   * no new table). This is the actual disconnect signal `VersusGameplayScreen`
+   * uses to distinguish "opponent connected" from "opponent disconnected",
+   * which the DB row alone can't tell you (the row only changes when someone
+   * *acts*; presence tells you who's *there*).
+   */
+  subscribeToRoomPresence(code: string, userId: string, onSync: (onlineUserIds: string[]) => void): () => void {
+    const supabase = getSupabaseClient()
+    if (!supabase) return () => {}
+    const channel = supabase.channel(`versus_room_presence:${code}`, {
+      config: { presence: { key: userId } },
+    })
+    channel
+      .on('presence', { event: 'sync' }, () => {
+        onSync(Object.keys(channel.presenceState()))
+      })
+      .subscribe((status) => {
+        if (status === 'SUBSCRIBED') {
+          void channel.track({ online_at: new Date().toISOString() })
+        }
+      })
     return () => { void supabase.removeChannel(channel) }
   },
 }

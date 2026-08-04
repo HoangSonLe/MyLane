@@ -52,6 +52,12 @@ function IconColor() {
 
 export const GAMES: GameMeta[] = [
   {
+    id: GameId.COLOR,
+    label: 'Color Memory',
+    description: 'Repeat growing color sequences',
+    icon: <IconColor />,
+  },
+  {
     id: GameId.NUMBER,
     label: 'Number Memory',
     description: 'Recall growing digit sequences',
@@ -74,12 +80,6 @@ export const GAMES: GameMeta[] = [
     label: 'Sequence Memory',
     description: 'Replay growing tile sequences',
     icon: <IconSequence />,
-  },
-  {
-    id: GameId.COLOR,
-    label: 'Color Memory',
-    description: 'Repeat growing color sequences',
-    icon: <IconColor />,
   },
 ]
 

@@ -8,11 +8,12 @@ Tài liệu này là nguồn chuẩn duy nhất (Single Source of Truth) phục 
 
 ### 1.1 Màn Hình Điều Hướng Chính
 - **`LandingScreen`**: Màn hình mở ứng dụng lần đầu hoặc dành cho người dùng chưa đăng nhập (cung cấp tùy chọn Chơi Guest hoặc Đăng nhập).
-- **`LoginScreen`**: Màn hình xác thực tài khoản (hỗ trợ Email/Password, Google OAuth và Discord OAuth).
+- **`LoginScreen`**: Màn hình xác thực tài khoản dùng chung component system nhưng có hai mode rõ ràng: Đăng nhập và Tạo tài khoản. Email/Password gọi hai flow riêng; Google/Discord dùng cùng hành động “Tiếp tục với…” cho người mới và người cũ.
 - **`HomeScreen`**: Dashboard mặc định sau khi đăng nhập, tập trung vào chế độ chơi đơn cá nhân và tiến trình hàng ngày.
 - **`LobbyScreen`**: Trung tâm tính năng xã hội, duyệt danh sách phòng công khai, danh sách bạn bè và nhận lời mời thách đấu.
-- **`ProfileScreen`**: Màn hình thông tin cá nhân hiển thị điểm ELO, lịch sử đấu, thống kê tổng thể và thành tựu.
-- **`SettingsScreen`**: Màn hình cấu hình ứng dụng (Âm thanh hiệu ứng, Phản hồi rung haptics, Giao diện Theme, Ngôn ngữ).
+- **`ProfileScreen`**: Màn hình thông tin cá nhân hiển thị avatar, điểm ELO, lịch sử đấu, thống kê tổng thể; cung cấp lối vào chỉnh sửa hồ sơ, QR kết bạn và modal gửi lời mời thách đấu 1v1.
+- **`EditProfileScreen`**: Màn hình riêng để cập nhật ảnh đại diện, tên hiển thị và handle.
+- **`SettingsScreen`**: Màn hình cấu hình ứng dụng (Âm thanh hiệu ứng, Phản hồi rung haptics, Giao diện Theme, Ngôn ngữ, Modal Hướng dẫn người mới `BeginnerGuideModal`, Modal Quy tắc tính điểm `ScoringRulesModal`).
 - **`LeaderboardScreen`**: Bảng xếp hạng cạnh tranh giữa các người chơi toàn cầu và theo từng thể loại game.
 
 ### 1.2 Màn Hình Game & Hàng Chờ Matchmaking
@@ -30,6 +31,7 @@ Tài liệu này là nguồn chuẩn duy nhất (Single Source of Truth) phục 
 - **`HostLeaveModal`**: Pop-up xác nhận rời phòng của Chủ phòng (xử lý chuyển quyền Chủ phòng hoặc giải tán phòng).
 - **`MuteInviteModal`**: Modal cấu hình tạm tắt nhận lời mời thách đấu (5 phút, 15 phút, 30 phút, hoặc trong phiên).
 - **`FriendProfileModal`**: Overlay xem thông tin hồ sơ công khai của bạn bè hoặc người chơi khác.
+- **`FriendQrModal`**: Overlay hiển thị QR cá nhân hoặc quét QR bằng camera/ảnh để xem trước người chơi và gửi lời mời kết bạn.
 - **`ConfirmDialog`**: Pop-up xác nhận hành động nguy hiểm (Rời trận đấu, Đăng xuất).
 - **`Toast`**: Thông báo dạng thanh nổi trên cùng (`z-[100]`) hiển thị phản hồi hệ thống và thông báo lỗi.
 
@@ -156,8 +158,10 @@ flowchart TD
     D -- "Mã Đúng & Còn Chỗ" --> E["VersusRoomScreen\n(ReadyRoomView: Vai Trò Guest)"]
     D -- "Mã Sai / Không Tồn Tại" --> F["Toast: Phòng Không Tồn Tại"]
     D -- "Phòng Đã Đầy (player_count >= 2)" --> G["Toast: Phòng Đã Đầy"]
+    D -- "Phòng Waiting Đã Hết Hạn" --> M["Inline Error: Phòng Đã Hết Hạn"]
     F --> B
     G --> B
+    M --> B
     
     C -- "Host Đổi Chế Độ (Public/Private)" --> C
     C -- "Host Bấm Rời Phòng" --> H["HostLeaveModal"]
@@ -165,6 +169,8 @@ flowchart TD
     H -- "Xác Nhận Rời (Đang Một Mình)" --> J["Giải Tán Phòng -> LobbyScreen"]
     
     E -- "Guest Bấm Rời Phòng" --> K["Guest Thoát -> LobbyScreen\n(Host Ở Lại Phòng)"]
+    C -- "Server Báo TTL 10 Phút Đã Hết" --> M
+    E -- "Server Báo TTL 10 Phút Đã Hết" --> M
     
     C -- "Guest Vào -> Cả 2 Sẵn Sàng -> Host Bắt Đầu" --> L["VersusGameplayScreen\n(Thi Đấu 1v1 PvP)"]
     E -- "Host Bắt Đầu Trận Đấu" --> L
@@ -177,6 +183,7 @@ flowchart TD
 2. **Vào phòng**:
    - Người chơi nhập mã 6 ký tự hoặc bấm **Vào** trực tiếp từ **Danh sách phòng khả dụng** ở `LobbyScreen`.
    - **Phòng không tồn tại (`Room Not Found`)**: Nếu nhập mã sai hoặc phòng đã bị hủy, trả về lỗi `RoomNotFoundError` và hiện Toast thông báo. Người dùng ở lại Form nhập mã.
+   - **Phòng đã hết hạn (`Room Expired`)**: Nếu room còn `waiting` đã vượt deadline server, trả về `RoomExpiredError`, đóng `ReadyRoomView` cũ và hiện inline error 10 phút. Người dùng quay lại form thay vì mắc kẹt trong phòng zombie.
    - **Phòng đã đầy (`Room Full`)**: Nếu `player_count >= 2`, trả về lỗi `RoomFullError` và hiện Toast thông báo. Người dùng ở lại Form nhập mã.
    - **Vào thành công**: Guest vào màn hình `VersusRoomScreen` ở giao diện `ReadyRoomView`. Số lượng người chơi `player_count` tăng lên 2 qua kết nối Supabase Realtime.
 3. **Quyền Chủ phòng & Chuyển giao (`Host Transfer`)**:
@@ -185,6 +192,7 @@ flowchart TD
      - Nếu đã có Guest trong phòng: Xác nhận rời sẽ tự động chuyển quyền Host cho Guest, Host cũ quay về `LobbyScreen`.
      - Nếu chưa có Guest: Phòng bị xóa khỏi `versus_rooms` và Host quay về `LobbyScreen`.
 4. **Guest rời phòng**: Guest bấm rời phòng sẽ tự động thoát khỏi phòng, giảm `player_count` xuống 1 và xóa `guest_id`.
+5. **TTL phòng chờ**: `VersusRoomScreen` gửi heartbeat riêng mỗi 60 giây khi participant đang mở phòng. Nếu không có heartbeat hoặc room-state mutation thành công trong 10 phút, RLS ẩn phòng hết hạn và cleanup xóa bản ghi. Poll đọc 800 ms, Realtime và Presence không tự gia hạn; `in_progress`/`finished` không áp dụng TTL này.
 
 ---
 
@@ -207,12 +215,12 @@ flowchart TD
 ```
 
 #### Chi Tiết Các Bước, Trường Hợp Biên & Lỗi:
-1. **Gửi lời mời**: Người gửi chọn 1 người chơi và bấm **Thách đấu**. Bản ghi được tạo trong `match_invites`.
+1. **Gửi lời mời**: Người gửi chọn 1 người chơi từ Lobby hoặc `ProfileScreen`, bấm **Thách đấu**, chọn cấu hình trong `ChallengeModal`, rồi gửi. Bản ghi được tạo trong `match_invites`.
 2. **Nhận Realtime**: Ứng dụng người nhận bắt được payload Supabase Realtime trên bảng `match_invites` và bật `IncomingInviteModal` đè lên màn hình hiện tại với z-index cao (`z-[60]`).
 3. **Thao tác của Người nhận**:
    - **Chấp nhận (`Accept`)**: Trạng thái chuyển thành `'accepted'`. Cả 2 người chơi cùng chuyển hướng sang `VersusRoomScreen` (`ReadyRoomView`).
    - **Từ chối (`Decline`)**: Trạng thái chuyển thành `'declined'`. Người gửi nhận Toast thông báo "Đối thủ đã từ chối lời mời".
-   - **Tắt nhận lời mời (`Mute Player Invites`)**: Người nhận mở `MuteInviteModal` từ pop-up và chọn thời gian tắt (5 phút, 15 phút, 30 phút, hoặc Hết phiên). Các lời mời sau từ người này sẽ bị tự động bỏ qua.
+   - **Tắt nhận lời mời (`Mute Player Invites`)**: Người nhận mở `MuteInviteModal` từ pop-up và chọn thời gian tắt (5 phút, 15 phút, 30 phút, hoặc Hết phiên). Các lời mời sau từ người này sẽ bị tự động bỏ qua. Các lựa chọn theo phút được đồng bộ Realtime theo tài khoản; lựa chọn Hết phiên chỉ tồn tại trong phiên ứng dụng hiện tại.
    - **Lời mời hết hạn (`Invite Expired`)**: Nếu người nhận không thao tác sau 30 giây, lời mời tự chuyển thành `'expired'`. Pop-up tự đóng và người gửi nhận thông báo hết hạn.
 
 ---

@@ -116,7 +116,8 @@ export function HeaderProfileMenu({
           </>
         )}
 
-        {/* 4. Settings */}
+        {/* 4. Story & Lore */}
+        {/* 5. Settings */}
         {onNavigateSettings && (
           <button
             type="button"

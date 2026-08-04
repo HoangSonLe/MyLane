@@ -44,7 +44,7 @@ Zero-cost start · mobile-first web game · fast to build · easy to scale later
 | Icons | Lucide React |
 | PWA | vite-plugin-pwa |
 | Backend provider (Primary) | ASP.NET Core 9 Web API + SignalR |
-| Backend provider (Cloud/BaaS) | Supabase (PostgreSQL + Auth + Realtime WebSockets) |
+| Backend provider (Cloud/BaaS) | Supabase (PostgreSQL + Auth + Realtime WebSockets + Storage) |
 | Backend provider (Dev/Offline) | MSW (Mock Service Worker) + Node mock-server |
 | ORM | Entity Framework Core / Supabase Client |
 | Validation | FluentValidation |
@@ -52,7 +52,7 @@ Zero-cost start · mobile-first web game · fast to build · easy to scale later
 | Logging | Serilog |
 | Database | PostgreSQL |
 | Cache | Redis |
-| Object storage (avatars) | Cloudflare R2 |
+| Object storage (avatars) | Supabase Storage (`avatars` public bucket, owner-write policies) |
 | Source control | GitHub |
 | CI/CD | GitHub Actions |
 | Container | Docker / Docker Compose |
@@ -106,7 +106,8 @@ Single command to bring up the full environment: `docker compose up`.
 - **Auth**: Google login, Guest login
 - **Gameplay**: Numbers, Alphabet, Grid (see [`docs/gameplay/`](../gameplay/README.md))
 - **Modes**: Solo Practice, Solo Ranked, Versus Ranked/Unranked (basic), Endless (post-Level 10)
-- **User**: Profile, Best Score, Elo, Match History
+- **User**: Profile editing, Supabase-hosted avatar, Best Score, Elo, Match History
+- **Social**: Friend search plus QR/deep-link friend requests with profile preview
 - **Ranking**: Global Leaderboard, Friends Leaderboard
 - **Mobile**: Responsive, PWA, Fullscreen
 - **UX**: Animation, Loading, Error states, basic haptic feedback
@@ -119,6 +120,11 @@ Single command to bring up the full environment: `docker compose up`.
 - Viewing/Answering countdown timers must be server-controlled — the client only displays them; never trust client-side timing for scoring/anti-cheat.
 - Basic anti-cheat: rate-limit input speed, detect abnormal/bot-like input patterns.
 - Guest progress/config is stored in `localStorage`; synced to the server on login.
+- First-run presentation defaults to locale `vi` and theme `light`. Existing local/server preferences remain authoritative and are never reset by this default.
+- Avatar uploads are JPEG/PNG/WebP only, capped at 2 MB by Storage policy, and written under `<auth.uid()>/avatar.webp`; public reads are allowed while writes are restricted to the owner folder.
+- Friend QR payloads are versioned app links (`?friend=<profile-id>&v=1`). Resolve the profile and current friendship server-side before enabling the send action; never encode mutable profile fields in the QR.
+- Timed challenge-invite mutes are keyed by immutable profile ID and synchronized through the account's `invite_mutes` rows plus Supabase Realtime. The "end of session" option is intentionally client-session-only.
+- Versus lifecycle deadlines are server-authoritative and independent: queue attempts expire after 60 seconds, pending invites after 30 seconds, and `waiting` rooms after 10 minutes without a participant heartbeat or successful room mutation. `versus_rooms.expires_at`, its trigger, RLS read filter, and cleanup RPC use the database clock; read polling/Realtime/Presence do not refresh it, and non-waiting rooms are exempt.
 - Reconnect window during Versus: **60 seconds**. Timing out while disconnected counts as a loss.
 - All tunable numbers (level count, timers, mode coefficients, K-factor, etc.) live in server-side config, not hard-coded in core logic.
 

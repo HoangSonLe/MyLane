@@ -41,7 +41,7 @@ export function LeaderboardScreen({ onBack, onViewProfile, onNavigate }: Props) 
   const { t } = useTranslation()
 
   const [board, setBoard] = useState<BoardType>('global-alltime')
-  const [category, setCategory] = useState<Category>('number')
+  const [category, setCategory] = useState<Category>('color')
   const [metric, setMetric] = useState<SortMetric>('score')
 
   const [data, setData] = useState<LeaderboardBoard>(EMPTY_BOARD)

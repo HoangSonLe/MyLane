@@ -10,7 +10,7 @@ via Axios, answered by one of two interchangeable fake backends:
 | `msw` (default) | A Service Worker intercepts the request in-browser | `src/mocks/handlers.ts` |
 | `server` | A real Node/Express process on its own port | `mock-server/index.mjs` |
 
-Both implement the same contract (`/auth/guest`, `/auth/login`,
+Both implement the same contract (`/auth/guest`, `/auth/login`, `/auth/register`,
 `/auth/oauth/:provider`, `/auth/session`, `/auth/logout`) and the same
 mock-token format, so switching modes doesn't change app behavior.
 

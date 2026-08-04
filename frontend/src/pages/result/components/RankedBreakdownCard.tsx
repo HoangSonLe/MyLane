@@ -1,24 +1,28 @@
 import { Card } from '@/components/ui/card'
-
+import { IconInfoCircle } from '@/components/ui/icons'
 import type { ResultData } from '@/services/result/result.interface'
 import { useTranslation } from '@/i18n/useTranslation'
+import type { ScoringSectionId } from '@/components/ui/modal/ScoringRulesModal'
 
-export function RankedBreakdownCard({ data }: { data: ResultData }) {
+export function RankedBreakdownCard({
+  data,
+  onOpenScoringRules,
+}: {
+  data: ResultData
+  onOpenScoringRules?: (section?: ScoringSectionId) => void
+}) {
   const { t } = useTranslation()
   const isRanked =
     data.mode === 'solo-ranked' || data.mode === 'versus-ranked'
   if (!isRanked || !data.rankedBreakdown) return null
 
   const b = data.rankedBreakdown
-  // docs/gameplay/README.md § Scoring Formula: Perfect Bonus is a
-  // multiplier (×1.25 zero-mistake / ×1.0 otherwise), not an additive line
-  // — despite the doc's own field name "Perfect Bonus".
-  const rows: { label: string; value: string; note?: string; highlight: boolean }[] = [
-    { label: t.result.baseScore, value: b.baseScore.toLocaleString(), highlight: false },
-    { label: t.result.speedBonus, value: `+${b.speedBonus.toLocaleString()}`, highlight: b.speedBonus > 0 },
-    { label: t.result.difficulty, value: `×${b.difficultyMultiplier.toFixed(1)}`, note: t.result.multiplier, highlight: b.difficultyMultiplier !== 1 },
-    { label: t.result.perfectBonus, value: `×${b.perfectBonus.toFixed(2)}`, note: t.result.multiplier, highlight: b.perfectBonus !== 1 },
-    { label: t.result.completion, value: `×${b.completionMultiplier.toFixed(1)}`, note: t.result.multiplier, highlight: b.completionMultiplier !== 1 },
+  const rows: { sectionId: ScoringSectionId; label: string; value: string; note?: string; highlight: boolean }[] = [
+    { sectionId: 'base', label: t.result.baseScore, value: b.baseScore.toLocaleString(), highlight: false },
+    { sectionId: 'speed', label: t.result.speedBonus, value: `+${b.speedBonus.toLocaleString()}`, highlight: b.speedBonus > 0 },
+    { sectionId: 'difficulty', label: t.result.difficulty, value: `×${b.difficultyMultiplier.toFixed(1)}`, note: t.result.multiplier, highlight: b.difficultyMultiplier !== 1 },
+    { sectionId: 'perfect', label: t.result.perfectBonus, value: `×${b.perfectBonus.toFixed(2)}`, note: t.result.multiplier, highlight: b.perfectBonus !== 1 },
+    { sectionId: 'completion', label: t.result.completion, value: `×${b.completionMultiplier.toFixed(1)}`, note: t.result.multiplier, highlight: b.completionMultiplier !== 1 },
   ]
 
   return (
@@ -26,12 +30,21 @@ export function RankedBreakdownCard({ data }: { data: ResultData }) {
       <Card className="overflow-hidden" shadow="sm">
         {/* Header */}
         <div
-          className="px-4 py-3"
+          className="flex items-center justify-between px-4 py-3"
           style={{ borderBottom: '1px solid var(--ma-border-subtle)' }}
         >
           <p className="text-[11px] font-semibold uppercase tracking-widest" style={{ color: 'var(--ma-fg-subtle)' }}>
             {t.result.scoreBreakdown}
           </p>
+          <button
+            type="button"
+            onClick={() => onOpenScoringRules?.()}
+            className="flex items-center gap-1.5 text-[11px] font-semibold text-[var(--ma-brand)] hover:underline active:scale-95 transition-all"
+            title={t.scoringRulesModal?.viewFullRules || 'Thông tin tính điểm'}
+          >
+            <IconInfoCircle size={13} />
+            <span>{t.scoringRulesModal?.viewFullRules || 'Thông tin'}</span>
+          </button>
         </div>
 
         {/* Rows */}
@@ -45,9 +58,20 @@ export function RankedBreakdownCard({ data }: { data: ResultData }) {
               }}
             >
               <div className="flex flex-col gap-0.5">
-                <span className="text-[13px] font-medium" style={{ color: 'var(--ma-fg)' }}>
-                  {row.label}
-                </span>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[13px] font-medium" style={{ color: 'var(--ma-fg)' }}>
+                    {row.label}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => onOpenScoringRules?.(row.sectionId)}
+                    className="flex h-4 w-4 items-center justify-center rounded-full text-[var(--ma-fg-subtle)] hover:text-[var(--ma-brand)] hover:bg-[var(--ma-brand-soft)] active:scale-95 transition-all"
+                    title={t.scoringRulesModal?.viewFullRules || 'Thông tin tính điểm'}
+                    aria-label={`Giải thích ${row.label}`}
+                  >
+                    <IconInfoCircle size={13} />
+                  </button>
+                </div>
                 {row.note && (
                   <span className="text-[11px]" style={{ color: 'var(--ma-fg-subtle)' }}>
                     {row.note}

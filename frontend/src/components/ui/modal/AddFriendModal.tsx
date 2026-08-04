@@ -5,6 +5,7 @@ import { lobbyService } from '@/services/lobby/lobby.service'
 import type { Friend } from '@/services/lobby/lobby.interface'
 import { IconSearch } from '@/components/ui/icons'
 import { useTranslation } from '@/i18n/useTranslation'
+import { FriendQrModal } from './FriendQrModal'
 
 interface Props {
   visible: boolean
@@ -19,6 +20,7 @@ export function AddFriendModal({ visible, onClose, onFriendAdded }: Props) {
   const [isSearching, setIsSearching] = useState(false)
   const [addedIds, setAddedIds] = useState<Set<string>>(new Set())
   const [selectedProfileUser, setSelectedProfileUser] = useState<Friend | null>(null)
+  const [friendQrVisible, setFriendQrVisible] = useState(false)
 
   if (!visible) return null
 
@@ -66,13 +68,25 @@ export function AddFriendModal({ visible, onClose, onFriendAdded }: Props) {
                 {t.addFriendModal?.title || 'Tìm bạn bè & Kết bạn'}
               </h2>
             </div>
-            <button
-              type="button"
-              onClick={onClose}
-              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--ma-surface)] text-[var(--ma-fg-subtle)] hover:text-[var(--ma-fg)] transition-colors"
-            >
-              ✕
-            </button>
+            <div className="flex items-center gap-1.5">
+              <button
+                type="button"
+                onClick={() => setFriendQrVisible(true)}
+                className="flex h-8 items-center justify-center gap-1.5 rounded-full bg-[var(--ma-brand-soft)] px-3 text-[11px] font-semibold text-[var(--ma-brand)] transition-colors"
+                aria-label={t.friendQr.openScanner}
+              >
+                <span aria-hidden="true">▦</span>
+                QR
+              </button>
+              <button
+                type="button"
+                onClick={onClose}
+                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--ma-surface)] text-[var(--ma-fg-subtle)] hover:text-[var(--ma-fg)] transition-colors"
+                aria-label={t.common.close}
+              >
+                ✕
+              </button>
+            </div>
           </div>
 
           {/* Search input form */}
@@ -132,10 +146,10 @@ export function AddFriendModal({ visible, onClose, onFriendAdded }: Props) {
                     title={t.addFriendModal?.clickProfileHint || 'Bấm để xem thông tin người chơi'}
                   >
                     <div
-                      className="flex h-8 w-8 sm:h-9 sm:w-9 shrink-0 items-center justify-center rounded-xl font-bold text-[12px] sm:text-[13px] text-white"
+                      className="flex h-8 w-8 sm:h-9 sm:w-9 shrink-0 items-center justify-center overflow-hidden rounded-xl font-bold text-[12px] sm:text-[13px] text-white"
                       style={{ background: 'var(--ma-brand)' }}
                     >
-                      {user.name[0]?.toUpperCase() || 'U'}
+                      {user.avatarUrl ? <img src={user.avatarUrl} alt="" className="h-full w-full object-cover" /> : (user.name[0]?.toUpperCase() || 'U')}
                     </div>
                     <div className="min-w-0 flex-1">
                       <p className="text-[13px] sm:text-[14px] font-semibold text-[var(--ma-fg)] truncate hover:underline">{user.name}</p>
@@ -169,6 +183,13 @@ export function AddFriendModal({ visible, onClose, onFriendAdded }: Props) {
         friend={selectedProfileUser}
         show={!!selectedProfileUser}
         onClose={() => setSelectedProfileUser(null)}
+      />
+
+      <FriendQrModal
+        visible={friendQrVisible}
+        initialTab="scan"
+        onClose={() => setFriendQrVisible(false)}
+        onFriendAdded={onFriendAdded}
       />
     </>
   )

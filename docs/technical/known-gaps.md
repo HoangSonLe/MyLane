@@ -16,6 +16,7 @@ lý xong một mục (đánh dấu hoặc xoá khỏi file).
 - **Lưu Kết Quả Ranked & Elo Cloud**: Chỉ Solo Ranked/Versus Ranked ghi `match_history` và `category_bests`; Solo Practice/Versus Unranked không lưu. Elo chỉ đổi ở Versus Ranked theo công thức chess-Elo/K-factor trong gameplay docs, khởi điểm 1000 và sàn 100.
 - **Hệ Thống Phòng Đấu 1v1 Realtime Cloud (`LobbyScreen` & `versus_rooms`)**: Tách biệt luồng kết nối tạo phòng, tìm phòng khả dụng (`getAvailableRooms`), Ghép trận nhanh (`quickJoinRoom`), Vào phòng (`joinRoom`), Rời phòng tự chuyển Host (`leaveRoom`), và Bật/tắt quyền riêng tư Public/Private (`toggleRoomPrivacy`) chạy trực tiếp trên Supabase Cloud.
 - **Hệ Thống Thách Đấu 1v1 Realtime (`match_invites` & `ChallengeModal`)**: Khi bấm "Thách đấu", người thách đấu chọn môn thi đấu và mở **Modal Chờ Đối Thủ Xác Nhận (đếm ngược 30s)**. Phía bạn bè nhận **Pop-up Realtime Thông báo Lời mời Thách đấu (`IncomingInviteModal`)**. Khi đối thủ bấm **✓ Chấp nhận (Accept)**, cả 2 người chơi lập tức được chuyển thẳng vào Phòng đấu 1v1! Nếu từ chối hoặc hết 30s, hệ thống báo hủy mượt mà.
+- **Tắt Lời Mời Đồng Bộ Theo Tài Khoản**: Mute 5/15/30 phút được lưu bằng profile ID trong `invite_mutes`, hydrate trước listener lời mời và đồng bộ thiết bị qua Supabase Realtime. Mute Hết phiên vẫn chỉ giữ trong phiên ứng dụng hiện tại.
 - **Hệ Thống Bảng Xếp Hạng Realtime (`LeaderboardScreen`)**: Tải dữ liệu xếp hạng thực tế từ Supabase Cloud. Hỗ trợ lọc theo 5 thể loại game (`number`, `alphabet`, `grid`, `sequence`, `color`), 2 tiêu chí sắp xếp (**Điểm Elo** vs **Điểm Kỷ Lục**), và 3 chế độ xem (**Bảng Toàn Cầu All-Time**, **Top 100**, và **Bảng Bạn Bè Friends Only**). Tự động ghim hàng **"Hạng Của Bạn" (`pinnedEntry`)** ở đáy bảng khi người chơi nằm ngoài Top 100.
 - **Shared Component `<CollapsibleCard>` UI Kit**: Tách thành phần Card thu gọn/mở rộng thành Component Dùng Chung (`components/ui/card/CollapsibleCard.tsx`), tích hợp **Icon SVG Chevron (`IconChevronDown`)** xoay 90° mượt mà, áp dụng cho `EloCard`, `BestScoresCard`, `RecordStatsCard`, `FriendsCard`, `MatchHistoryCard`, `AvailableRoomsCard`.
 
@@ -218,13 +219,65 @@ Home/Game Select/Gameplay).
 game/mode/difficulty/seed/player được nhận từ phòng thật, năm game đều dùng
 rule table chung, và kết quả được chuyển sang `ResultScreen` để submit.
 
-**Còn thiếu — chưa phải trận realtime có server làm nguồn sự thật:**
-- `opponentStatus` và điểm đối thủ vẫn do state/mô phỏng cục bộ điều khiển;
-  `VersusGameplayScreen` chưa subscribe `subscribeToRoom()` để nhận hành động
-  và điểm của client còn lại.
-- Vì vậy outcome/Elo hiện đúng công thức và đúng payload, nhưng chưa thể được
-  xem là kết quả cạnh tranh có server xác thực. Cần SignalR/Redis Pub-Sub hoặc
-  Supabase Realtime authoritative flow theo `docs/technical/README.md`.
+**Cập nhật — dòng "opponentStatus/điểm đối thủ do state cục bộ điều khiển" ở
+trên đã LỖI THỜI (đã sai từ trước lần sửa này, không phải do lần sửa này gây
+ra):** `VersusGameplayScreen` từ trước đã có 1 vòng poll 800ms
+(`versusRoomService.getRoom(room.code)`) đọc đúng điểm/round/trạng thái
+`finished` từ `versus_rooms` — tức điểm đối thủ **đã là server-authoritative**
+từ trước, chỉ là qua polling chứ không phải push. Comment cũ trong code
+("Room polling is the durable recovery path for Realtime loss") cho thấy ý
+định ban đầu là polling chỉ nên là lớp dự phòng, nhưng phần Realtime chính
+chưa từng được nối.
+
+**Đã làm (lần này):**
+- Thêm `versusSupabaseService.subscribeToRoomUpdates(code, onChange)`
+  (`services/supabase/versus.supabase.ts`) — `postgres_changes` lọc theo
+  `code=eq.<room code>` trên bảng `versus_rooms`. Không cần migration DB mới:
+  bảng này đã nằm trong `supabase_realtime` publication từ trước
+  (`database/schema.sql` dòng 307). Expose qua `versusRoomService.subscribeToRoomUpdates()`.
+- `VersusGameplayScreen` giờ gọi `subscribeToRoomUpdates` cùng lúc với vòng
+  poll 800ms hiện có, cả 2 cùng gọi 1 hàm `syncRoom()` — bất kỳ round nào đối
+  thủ nộp (`submit_versus_round` RPC ghi thẳng vào row) đẩy update gần như
+  ngay lập tức qua WebSocket, còn poll 800ms **vẫn giữ nguyên** làm lớp dự
+  phòng khi mất kết nối Realtime (đúng ý định ban đầu trong comment cũ, không
+  xoá polling).
+- Người tiêu thụ duy nhất của thay đổi này là `syncRoom()` đã có sẵn — không
+  cần viết lại logic map điểm/outcome nào, chỉ thêm 1 tín hiệu kích hoạt sớm
+  hơn cho đúng hàm đó.
+
+**Đã làm thêm — disconnect detection thật (đóng nốt phần "dead code" ở trên):**
+- Thêm `versusSupabaseService.subscribeToRoomPresence(code, userId, onSync)`
+  (`services/supabase/versus.supabase.ts`) dùng **Supabase Presence** (khác
+  `postgres_changes` ở trên) — mỗi client `track()` chính mình trên kênh
+  `versus_room_presence:<code>`, `onSync` nhận đúng danh sách user id đang
+  thật sự kết nối. Tab đóng/rớt mạng/crash tự động rời kênh, không cần bảng
+  heartbeat mới, không cần polling `updated_at`. Expose qua
+  `versusRoomService.subscribeToRoomPresence()`.
+- `VersusGameplayScreen` giờ subscribe kênh này riêng (tách khỏi effect
+  poll/push điểm số) và **thực sự set** `OpponentStatus.RECONNECTING` khi đối
+  thủ vắng mặt liên tục quá 4 giây (grace period chống flash khi chỉ là
+  WebSocket tự reconnect chớp nhoáng), rồi trả về `CONNECTED` ngay khi
+  presence báo đối thủ có mặt lại. Thêm `opponentPresentRef` để vòng
+  poll/push điểm số (effect khác) không ghi đè nhầm trạng thái RECONNECTING
+  về CONNECTED/ANSWERED trước khi đối thủ thật sự quay lại.
+- Đếm ngược 60s + `ReconnectingOverlay` (mục 9) giờ **tự kích hoạt thật** khi
+  đối thủ mất kết nối thật, không còn là dead code.
+- **Cố ý KHÔNG làm** (giữ nguyên đúng thiết kế + comment đã có sẵn trong
+  code): khi đếm ngược hết 60s, client vẫn KHÔNG tự tuyên bố mình thắng —
+  chuyển sang `ScreenState.ERROR` như cũ. Tự cho client quyền phán quyết thắng
+  thua khi đối thủ mất kết nối là một quyết định bảo mật/toàn vẹn dữ liệu
+  (client không được tự thưởng chiến thắng cho chính mình) — cần 1 RPC server
+  mới (kiểu `claim_opponent_disconnect_forfeit`) xác thực độc lập việc mất kết
+  nối rồi mới được xử thua hộ, đây là thay đổi database/migration, không tự
+  làm khi chưa hỏi lại.
+- `versusSupabaseService.subscribeToRoom()` (kênh `broadcast`, khác cả
+  `subscribeToRoomUpdates()` lẫn `subscribeToRoomPresence()` ở trên) vẫn là
+  code chưa từng được gọi ở đâu — không đụng vào, chỉ ghi chú để không nhầm
+  3 cơ chế với nhau.
+
+**Còn thiếu — chưa phải trận realtime "server làm nguồn sự thật" tuyệt đối:**
+- Anti-cheat (rate-limit input, xác thực đáp án thật) vẫn cần dedicated Game
+  API/WebSocket server — xem mục 11, ngoài phạm vi Supabase RPC hiện tại.
 
 ---
 
@@ -336,15 +389,24 @@ Core thật.
 
 ---
 
-## 9. Reconnect window — ĐÃ ĐÓNG
+## 9. Reconnect window — state/UI đúng 60s, nhưng KHÔNG tự chuyển thành thắng
 
 `docs/technical/README.md`:
 
 > Reconnect window during Versus: **60 seconds**. Timing out while
 > disconnected counts as a loss.
 
-State và vòng tròn overlay đều dùng 60 giây. Khi đối thủ hết reconnect window,
-ván chuyển sang Result với outcome thắng do đối thủ bỏ cuộc.
+**Sửa lại mô tả cũ ở đây (trước ghi sai là "ĐÃ ĐÓNG"/"chuyển sang Result với
+outcome thắng"):** State và vòng tròn overlay đều dùng đúng 60 giây, và trigger
+này giờ đã thật (xem mục 1 "Versus Gameplay" — Supabase Presence phát hiện mất
+kết nối thật, không còn là dead code). Nhưng khi countdown về 0,
+`VersusGameplayScreen` **không** tự chuyển sang Result với outcome thắng —
+chuyển sang `ScreenState.ERROR` (màn hình lỗi + nút Quit), đúng theo comment
+sẵn có trong code: client không được tự thưởng chiến thắng cho chính mình khi
+đối thủ mất kết nối, vì không có cách nào xác thực độc lập việc đó từ phía
+client. Cần 1 RPC server mới xác nhận forfeit-do-disconnect rồi mới đóng được
+đúng nghĩa "Timing out while disconnected counts as a loss" — đây là việc
+backend/migration, chưa làm.
 
 ---
 
@@ -577,4 +639,86 @@ sống trên Supabase.
   cần nhớ thêm tay vào đây. Chấp nhận được ở quy mô 3 màn hình hiện tại; chưa
   đáng để dựng 1 cơ chế metadata-per-screen tổng quát hơn cho 3 mục.
 
+---
 
+## 15. RPC forfeit-do-disconnect (thiết kế backlog, CHƯA LÀM)
+
+**Mục tiêu:** đóng đúng nghĩa yêu cầu trong `docs/technical/README.md`:
+
+> Reconnect window during Versus: **60 seconds**. Timing out while
+> disconnected counts as a loss.
+
+Hiện tại (sau khi làm xong phần Presence ở mục 1 "Versus Gameplay"): đếm
+ngược 60s đã **kích hoạt thật** khi đối thủ mất kết nối thật, nhưng khi hết
+giờ, client chỉ chuyển sang `ScreenState.ERROR` (màn lỗi + Quit) — KHÔNG tự
+xử đối thủ thua/mình thắng. Đây là chủ đích, không phải thiếu sót: client
+không được quyền tự phán quyết thắng-thua khi đối thủ mất kết nối, vì không
+có gì ngăn 1 client gian lận tự gọi thẳng RPC hiện có
+(`forfeit_versus_match`) để cướp thắng trong khi đối thủ vẫn đang chơi bình
+thường — RPC đó chỉ cho tự khai bản thân thua (`p_forfeiter_id := auth.uid()`
+= chính người gọi), không có nhánh nào cho "khai hộ" người khác.
+
+**Thiết kế đề xuất (cần làm ở đợt sau, có động tới migration/schema):**
+
+1. **Heartbeat ghi xuống database, không chỉ Presence trong bộ nhớ Realtime
+   server.** Presence hiện tại (mục 1) chỉ tồn tại phía Realtime server, DB
+   không biết gì về nó — không dùng để RPC xác thực được. Cần 1 trong 2:
+   - Thêm cột kiểu `host_last_seen_at`/`guest_last_seen_at` (hoặc 1 bảng
+     `versus_room_presence` riêng) trên `versus_rooms`, cập nhật qua 1 RPC nhỏ
+     (`ping_versus_room(code)`) mà mỗi client tự gọi định kỳ (5-10s) trong khi
+     còn ở màn `VersusGameplayScreen` — tương tự cơ chế heartbeat 30s đã có
+     sẵn cho Lobby (`lobbyService.updatePresence`), chỉ scope hẹp hơn cho 1
+     trận đấu.
+   - Hoặc dùng Supabase Edge Function lắng nghe Presence phía server (không
+     qua client) rồi tự ghi DB khi phát hiện leave — "sạch" hơn vì hoàn toàn
+     không đi qua client, nhưng phức tạp hạ tầng hơn (cần deploy Edge
+     Function riêng).
+2. **RPC mới**, ví dụ `claim_opponent_disconnect_forfeit(p_code TEXT)`:
+   - Người chơi CÒN LẠI gọi (không phải người mất kết nối).
+   - Bên trong, server tự so `now() - <heartbeat cuối của đối thủ>` — chỉ
+     finalize nếu **server** thấy đã quá 60 giây thật (dùng đồng hồ server,
+     tuyệt đối không tin bất kỳ tham số "đã đủ 60s" nào client gửi lên).
+     Chưa đủ thời gian → raise lỗi, từ chối.
+   - Nếu đủ điều kiện: gọi `finalize_versus_room(code, 'disconnect',
+     <id người mất kết nối>)` — hàm này đã tồn tại sẵn (dùng bởi
+     `forfeit_versus_match`), chỉ cần forfeiter là đối thủ thay vì bản thân.
+   - Trả về outcome/eloChange giống hệt shape `forfeitMatch()` hiện có, để
+     `VersusGameplayScreen` chỉ cần đổi 1 chỗ gọi RPC khi countdown về 0
+     (thay vì chuyển `ScreenState.ERROR`, gọi RPC này rồi xử lý kết quả y hệt
+     đường `onMatchEnd` hiện có).
+3. **Không làm nếu chưa xác nhận lại**: đây là thay đổi migration/schema thật
+   (cột mới hoặc bảng mới + RPC mới có logic chống gian lận), ảnh hưởng tới
+   bảng điểm/Elo thật — rủi ro cao hơn hẳn 2 việc realtime/presence vừa làm
+   (thuần frontend). Cần duyệt kỹ RPC (đặc biệt phần "chỉ tin đồng hồ server,
+   không tin client") trước khi viết migration.
+
+---
+
+## 16. Phòng `waiting` mồ côi khi Logout/đóng tab — ĐÃ FIX TTL server-side
+
+**Bug đã báo cáo:** Phòng được tạo từ nhánh “Tự Tạo Phòng Chờ Đối Thủ” hoặc
+Custom Room có thể còn `status='waiting'` vô thời hạn nếu người chơi đóng tab,
+rớt mạng hoặc đăng xuất mà không hoàn tất `leave_versus_room`.
+
+**Đã fix đường logout chủ động:** `leaveActiveWaitingRoom()` gọi
+`versusRoomService.leaveRoom(room.code)` best-effort trước khi sign-out, trong
+lúc `auth.uid()` còn hợp lệ. Trận `in_progress` vẫn phải đi qua đường forfeit.
+
+**Đã fix TTL server-side (2026-08-04):**
+
+- `versus_rooms.expires_at` đặt hạn **10 phút** cho trạng thái `waiting`; trigger
+  gia hạn bằng đồng hồ database khi có participant heartbeat hoặc room-state
+  mutation thành công, và xóa deadline khi phòng chuyển sang trạng thái khác.
+- `VersusRoomScreen` gửi `heartbeat_versus_room` mỗi 60 giây khi người tham gia
+  đang mở phòng. Poll đọc 800 ms, Realtime và Presence không gia hạn deadline.
+- RLS không cho đọc phòng `waiting` đã hết hạn. `expire_stale_waiting_rooms()`
+  xóa vật lý các bản ghi mồ côi; Lobby gọi cleanup có throttle để tránh cleanup
+  storm. `join_versus_room` xóa và trả kết quả hết hạn atomically nếu deadline
+  vừa trôi qua trong lúc join.
+- UI đóng Ready Room cũ và hiện lỗi `room-expired` thay vì nuốt lỗi poll rồi mắc
+  kẹt trong “phòng zombie”. Phòng `in_progress`/`finished` không chịu TTL này.
+- Contract thời gian độc lập: Quick Match queue **60 giây**, pending challenge
+  invite **30 giây**, waiting room inactivity **10 phút**.
+
+Migration: `database/migrations/20260804_waiting_room_ttl.sql`.
+Smoke coverage: `database/tests/waiting_room_ttl.smoke.sql`.

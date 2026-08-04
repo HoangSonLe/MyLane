@@ -1,8 +1,7 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 import { BottomNavBar } from '@/components/ui/BottomNavBar'
 import { SectionLabel } from '@/components/ui/SectionLabel'
-import { Toast } from '@/components/ui/Toast'
 import { EmptyStateCard } from '@/components/ui/card'
 import { IconPlay } from '@/components/ui/icons'
 import {
@@ -22,6 +21,7 @@ import { LoadingIndicator } from './components/LoadingIndicator'
 import { ErrorState } from './components/ErrorState'
 import { MatchDetailDialog } from './components/MatchDetailDialog'
 import { FriendProfileModal } from '@/pages/lobby/components/FriendProfileModal'
+import { ChallengeModal } from '@/pages/lobby/components/ChallengeModal'
 import { profileService } from '@/services/profile/profile.service'
 import { lobbyService } from '@/services/lobby/lobby.service'
 import type { ProfileData, MatchEntry } from '@/services/profile/profile.interface'
@@ -31,12 +31,17 @@ import { useAuthStore } from '@/stores/auth.store'
 import { useTranslation } from '@/i18n/useTranslation'
 
 import { AddFriendModal } from '@/components/ui/modal/AddFriendModal'
+import { FriendQrModal } from '@/components/ui/modal/FriendQrModal'
+import { ScoringRulesModal, type ScoringSectionId } from '@/components/ui/modal/ScoringRulesModal'
 
 interface Props {
   onBack?: () => void
   onEditProfile?: () => void
   onSettings?: () => void
   onNavigate?: (screen: string) => void
+  onChallengeAccepted?: (roomCode: string) => void | Promise<void>
+  initialFriendCode?: string
+  onFriendCodeConsumed?: () => void
 }
 
 export function ProfileScreen({
@@ -44,6 +49,9 @@ export function ProfileScreen({
   onEditProfile,
   onSettings,
   onNavigate,
+  onChallengeAccepted,
+  initialFriendCode,
+  onFriendCodeConsumed,
 }: Props) {
   const { isOffline } = useNetworkStatus()
   const user = useAuthStore((s) => s.user)
@@ -55,17 +63,17 @@ export function ProfileScreen({
   const [isError, setIsError] = useState(false)
   const [selectedMatch, setSelectedMatch] = useState<MatchEntry | null>(null)
   const [selectedFriendForProfile, setSelectedFriendForProfile] = useState<Friend | null>(null)
+  const [challengeTargetFriend, setChallengeTargetFriend] = useState<Friend | null>(null)
   const [addFriendModalVisible, setAddFriendModalVisible] = useState(false)
+  const [friendQrVisible, setFriendQrVisible] = useState(Boolean(initialFriendCode))
+  const [scoringRulesModalState, setScoringRulesModalState] = useState<{
+    open: boolean
+    section: ScoringSectionId | null
+  }>({ open: false, section: null })
 
-  const [noticeVisible, setNoticeVisible] = useState(false)
-  const noticeTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
-
-  function showComingSoon() {
-    if (noticeTimer.current) clearTimeout(noticeTimer.current)
-    setNoticeVisible(true)
-    noticeTimer.current = setTimeout(() => setNoticeVisible(false), 2000)
-    onEditProfile?.()
-  }
+  const handleOpenScoringRules = useCallback((section?: ScoringSectionId) => {
+    setScoringRulesModalState({ open: true, section: section ?? null })
+  }, [])
 
   const load = useCallback(async () => {
     if (isGuest) {
@@ -111,6 +119,10 @@ export function ProfileScreen({
     return () => clearInterval(interval)
   }, [load, loadSilent])
 
+  useEffect(() => {
+    if (initialFriendCode) setFriendQrVisible(true)
+  }, [initialFriendCode])
+
   return (
     <ScreenShell>
       <ScreenOfflineBanner
@@ -118,14 +130,13 @@ export function ProfileScreen({
         message={t.profile.offlineBanner}
       />
 
-      <Toast visible={noticeVisible} message={t.profile.editingNotAvailable} />
-
       <ScreenMain bottomPadding="pb-32" offline={isOffline} ariaBusy={isLoading}>
         {/* Header */}
         <ProfileHeader
           skeleton={isLoading && !isGuest}
           onBack={onBack}
           onSettings={onSettings}
+          onOpenScoringRules={handleOpenScoringRules}
         />
 
         {/* Divider */}
@@ -185,17 +196,21 @@ export function ProfileScreen({
         {/* ── Profile Content ── */}
         {!isGuest && data && (
           <>
-            <AvatarHero data={data} onEdit={showComingSoon} />
+            <AvatarHero
+              data={data}
+              onEdit={onEditProfile}
+              onShowQr={() => setFriendQrVisible(true)}
+            />
 
             <div className="flex flex-col gap-5">
               <div className="flex flex-col gap-3">
                 <SectionLabel label={t.profile.eloSection} />
-                <EloCard data={data} />
+                <EloCard data={data} onOpenScoringRules={handleOpenScoringRules} />
               </div>
 
               <div className="flex flex-col gap-3">
                 <SectionLabel label={t.profile.bestScoresSection} />
-                <BestScoresCard data={data} />
+                <BestScoresCard data={data} onOpenScoringRules={handleOpenScoringRules} />
               </div>
 
               <div className="flex flex-col gap-3">
@@ -253,7 +268,21 @@ export function ProfileScreen({
         friend={selectedFriendForProfile}
         show={!!selectedFriendForProfile}
         onClose={() => setSelectedFriendForProfile(null)}
-        onChallenge={() => onNavigate?.('matchmaking')}
+        onChallenge={() => {
+          const target = selectedFriendForProfile
+          setSelectedFriendForProfile(null)
+          setChallengeTargetFriend(target)
+        }}
+      />
+
+      <ChallengeModal
+        friend={challengeTargetFriend}
+        show={!!challengeTargetFriend}
+        onClose={() => setChallengeTargetFriend(null)}
+        onAccepted={(roomCode) => {
+          setChallengeTargetFriend(null)
+          void onChallengeAccepted?.(roomCode)
+        }}
       />
 
       {/* Add friend modal */}
@@ -261,6 +290,23 @@ export function ProfileScreen({
         visible={addFriendModalVisible}
         onClose={() => setAddFriendModalVisible(false)}
         onFriendAdded={load}
+      />
+
+      <FriendQrModal
+        visible={friendQrVisible}
+        initialTab={initialFriendCode ? 'scan' : 'mine'}
+        initialCode={initialFriendCode}
+        onClose={() => {
+          setFriendQrVisible(false)
+          if (initialFriendCode) onFriendCodeConsumed?.()
+        }}
+        onFriendAdded={load}
+      />
+
+      <ScoringRulesModal
+        visible={scoringRulesModalState.open}
+        highlightSection={scoringRulesModalState.section}
+        onClose={() => setScoringRulesModalState({ open: false, section: null })}
       />
     </ScreenShell>
   )

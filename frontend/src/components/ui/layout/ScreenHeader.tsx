@@ -102,6 +102,7 @@ export function ScreenHeaderWithBack({
   titleSkeletonWidth,
   trailing,
   className = '',
+  iconOnly = true,
 }: {
   skeleton?: boolean
   onBack?: () => void
@@ -110,6 +111,7 @@ export function ScreenHeaderWithBack({
   titleSkeletonWidth?: string
   trailing?: ReactNode
   className?: string
+  iconOnly?: boolean
 }) {
   return (
     <header
@@ -118,7 +120,7 @@ export function ScreenHeaderWithBack({
         .join(' ')}
     >
       <div className="flex justify-start">
-        <BackButton onBack={onBack} skeleton={skeleton} {...(ariaLabel ? { ariaLabel } : {})} />
+        <BackButton onBack={onBack} skeleton={skeleton} iconOnly={iconOnly} {...(ariaLabel ? { ariaLabel } : {})} />
       </div>
       <ScreenHeaderTitle skeleton={skeleton} skeletonWidth={titleSkeletonWidth}>
         {title}

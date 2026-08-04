@@ -75,6 +75,23 @@ BEGIN
   IF (SELECT COUNT(*) FROM public.match_history WHERE match_id = v_room.match_id) <> 2 THEN
     RAISE EXCEPTION 'Expected exactly two match history rows';
   END IF;
+  IF NOT EXISTS (
+    SELECT 1
+    FROM public.match_history
+    WHERE match_id = v_room.match_id
+      AND user_id = v_room.host_id
+      AND player_round_score = 4
+      AND opponent_round_score = 3
+  ) OR NOT EXISTS (
+    SELECT 1
+    FROM public.match_history
+    WHERE match_id = v_room.match_id
+      AND user_id = v_room.guest_id
+      AND player_round_score = 3
+      AND opponent_round_score = 4
+  ) THEN
+    RAISE EXCEPTION 'Versus history did not preserve both head-to-head scores';
+  END IF;
 END;
 $$;
 

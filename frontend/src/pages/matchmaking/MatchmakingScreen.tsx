@@ -17,19 +17,21 @@ import { matchmakingSupabaseService } from '@/services/supabase/matchmaking.supa
 import type { GameCategoryId, Room } from '@/services/versus-room/versus-room.interface'
 import { versusRoomService } from '@/services/versus-room/versus-room.service'
 import { useAuthStore } from '@/stores/auth.store'
+import { useTranslation } from '@/i18n/useTranslation'
+import { getLocalizedGameLabel } from '@/services/gameplay/gameplay-screen.types'
 
 const CATEGORY_ITEMS: { id: GameCategoryId; label: string; icon: ComponentType<{ width?: number; height?: number }> }[] = [
+  { id: GameId.COLOR, label: 'Color', icon: IconCategoryColor },
   { id: GameId.NUMBER, label: 'Number', icon: IconCategoryNumber },
   { id: GameId.ALPHABET, label: 'Alphabet', icon: IconCategoryAlphabet },
   { id: GameId.GRID, label: 'Grid', icon: IconCategoryGrid },
   { id: GameId.SEQUENCE, label: 'Sequence', icon: IconCategorySequence },
-  { id: GameId.COLOR, label: 'Color', icon: IconCategoryColor },
 ]
 
 export function MatchmakingScreen({
   onBack,
   onMatched,
-  initialCategory = GameId.NUMBER,
+  initialCategory = GameId.COLOR,
   initialDifficulty = DifficultyId.MEDIUM,
 }: {
   onBack: () => void
@@ -37,6 +39,7 @@ export function MatchmakingScreen({
   initialCategory?: GameCategoryId
   initialDifficulty?: DifficultyId
 }) {
+  const { t } = useTranslation()
   const user = useAuthStore((state) => state.user)
   const [selectedCategory, setSelectedCategory] = useState<GameCategoryId>(initialCategory)
   const [userElo, setUserElo] = useState<number | null>(null)
@@ -262,7 +265,7 @@ export function MatchmakingScreen({
                   }}
                 >
                   <CategoryIcon width={14} height={14} />
-                  <span>{category.label}</span>
+                  <span>{getLocalizedGameLabel(t, category.id)}</span>
                 </button>
               )
             })}

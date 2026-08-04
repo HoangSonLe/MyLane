@@ -3,6 +3,12 @@ import { Card } from '@/components/ui/card'
 
 import { DifficultyId, type GameCategory, type RoomMode } from '@/services/versus-room/versus-room.interface'
 import { useTranslation } from '@/i18n/useTranslation'
+import {
+  getDifficultyLabels,
+  getLocalizedGameLabel,
+  getModeLabels,
+} from '@/services/gameplay/gameplay-screen.types'
+import { ModeId } from '@/configs/enum'
 import { RoomCodeBar } from './RoomCodeBar'
 
 export function ModeSummaryCard({
@@ -25,6 +31,8 @@ export function ModeSummaryCard({
   showPreviewTitle?: boolean
 }) {
   const { t } = useTranslation()
+  const difficultyLabels = getDifficultyLabels(t)
+  const modeLabels = getModeLabels(t)
   if (skeleton) {
     return (
       <div
@@ -35,14 +43,11 @@ export function ModeSummaryCard({
   }
 
   const isRanked = mode === 'versus-ranked'
-  const rankedLabel = isRanked ? t.versusGameplay.ranked : t.versusGameplay.unranked
+  const modeLabel = isRanked
+    ? modeLabels[ModeId.VERSUS_RANKED]
+    : modeLabels[ModeId.VERSUS_UNRANKED]
   const difficultyLabel = difficulty
-    ? {
-        [DifficultyId.EASY]: t.challenge?.easy || 'Dễ',
-        [DifficultyId.MEDIUM]: t.challenge?.medium || 'Trung Bình',
-        [DifficultyId.HARD]: t.challenge?.hard || 'Khó',
-        [DifficultyId.SUPER_HARD]: t.challenge?.superHard || 'Siêu Khó',
-      }[difficulty]
+    ? difficultyLabels[difficulty]
     : null
 
   return (
@@ -70,10 +75,10 @@ export function ModeSummaryCard({
           </div>
           <div className="min-w-0">
             <p className="truncate text-[13px] font-semibold leading-none" style={{ color: 'var(--ma-fg)' }}>
-              {category ? category.label : t.versusRoom.noGameSelected}
+              {category ? getLocalizedGameLabel(t, category.id) : t.versusRoom.noGameSelected}
             </p>
             <p className="mt-0.5 truncate text-[11px]" style={{ color: 'var(--ma-fg-muted)' }}>
-              Versus{difficultyLabel ? <> &middot; {difficultyLabel}</> : null}
+              {modeLabel}{difficultyLabel ? <> &middot; {difficultyLabel}</> : null}
             </p>
           </div>
         </div>
@@ -98,7 +103,7 @@ export function ModeSummaryCard({
               border: `1px solid ${isRanked ? 'var(--ma-progress-soft)' : 'var(--ma-border)'}`,
             }}
           >
-            {rankedLabel}
+            {isRanked ? t.versusGameplay.ranked : t.versusGameplay.unranked}
           </span>
         </div>
       </div>

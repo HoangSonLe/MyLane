@@ -80,7 +80,7 @@ function getAnswerTimeSeconds(gameType: GameId, level: number, difficulty: Diffi
 
 // ─── Main export ───────────────────────────────────────────────────
 export function GameplayScreen({
-  gameType: initialGameType = GameId.SEQUENCE,
+  gameType: initialGameType = GameId.COLOR,
   mode = ModeId.SOLO_PRACTICE,
   difficulty = DifficultyId.MEDIUM,
   onBack,

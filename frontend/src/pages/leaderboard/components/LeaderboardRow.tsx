@@ -47,7 +47,7 @@ export function LeaderboardRow({
       <RankBadge rank={entry.rank} />
 
       {/* Avatar */}
-      <InitialsAvatar name={entry.username} highlight={isCurrentUser} />
+      <InitialsAvatar name={entry.username} imageUrl={entry.avatarUrl} highlight={isCurrentUser} />
 
       {/* Name + handle */}
       <div className="min-w-0 flex-1">

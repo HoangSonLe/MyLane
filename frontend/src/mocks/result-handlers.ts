@@ -89,6 +89,9 @@ export const resultHandlers = [
         mode: MODE_LABELS[input.mode],
         outcome,
         score: breakdown.score,
+        opponentName: input.versusComparison?.opponentName,
+        playerRoundScore: input.versusComparison?.playerScore,
+        opponentRoundScore: input.versusComparison?.opponentScore,
         eloChange,
         playedAt: 'Just now',
       })

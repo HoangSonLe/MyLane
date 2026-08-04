@@ -1,13 +1,19 @@
 import { Card, CollapsibleCard } from '@/components/ui/card'
+import { IconInfoCircle } from '@/components/ui/icons'
 import type { ProfileData } from '@/services/profile/profile.interface'
 import { useTranslation } from '@/i18n/useTranslation'
+import { getLocalizedGameLabel } from '@/services/gameplay/gameplay-screen.types'
+
+import type { ScoringSectionId } from '@/components/ui/modal/ScoringRulesModal'
 
 export function BestScoresCard({
   skeleton,
   data,
+  onOpenScoringRules,
 }: {
   skeleton?: boolean
   data: ProfileData
+  onOpenScoringRules?: (section?: ScoringSectionId) => void
 }) {
   const { t } = useTranslation()
 
@@ -31,7 +37,23 @@ export function BestScoresCard({
   }
 
   return (
-    <CollapsibleCard title={t.profile.bestScoresTitle}>
+    <CollapsibleCard
+      title={t.profile.bestScoresTitle}
+      action={
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation()
+            onOpenScoringRules?.()
+          }}
+          className="flex h-5 w-5 items-center justify-center rounded-full text-[var(--ma-fg-subtle)] hover:text-[var(--ma-brand)] hover:bg-[var(--ma-brand-soft)] active:scale-95 transition-all"
+          title={t.scoringRulesModal?.viewFullRules || 'Thông tin tính điểm'}
+          aria-label={t.scoringRulesModal?.viewFullRules || 'Thông tin tính điểm'}
+        >
+          <IconInfoCircle size={14} />
+        </button>
+      }
+    >
       {data.categoryBests.map((cat, i) => (
         <div
           key={cat.category}
@@ -40,7 +62,7 @@ export function BestScoresCard({
         >
           <div className="flex items-center justify-between mb-2">
             <p className="text-[13px] font-semibold" style={{ color: 'var(--ma-fg)' }}>
-              {cat.label}
+              {getLocalizedGameLabel(t, cat.category)}
             </p>
             <span
               className="text-[11px] font-semibold"

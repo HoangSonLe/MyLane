@@ -267,4 +267,53 @@
   .toggle-thumb {
     transition: transform var(--ma-duration-base) var(--ma-ease-spring);
   }
+
+  /* Story chapter transition: short, directional and synchronized by animationend. */
+  @keyframes story-card-out-next {
+    from { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+    to { opacity: 0.08; transform: translate3d(-14px, 0, 0) scale(0.995); }
+  }
+
+  @keyframes story-card-in-next {
+    from { opacity: 0.08; transform: translate3d(14px, 0, 0) scale(0.995); }
+    to { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+  }
+
+  @keyframes story-card-out-prev {
+    from { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+    to { opacity: 0.08; transform: translate3d(14px, 0, 0) scale(0.995); }
+  }
+
+  @keyframes story-card-in-prev {
+    from { opacity: 0.08; transform: translate3d(-14px, 0, 0) scale(0.995); }
+    to { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+  }
+
+  .story-card-transition {
+    backface-visibility: hidden;
+    transform-origin: center;
+    will-change: transform, opacity;
+  }
+
+  .story-card-transition--out-next {
+    animation: story-card-out-next 180ms cubic-bezier(0.4, 0, 1, 1) both;
+  }
+
+  .story-card-transition--in-next {
+    animation: story-card-in-next 240ms cubic-bezier(0, 0, 0.2, 1) both;
+  }
+
+  .story-card-transition--out-prev {
+    animation: story-card-out-prev 180ms cubic-bezier(0.4, 0, 1, 1) both;
+  }
+
+  .story-card-transition--in-prev {
+    animation: story-card-in-prev 240ms cubic-bezier(0, 0, 0.2, 1) both;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .story-card-transition {
+      animation-duration: 1ms !important;
+    }
+  }
 }

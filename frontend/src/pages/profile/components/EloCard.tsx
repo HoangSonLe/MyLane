@@ -1,14 +1,19 @@
-import { IconTrophy16 as IconTrophy } from '@/components/ui/icons'
+import { IconTrophy16 as IconTrophy, IconInfoCircle } from '@/components/ui/icons'
 import { Card, CollapsibleCard } from '@/components/ui/card'
 import type { ProfileData } from '@/services/profile/profile.interface'
 import { useTranslation } from '@/i18n/useTranslation'
+import { getLocalizedGameLabel } from '@/services/gameplay/gameplay-screen.types'
+
+import type { ScoringSectionId } from '@/components/ui/modal/ScoringRulesModal'
 
 export function EloCard({
   skeleton,
   data,
+  onOpenScoringRules,
 }: {
   skeleton?: boolean
   data: ProfileData
+  onOpenScoringRules?: (section?: ScoringSectionId) => void
 }) {
   const { t } = useTranslation()
 
@@ -29,7 +34,23 @@ export function EloCard({
   }
 
   return (
-    <CollapsibleCard title={t.profile.eloRatingTitle}>
+    <CollapsibleCard
+      title={t.profile.eloRatingTitle}
+      action={
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation()
+            onOpenScoringRules?.('elo')
+          }}
+          className="flex h-5 w-5 items-center justify-center rounded-full text-[var(--ma-fg-subtle)] hover:text-[var(--ma-brand)] hover:bg-[var(--ma-brand-soft)] active:scale-95 transition-all"
+          title={t.scoringRulesModal?.viewFullRules || 'Thông tin Elo'}
+          aria-label={t.scoringRulesModal?.viewFullRules || 'Thông tin Elo'}
+        >
+          <IconInfoCircle size={14} />
+        </button>
+      }
+    >
       {/* Overall Elo */}
       <div
         className="flex items-center justify-between px-4 py-3"
@@ -71,7 +92,7 @@ export function EloCard({
           style={{ borderTop: i > 0 ? '1px solid var(--ma-border-subtle)' : undefined }}
         >
           <span className="text-[13px] font-medium" style={{ color: 'var(--ma-fg-muted)' }}>
-            {cat.label}
+            {getLocalizedGameLabel(t, cat.category)}
           </span>
           <div className="flex items-center gap-2">
             {cat.delta !== 0 && (

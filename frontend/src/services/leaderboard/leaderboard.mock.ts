@@ -10,9 +10,9 @@ export const BOARD_TABS: { id: BoardType; label: string; short: string }[] = [
 ]
 
 export const CATEGORIES: { id: Category; label: string }[] = [
+  { id: 'color',    label: 'Color' },
   { id: 'number',   label: 'Number' },
   { id: 'alphabet', label: 'Alphabet' },
   { id: 'grid',     label: 'Grid' },
   { id: 'sequence', label: 'Sequence' },
-  { id: 'color',    label: 'Color' },
 ]

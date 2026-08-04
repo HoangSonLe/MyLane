@@ -21,6 +21,7 @@ import { useTranslation } from '@/i18n/useTranslation'
 import { AddFriendModal } from '@/components/ui/modal/AddFriendModal'
 import { FriendNotificationsModal } from '@/components/ui/modal/FriendNotificationsModal'
 import { HeaderProfileMenu } from '@/components/ui/modal/HeaderProfileMenu'
+import { StoryTeaserCard } from '@/pages/story/components/StoryTeaserCard'
 
 // ─── Main component ──────────────────────────────────────────────
 export function HomeScreen({
@@ -145,6 +146,8 @@ export function HomeScreen({
         ) : (
           <EmptyPrompt />
         )}
+
+        <StoryTeaserCard onOpen={() => onNavigate?.('story')} />
 
         {/* Nav shortcuts section */}
         <div className="flex flex-col gap-3">

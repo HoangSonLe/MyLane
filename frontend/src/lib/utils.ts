@@ -17,3 +17,49 @@ export function getInitials(name: string): string {
     .slice(0, 2)
     .toUpperCase()
 }
+
+export const ALL_GAME_CATEGORIES = ['number', 'alphabet', 'grid', 'sequence', 'color'] as const
+
+/**
+ * Calculates overall Elo rating as the average of the 5 game categories per docs/gameplay/README.md.
+ * Missing categories default to 1000.
+ */
+export function calculateOverallElo(
+  eloEntries?: Array<{ category: string; elo?: number | null }> | null,
+  fallbackElo: number = 1000,
+): number {
+  if (!eloEntries || eloEntries.length === 0) {
+    return fallbackElo
+  }
+  const total = ALL_GAME_CATEGORIES.reduce((acc, cat) => {
+    const entry = eloEntries.find((item) => item.category === cat)
+    return acc + (entry?.elo ?? 1000)
+  }, 0)
+  return Math.round(total / ALL_GAME_CATEGORIES.length)
+}
+
+/**
+ * Formats/localizes the user profile's joinedLabel (e.g. 'Joined Jun 2024', 'Joined recently', 'Member', 'Guest Session').
+ */
+export function formatJoinedLabel(joinedLabel?: string, locale: 'en' | 'vi' = 'en'): string {
+  if (!joinedLabel) return ''
+  if (locale === 'en') return joinedLabel
+
+  if (joinedLabel === 'Joined recently' || joinedLabel === 'Joined Recently') return 'Tham gia gần đây'
+  if (joinedLabel === 'Member') return 'Thành viên'
+  if (joinedLabel === 'Guest Session') return 'Phiên khách'
+
+  const joinedMatch = joinedLabel.match(/^Joined\s+([A-Za-z]+)\s+(\d{4})$/i)
+  if (joinedMatch) {
+    const monthMap: Record<string, string> = {
+      jan: 'Thg 1', feb: 'Thg 2', mar: 'Thg 3', apr: 'Thg 4',
+      may: 'Thg 5', jun: 'Thg 6', jul: 'Thg 7', aug: 'Thg 8',
+      sep: 'Thg 9', oct: 'Thg 10', nov: 'Thg 11', dec: 'Thg 12',
+    }
+    const monthKey = joinedMatch[1].slice(0, 3).toLowerCase()
+    const monthVi = monthMap[monthKey] || joinedMatch[1]
+    return `Tham gia ${monthVi} ${joinedMatch[2]}`
+  }
+
+  return joinedLabel
+}

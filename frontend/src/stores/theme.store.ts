@@ -3,6 +3,7 @@ import { create } from 'zustand'
 export type Theme = 'dark' | 'light'
 
 const THEME_KEY = 'ma_theme'
+const DEFAULT_THEME: Theme = 'light'
 
 interface ThemeState {
   theme: Theme
@@ -23,10 +24,10 @@ function applyThemeToDocument(theme: Theme) {
 }
 
 function getInitialTheme(): Theme {
-  if (typeof window === 'undefined') return 'dark'
+  if (typeof window === 'undefined') return DEFAULT_THEME
   const saved = localStorage.getItem(THEME_KEY) as Theme | null
   if (saved === 'dark' || saved === 'light') return saved
-  return 'dark'
+  return DEFAULT_THEME
 }
 
 export const useThemeStore = create<ThemeState>((set, get) => ({

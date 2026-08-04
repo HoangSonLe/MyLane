@@ -5,9 +5,15 @@ import { FriendProfileModal } from '@/pages/lobby/components/FriendProfileModal'
 import { useTranslation } from '@/i18n/useTranslation'
 import type { GameId } from '@/configs/enum'
 import type { Friend } from '@/services/lobby/lobby.interface'
+import {
+  getLocalizedDifficultyLabel,
+  getLocalizedGameLabel,
+  getLocalizedModeLabel,
+} from '@/services/gameplay/gameplay-screen.types'
 
 export interface IncomingInviteData {
   id?: string
+  inviterId: string
   inviterName: string
   inviterHandle: string
   inviterElo: number
@@ -22,7 +28,7 @@ interface IncomingInviteModalProps {
   show: boolean
   onAccept: (code: string) => void
   onDecline: () => void
-  onOpenMute: (inviterHandle: string, inviterName: string) => void
+  onOpenMute: (inviterId: string, inviterHandle: string, inviterName: string) => void
 }
 
 const GAME_DETAILS: Record<string, { label: string; modeLabel: string; desc: string; icon: string }> = {
@@ -95,11 +101,12 @@ export function IncomingInviteModal({
 
   const diffKey = (invite.difficulty || 'medium').toLowerCase()
   const diffInfo = DIFFICULTY_MAP[diffKey] || DIFFICULTY_MAP.medium
-
-  const modeText = invite.mode === 'versus_unranked' ? '🎯 Đấu Thường' : '🏆 Đấu Xếp Hạng'
+  const gameLabel = getLocalizedGameLabel(t, invite.gameCategory)
+  const difficultyLabel = getLocalizedDifficultyLabel(t, diffKey)
+  const modeText = getLocalizedModeLabel(t, invite.mode || 'versus-ranked')
 
   const inviterFriendObj: Friend = {
-    id: invite.inviterHandle || 'inviter',
+    id: invite.inviterId,
     name: invite.inviterName,
     handle: invite.inviterHandle,
     elo: invite.inviterElo,
@@ -133,14 +140,14 @@ export function IncomingInviteModal({
                   {t.lobby.incomingChallengeTitle}
                 </span>
                 <span className="text-[12px] font-semibold text-[var(--ma-brand)]">
-                  {gameInfo.icon} {gameInfo.label}
+                  {gameInfo.icon} {gameLabel}
                 </span>
               </div>
             </div>
 
             <button
               type="button"
-              onClick={() => onOpenMute(invite.inviterHandle, invite.inviterName)}
+              onClick={() => onOpenMute(invite.inviterId, invite.inviterHandle, invite.inviterName)}
               className="flex items-center gap-1 rounded-xl px-2.5 py-1 text-[11px] font-semibold transition-opacity hover:opacity-80 active:opacity-60"
               style={{
                 background: 'var(--ma-surface-raised)',
@@ -166,7 +173,7 @@ export function IncomingInviteModal({
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 flex-wrap">
                 <span className="text-[12px] font-bold text-[var(--ma-fg)]">
-                  {modeText} • {gameInfo.modeLabel}
+                  {modeText} • {gameLabel}
                 </span>
 
                 {/* Prominent Difficulty Tag */}
@@ -177,7 +184,7 @@ export function IncomingInviteModal({
                     color: diffInfo.textColor,
                   }}
                 >
-                  {diffInfo.label}
+                  {difficultyLabel}
                 </span>
               </div>
 
@@ -267,6 +274,7 @@ export function IncomingInviteModal({
         friend={inviterFriendObj}
         show={showInviterProfile}
         onClose={() => setShowInviterProfile(false)}
+        onOpenMute={onOpenMute}
         className="z-[80]"
       />
     </>

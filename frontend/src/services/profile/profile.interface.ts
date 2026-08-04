@@ -29,8 +29,13 @@ export interface MatchEntry {
   categoryLabel: string
   mode: string
   outcome: MatchOutcome
+  /** Calculated game points earned in this run. */
   score: number
   opponentName?: string
+  /** Correct-round tally for the signed-in player in a Versus match. */
+  playerRoundScore?: number
+  /** Correct-round tally for the opponent in a Versus match. */
+  opponentRoundScore?: number
   eloChange?: number
   playedAt: string   // e.g. "Today", "Yesterday", "3d ago"
 }
@@ -39,6 +44,7 @@ export interface MatchEntry {
 export interface ProfileStats {
   username: string
   handle: string
+  avatarUrl?: string
   joinedLabel: string
   overallElo: number
   categoryElo: CategoryElo[]
@@ -53,4 +59,16 @@ export interface ProfileStats {
 /** Shape the Profile screen's components render — `ProfileStats` merged with the player's real friends list. */
 export interface ProfileData extends ProfileStats {
   friends: Friend[]
+}
+
+export interface UpdateProfileInput {
+  username: string
+  handle: string
+  avatarUrl?: string
+}
+
+export interface ProfileIdentity {
+  username: string
+  handle: string
+  avatarUrl?: string
 }

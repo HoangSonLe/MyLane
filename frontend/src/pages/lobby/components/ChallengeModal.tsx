@@ -19,6 +19,11 @@ import {
   IconTarget16,
 } from '@/components/ui/icons'
 import { useTranslation } from '@/i18n/useTranslation'
+import {
+  getLocalizedDifficultyLabel,
+  getLocalizedGameLabel,
+  getLocalizedModeLabel,
+} from '@/services/gameplay/gameplay-screen.types'
 
 interface Props {
   friend: Friend | null
@@ -28,16 +33,16 @@ interface Props {
 }
 
 const CATEGORY_OPTIONS = [
+  { id: GameId.COLOR, iconComponent: IconCategoryColor, label: 'Color Memory', desc: 'Nhớ chuỗi màu sắc và điểm khác biệt' },
   { id: GameId.NUMBER, iconComponent: IconCategoryNumber, label: 'Number Memory', desc: 'Nhớ chuỗi chữ số ngẫu nhiên' },
   { id: GameId.ALPHABET, iconComponent: IconCategoryAlphabet, label: 'Alphabet Memory', desc: 'Nhớ chuỗi chữ cái xuất hiện nhanh' },
   { id: GameId.GRID, iconComponent: IconCategoryGrid, label: 'Grid Memory', desc: 'Nhớ vị trí ma trận lưới phát sáng' },
   { id: GameId.SEQUENCE, iconComponent: IconCategorySequence, label: 'Sequence Memory', desc: 'Nhớ thứ tự phím sáng nhịp điệu' },
-  { id: GameId.COLOR, iconComponent: IconCategoryColor, label: 'Color Memory', desc: 'Nhớ chuỗi màu sắc và điểm khác biệt' },
 ]
 
 export function ChallengeModal({ friend, show, onClose, onAccepted }: Props) {
   const { t } = useTranslation()
-  const [selectedCategory, setSelectedCategory] = useState<GameId>(GameId.NUMBER)
+  const [selectedCategory, setSelectedCategory] = useState<GameId>(GameId.COLOR)
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>('medium')
   const [selectedMode, setSelectedMode] = useState<string>('versus_ranked')
   const [isSending, setIsSending] = useState(false)
@@ -59,15 +64,15 @@ export function ChallengeModal({ friend, show, onClose, onAccepted }: Props) {
   }, [inviteState])
 
   const DIFFICULTY_OPTIONS = [
-    { id: 'easy', icon: IconDiffEasy, label: t.challenge?.easy || 'Dễ', color: 'var(--ma-success)' },
-    { id: 'medium', icon: IconDiffMedium, label: t.challenge?.medium || 'Trung Bình', color: 'var(--ma-brand)' },
-    { id: 'hard', icon: IconDiffHard, label: t.challenge?.hard || 'Khó', color: 'var(--ma-danger)' },
-    { id: 'super_hard', icon: IconDiffSuperHard, label: t.challenge?.superHard || 'Siêu Khó', color: '#f59e0b' },
+    { id: 'easy', icon: IconDiffEasy, label: getLocalizedDifficultyLabel(t, 'easy'), color: 'var(--ma-success)' },
+    { id: 'medium', icon: IconDiffMedium, label: getLocalizedDifficultyLabel(t, 'medium'), color: 'var(--ma-brand)' },
+    { id: 'hard', icon: IconDiffHard, label: getLocalizedDifficultyLabel(t, 'hard'), color: 'var(--ma-danger)' },
+    { id: 'super_hard', icon: IconDiffSuperHard, label: getLocalizedDifficultyLabel(t, 'super_hard'), color: '#f59e0b' },
   ]
 
   const MODE_OPTIONS = [
-    { id: 'versus_ranked', label: t.challenge?.rankedMode || '🏆 Đấu Xếp Hạng (+/- Elo)' },
-    { id: 'versus_unranked', label: t.challenge?.unrankedMode || '🎯 Đấu Thường (Luyện tập)' },
+    { id: 'versus_ranked', label: getLocalizedModeLabel(t, 'versus_ranked') },
+    { id: 'versus_unranked', label: getLocalizedModeLabel(t, 'versus_unranked') },
   ]
 
   // 30s Countdown timer when waiting for opponent
@@ -152,7 +157,7 @@ export function ChallengeModal({ friend, show, onClose, onAccepted }: Props) {
     }
   }
 
-  const activeCategoryMeta = CATEGORY_OPTIONS.find((c) => c.id === selectedCategory)
+  const activeCategoryLabel = getLocalizedGameLabel(t, selectedCategory)
 
   return (
     <ModalBackdrop show={show} onClose={inviteState ? undefined : handleCancel}>
@@ -248,7 +253,7 @@ export function ChallengeModal({ friend, show, onClose, onAccepted }: Props) {
                           <span style={{ color: isSelected ? 'var(--ma-brand)' : 'var(--ma-fg-subtle)' }}>
                             <IconComp width={16} height={16} />
                           </span>
-                          <span>{cat.label}</span>
+                          <span>{getLocalizedGameLabel(t, cat.id)}</span>
                         </div>
                         <p className="text-[10px] font-normal opacity-80 mt-0.5 truncate">{cat.desc}</p>
                       </div>
@@ -330,8 +335,8 @@ export function ChallengeModal({ friend, show, onClose, onAccepted }: Props) {
             {/* Summary preview */}
             <div className="p-2.5 rounded-xl text-[11px]" style={{ background: 'var(--ma-surface)', border: '1px solid var(--ma-border-subtle)', color: 'var(--ma-fg-muted)' }}>
               {t.challenge?.challengeSummary
-                ? t.challenge.challengeSummary(friend.name, activeCategoryMeta?.label || '', selectedDifficulty.toUpperCase())
-                : `🎯 Bạn sẽ thách đấu ${friend.name} môn ${activeCategoryMeta?.label} (${selectedDifficulty.toUpperCase()}).`}
+                ? t.challenge.challengeSummary(friend.name, activeCategoryLabel, getLocalizedDifficultyLabel(t, selectedDifficulty))
+                : `🎯 Bạn sẽ thách đấu ${friend.name} môn ${activeCategoryLabel} (${getLocalizedDifficultyLabel(t, selectedDifficulty)}).`}
             </div>
 
             <div className="mt-2 flex gap-2 shrink-0 pb-1">

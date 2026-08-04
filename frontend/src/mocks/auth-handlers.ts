@@ -1,6 +1,8 @@
 import { http, HttpResponse } from 'msw'
 import { decodeToken, encodeToken, makeEmailUser, makeGuestUser, makeOAuthUser } from './fake-users'
 
+const registeredEmails = new Set<string>()
+
 /**
  * Fake backend for Auth, reachable at the same /api/auth/* paths the real
  * ASP.NET Core API will use later (docs/technical/README.md). Requests still
@@ -23,6 +25,28 @@ export const authHandlers = [
     }
     const user = makeEmailUser(email)
     return HttpResponse.json({ user, token: encodeToken(user) })
+  }),
+
+  http.post('/api/auth/register', async ({ request }) => {
+    const { email, password } = (await request.json()) as { email?: string; password?: string }
+    const normalizedEmail = email?.trim().toLowerCase()
+
+    if (!normalizedEmail || !password) {
+      return HttpResponse.json(
+        { message: 'Email and password are required.' },
+        { status: 400 },
+      )
+    }
+    if (registeredEmails.has(normalizedEmail)) {
+      return HttpResponse.json(
+        { message: 'An account with this email already exists.' },
+        { status: 409 },
+      )
+    }
+
+    registeredEmails.add(normalizedEmail)
+    const user = makeEmailUser(normalizedEmail)
+    return HttpResponse.json({ user, token: encodeToken(user) }, { status: 201 })
   }),
 
   http.post('/api/auth/oauth/:provider', ({ params }) => {

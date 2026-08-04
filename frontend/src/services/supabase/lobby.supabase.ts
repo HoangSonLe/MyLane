@@ -1,5 +1,6 @@
 import { getSupabaseClient } from './supabase.client'
 import type { Friend, FriendCategoryRecord } from '../lobby/lobby.interface'
+import { calculateOverallElo } from '@/lib/utils'
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
 
@@ -35,11 +36,13 @@ export const lobbySupabaseService = {
           id: userId,
           name: userData?.user?.user_metadata?.full_name || userData?.user?.email?.split('@')[0] || 'Player',
           handle: userData?.user?.email?.split('@')[0] || 'player',
-          status: dbStatus,
-          updated_at: new Date().toISOString(),
         },
-        { onConflict: 'id' }
+        { onConflict: 'id', ignoreDuplicates: true }
       )
+      await supabase
+        .from('profiles')
+        .update({ status: dbStatus, updated_at: new Date().toISOString() })
+        .eq('id', userId)
     } catch (err) {
       console.error('Error updating presence:', err)
     }
@@ -73,7 +76,7 @@ export const lobbySupabaseService = {
 
     const { data: profiles } = await supabase
       .from('profiles')
-      .select('id, name, handle, overall_elo, status, updated_at')
+      .select('id, name, handle, avatar_url, overall_elo, status, updated_at')
       .in('id', friendIds)
 
     return (profiles || []).map((p: any) => {
@@ -99,6 +102,7 @@ export const lobbySupabaseService = {
         id: p.id,
         name: p.name || 'Friend',
         handle: p.handle || 'friend',
+        avatarUrl: p.avatar_url || undefined,
         elo: p.overall_elo || 1000,
         status: onlineStatus,
       }
@@ -121,7 +125,7 @@ export const lobbySupabaseService = {
     const lookupValue = lookupField === 'id' ? identifier : (handle || identifier)
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
-      .select('id, name, handle, overall_elo, status, updated_at')
+      .select('id, name, handle, avatar_url, overall_elo, status, updated_at')
       .eq(lookupField, lookupValue)
       .maybeSingle()
 
@@ -173,13 +177,42 @@ export const lobbySupabaseService = {
       id: profile.id,
       name: profile.name || 'Friend',
       handle: profile.handle || 'friend',
-      elo: profile.overall_elo ?? 1000,
+      avatarUrl: profile.avatar_url || undefined,
+      elo: calculateOverallElo(eloRows, profile.overall_elo ?? 1000),
       status: resolvePresenceStatus(profile.status, profile.updated_at),
       gamesPlayed,
       winRate: gamesPlayed === undefined ? undefined : gamesPlayed === 0 ? 0 : Math.round((wins / gamesPlayed) * 100),
       rank: higherEloCount === null || higherEloCount === undefined ? undefined : higherEloCount + 1,
       records: Object.keys(records).length > 0 ? records : undefined,
     }
+  },
+
+  async getFriendById(friendId: string): Promise<Friend | null> {
+    const supabase = getSupabaseClient()
+    if (!supabase || !friendId.trim()) return null
+
+    const { data: userData } = await supabase.auth.getUser()
+    const userId = userData?.user?.id
+    if (!userId || userId === friendId) return null
+
+    const profile = await lobbySupabaseService.getFriendProfile(friendId)
+    if (!profile) return null
+
+    const { data: relationship } = await supabase
+      .from('friendships')
+      .select('requester_id, addressee_id, status')
+      .or(`and(requester_id.eq.${userId},addressee_id.eq.${friendId}),and(requester_id.eq.${friendId},addressee_id.eq.${userId})`)
+      .limit(1)
+      .maybeSingle()
+
+    let friendshipStatus: Friend['friendshipStatus'] = 'none'
+    if (relationship?.status === 'accepted') {
+      friendshipStatus = 'accepted'
+    } else if (relationship?.status === 'pending') {
+      friendshipStatus = relationship.requester_id === userId ? 'pending_sent' : 'pending_received'
+    }
+
+    return { ...profile, friendshipStatus }
   },
 
   /**
@@ -196,7 +229,7 @@ export const lobbySupabaseService = {
 
     const { data: profiles } = await supabase
       .from('profiles')
-      .select('id, name, handle, overall_elo, status')
+      .select('id, name, handle, avatar_url, overall_elo, status')
       .or(`name.ilike.%${cleanQuery}%,handle.ilike.%${cleanQuery}%`)
       .neq('id', userId || '')
       .limit(10)
@@ -240,6 +273,7 @@ export const lobbySupabaseService = {
         id: p.id,
         name: p.name || 'User',
         handle: p.handle || 'user',
+        avatarUrl: p.avatar_url || undefined,
         elo: p.overall_elo || 1000,
         status: (p.status as 'online' | 'offline' | 'in-game') || 'offline',
         friendshipStatus,
@@ -266,7 +300,7 @@ export const lobbySupabaseService = {
           name: userData?.user?.user_metadata?.full_name || userData?.user?.email?.split('@')[0] || 'Player',
           handle: userData?.user?.email?.split('@')[0] || 'player',
         },
-        { onConflict: 'id' }
+        { onConflict: 'id', ignoreDuplicates: true }
       )
 
       const { error } = await supabase.from('friendships').upsert(
@@ -321,7 +355,7 @@ export const lobbySupabaseService = {
 
       const { data: profiles, error: profErr } = await supabase
         .from('profiles')
-        .select('id, name, handle, overall_elo, status')
+        .select('id, name, handle, avatar_url, overall_elo, status')
         .in('id', requesterIds)
 
       if (profErr) {
@@ -332,6 +366,7 @@ export const lobbySupabaseService = {
         id: p.id,
         name: p.name || 'Player',
         handle: p.handle || 'player',
+        avatarUrl: p.avatar_url || undefined,
         elo: p.overall_elo || 1000,
         status: (p.status as 'online' | 'offline' | 'in-game') || 'online',
       }))
@@ -433,7 +468,7 @@ export const lobbySupabaseService = {
 
     const { data: profiles } = await supabase
       .from('profiles')
-      .select('id, name, handle, overall_elo, status')
+      .select('id, name, handle, avatar_url, overall_elo, status')
       .neq('id', userId)
       .limit(10)
 
@@ -443,6 +478,7 @@ export const lobbySupabaseService = {
       id: p.id,
       name: p.name || 'Player',
       handle: p.handle || 'player',
+      avatarUrl: p.avatar_url || undefined,
       elo: p.overall_elo || 1000,
       status: (p.status as 'online' | 'offline' | 'in-game') || 'online',
     }))

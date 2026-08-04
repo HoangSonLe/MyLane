@@ -6,15 +6,20 @@ import { ModalBackdrop } from '@/components/ui/ModalBackdrop'
 import type { Friend } from '@/services/lobby/lobby.interface'
 import { lobbyService } from '@/services/lobby/lobby.service'
 import { GAME_CATEGORIES } from '@/services/versus-room/versus-room.mock'
+import { getLocalizedGameLabel } from '@/services/gameplay/gameplay-screen.types'
 import { useTranslation } from '@/i18n/useTranslation'
-import { useInviteMuteStore } from '@/stores/invite-mute.store'
+import {
+  useInviteMuteStore,
+  type MuteDurationOption,
+} from '@/stores/invite-mute.store'
+import { MuteInviteModal } from './MuteInviteModal'
 
 interface FriendProfileModalProps {
   friend: Friend | null
   show: boolean
   onClose: () => void
   onChallenge?: (friendId: string) => void
-  onOpenMute?: (handle: string, name: string) => void
+  onOpenMute?: (userId: string, handle: string, name: string) => void
   className?: string
 }
 
@@ -43,8 +48,9 @@ export function FriendProfileModal({
   className = 'z-[70]',
 }: FriendProfileModalProps) {
   const { t } = useTranslation()
-  const { isMuted, unmuteUser } = useInviteMuteStore()
+  const { isMuted, muteUser, unmuteUser } = useInviteMuteStore()
   const [loadedProfile, setLoadedProfile] = useState<{ key: string; friend: Friend } | null>(null)
+  const [showMuteDialog, setShowMuteDialog] = useState(false)
 
   const profileKey = friend ? `${friend.id}:${friend.handle}` : ''
 
@@ -53,6 +59,7 @@ export function FriendProfileModal({
 
     if (!show || !friend) {
       setLoadedProfile(null)
+      setShowMuteDialog(false)
       return () => {
         cancelled = true
       }
@@ -92,17 +99,19 @@ export function FriendProfileModal({
   const displayedFriend = loadedProfile?.key === profileKey
     ? { ...friend, ...loadedProfile.friend }
     : friend
-  const isUserMuted = isMuted(displayedFriend.handle)
+  const muteTarget = { userId: displayedFriend.id, handle: displayedFriend.handle }
+  const isUserMuted = isMuted(muteTarget)
 
   return (
-    <ModalBackdrop show={show} onClose={onClose} className={className}>
-      <div
-        className="flex w-full max-w-sm flex-col gap-5 rounded-3xl p-6 shadow-2xl"
-        style={{
-          background: 'var(--ma-surface)',
-          border: '1px solid var(--ma-border)',
-        }}
-      >
+    <>
+      <ModalBackdrop show={show} onClose={onClose} className={className}>
+        <div
+          className="flex w-full max-w-sm flex-col gap-5 rounded-3xl p-6 shadow-2xl"
+          style={{
+            background: 'var(--ma-surface)',
+            border: '1px solid var(--ma-border)',
+          }}
+        >
         {/* Modal Header */}
         <div className="flex items-center justify-between">
           <span className="text-[12px] font-semibold uppercase tracking-wider" style={{ color: 'var(--ma-fg-subtle)' }}>
@@ -127,7 +136,7 @@ export function FriendProfileModal({
 
         {/* User Hero Header */}
         <div className="flex items-center gap-4 rounded-2xl p-4" style={{ background: 'var(--ma-surface-raised)' }}>
-          <Avatar name={displayedFriend.name} size="3.25rem" fontSize="16px" />
+          <Avatar name={displayedFriend.name} imageUrl={displayedFriend.avatarUrl} size="3.25rem" fontSize="16px" />
           <div className="flex flex-col min-w-0 flex-1">
             <h3 className="text-[16px] font-bold truncate" style={{ color: 'var(--ma-fg)' }}>
               {displayedFriend.name}
@@ -185,7 +194,7 @@ export function FriendProfileModal({
                     style={{ background: 'var(--ma-surface-raised)' }}
                   >
                     <span className="font-semibold" style={{ color: 'var(--ma-fg)' }}>
-                      {catMeta?.label ?? catId}
+                      {getLocalizedGameLabel(t, catMeta?.id ?? catId)}
                     </span>
                     <div className="flex items-center gap-3" style={{ color: 'var(--ma-fg-muted)' }}>
                       {rec.bestScore && (
@@ -207,7 +216,7 @@ export function FriendProfileModal({
           {isUserMuted ? (
             <button
               type="button"
-              onClick={() => unmuteUser(displayedFriend.handle)}
+              onClick={() => { void unmuteUser(muteTarget) }}
               className="flex items-center justify-center gap-1.5 rounded-2xl py-2.5 px-3 text-[12px] font-semibold transition-transform active:scale-95"
               style={{
                 background: 'oklch(0.55 0.12 140 / 0.12)',
@@ -222,8 +231,12 @@ export function FriendProfileModal({
             <button
               type="button"
               onClick={() => {
-                onClose()
-                onOpenMute?.(displayedFriend.handle, displayedFriend.name)
+                if (onOpenMute) {
+                  onClose()
+                  onOpenMute(displayedFriend.id, displayedFriend.handle, displayedFriend.name)
+                } else {
+                  setShowMuteDialog(true)
+                }
               }}
               className="flex items-center justify-center gap-1.5 rounded-2xl py-2.5 px-3 text-[12px] font-semibold transition-transform active:scale-95"
               style={{
@@ -255,7 +268,19 @@ export function FriendProfileModal({
             {t.lobby.challengeBtn}
           </button>
         </div>
-      </div>
-    </ModalBackdrop>
+        </div>
+      </ModalBackdrop>
+
+      <MuteInviteModal
+        inviterHandle={displayedFriend.handle}
+        inviterName={displayedFriend.name}
+        show={showMuteDialog}
+        onClose={() => setShowMuteDialog(false)}
+        onConfirmMute={(_handle: string, option: MuteDurationOption) => {
+          void muteUser(muteTarget, option)
+          setShowMuteDialog(false)
+        }}
+      />
+    </>
   )
 }

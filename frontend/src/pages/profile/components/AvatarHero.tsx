@@ -1,4 +1,4 @@
-import { getInitials } from '@/lib/utils'
+import { getInitials, formatJoinedLabel } from '@/lib/utils'
 import { CardButton } from '@/components/ui/card'
 
 import type { ProfileData } from '@/services/profile/profile.interface'
@@ -13,17 +13,28 @@ function IconEdit() {
   )
 }
 
+function IconQr() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM15 14h2v2h-2zM19 14h2v4h-4v3h-3v-3M19 20h2v1h-2z" stroke="currentColor" strokeWidth="1.75" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
 export function AvatarHero({
   skeleton,
   data,
   onEdit,
+  onShowQr,
 }: {
   skeleton?: boolean
   data: ProfileData
   onEdit?: () => void
+  onShowQr?: () => void
 }) {
-  const { t } = useTranslation()
+  const { t, locale } = useTranslation()
   const initials = getInitials(data.username)
+  const displayJoinedLabel = formatJoinedLabel(data.joinedLabel, locale)
 
   if (skeleton) {
     return (
@@ -42,7 +53,7 @@ export function AvatarHero({
     <div className="flex flex-col items-center gap-3 px-4 py-4">
       {/* Avatar */}
       <div
-        className="flex items-center justify-center"
+        className="flex items-center justify-center overflow-hidden"
         style={{
           height: '5rem',
           width: '5rem',
@@ -53,9 +64,13 @@ export function AvatarHero({
         }}
         aria-label={t.profile.avatarFor(data.username)}
       >
-        <span className="text-[28px] font-bold" style={{ color: 'var(--ma-fg-muted)' }}>
-          {initials}
-        </span>
+        {data.avatarUrl ? (
+          <img src={data.avatarUrl} alt="" className="h-full w-full object-cover" />
+        ) : (
+          <span className="text-[28px] font-bold" style={{ color: 'var(--ma-fg-muted)' }}>
+            {initials}
+          </span>
+        )}
       </div>
 
       {/* Name + meta */}
@@ -64,26 +79,37 @@ export function AvatarHero({
           {data.username}
         </p>
         <p className="text-[13px]" style={{ color: 'var(--ma-fg-subtle)' }}>
-          @{data.handle} · {data.joinedLabel}
+          @{data.handle} · {displayJoinedLabel}
         </p>
       </div>
 
-      {/* Edit profile button */}
-      <CardButton
-        onClick={onEdit}
-        aria-label={t.profile.editAriaLabel}
-        className={[
-          'flex h-10 items-center justify-center gap-2 px-5',
-          'text-[13px] font-semibold',
-          'transition-transform duration-[var(--ma-duration-micro)] active:scale-95',
-          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ma-ring)]',
-        ].join(' ')}
-        shadow="sm"
-        style={{ color: 'var(--ma-fg-muted)' }}
-      >
-        <IconEdit />
-        {t.profile.editProfile}
-      </CardButton>
+      <div className="flex flex-wrap justify-center gap-2">
+        <CardButton
+          onClick={onEdit}
+          aria-label={t.profile.editAriaLabel}
+          className={[
+            'flex h-10 items-center justify-center gap-2 px-4',
+            'text-[13px] font-semibold',
+            'transition-transform duration-[var(--ma-duration-micro)] active:scale-95',
+            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ma-ring)]',
+          ].join(' ')}
+          shadow="sm"
+          style={{ color: 'var(--ma-fg-muted)' }}
+        >
+          <IconEdit />
+          {t.profile.editProfile}
+        </CardButton>
+        <CardButton
+          onClick={onShowQr}
+          aria-label={t.profile.showFriendCodeAria}
+          className="flex h-10 items-center justify-center gap-2 px-4 text-[13px] font-semibold transition-transform duration-[var(--ma-duration-micro)] active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ma-ring)]"
+          shadow="sm"
+          style={{ color: 'var(--ma-brand)' }}
+        >
+          <IconQr />
+          {t.profile.showFriendCode}
+        </CardButton>
+      </div>
     </div>
   )
 }

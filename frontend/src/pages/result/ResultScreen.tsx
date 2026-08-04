@@ -13,6 +13,7 @@ import { PrimaryButton } from './components/PrimaryButton'
 import { SecondaryActions } from './components/SecondaryActions'
 import { VersusComparisonCard } from './components/VersusComparisonCard'
 import { Toast } from '@/components/ui/Toast'
+import { ScoringRulesModal, type ScoringSectionId } from '@/components/ui/modal/ScoringRulesModal'
 import { resultService } from '@/services/result/result.service'
 import { computeScore } from '@/services/gameplay/game-rules'
 import { getGameLabels, getModeLabels } from '@/services/gameplay/gameplay-screen.types'
@@ -58,6 +59,15 @@ export function ResultScreen({
   const [syncError, setSyncError] = useState(false)
   const opponentForfeited = result?.finishReason === 'forfeit' && result.outcome === 'win'
   const [showForfeitToast, setShowForfeitToast] = useState(opponentForfeited)
+
+  const [scoringRulesModalState, setScoringRulesModalState] = useState<{
+    open: boolean
+    section: ScoringSectionId | null
+  }>({ open: false, section: null })
+
+  const handleOpenScoringRules = useCallback((section?: ScoringSectionId) => {
+    setScoringRulesModalState({ open: true, section: section ?? null })
+  }, [])
 
   // Submitting mutates server-side stats (bestScore/highestLevel), so unlike
   // a plain fetch it can't just tolerate StrictMode's double-invoke of
@@ -125,9 +135,18 @@ export function ResultScreen({
         message={t.result.opponentForfeited}
         onClose={() => setShowForfeitToast(false)}
       />
+      <ScoringRulesModal
+        visible={scoringRulesModalState.open}
+        highlightSection={scoringRulesModalState.section}
+        onClose={() => setScoringRulesModalState({ open: false, section: null })}
+      />
       <ScreenMain bottomPadding="pb-28" topPadding="none" className="pt-20">
         {/* Score hero */}
-        <ScoreHero skeleton={isSubmitting} data={data ?? PLACEHOLDER} />
+        <ScoreHero
+          skeleton={isSubmitting}
+          data={data ?? PLACEHOLDER}
+          onOpenScoringRules={handleOpenScoringRules}
+        />
 
         {/* Divider */}
         <div
@@ -160,8 +179,8 @@ export function ResultScreen({
         {!isSubmitting && data && !isGuest && (
           <>
             {data.isNewRecord && <NewRecordBadge data={data} />}
-            <EloChangeCard data={data} />
-            <RankedBreakdownCard data={data} />
+            <EloChangeCard data={data} onOpenScoringRules={handleOpenScoringRules} />
+            <RankedBreakdownCard data={data} onOpenScoringRules={handleOpenScoringRules} />
             <BestComparison data={data} />
           </>
         )}

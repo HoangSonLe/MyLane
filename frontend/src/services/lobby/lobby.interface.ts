@@ -8,6 +8,7 @@ export interface Friend {
   id: string
   name: string
   handle: string
+  avatarUrl?: string
   elo: number
   status: 'online' | 'offline' | 'in-game'
   friendshipStatus?: 'none' | 'pending_sent' | 'pending_received' | 'accepted'

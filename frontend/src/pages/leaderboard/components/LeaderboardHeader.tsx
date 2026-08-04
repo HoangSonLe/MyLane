@@ -16,6 +16,7 @@ export function LeaderboardHeader({
       ariaLabel={t.common.back}
       title={t.leaderboard.title}
       titleSkeletonWidth="7rem"
+      iconOnly
     />
   )
 }

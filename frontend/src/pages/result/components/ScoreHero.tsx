@@ -1,5 +1,5 @@
 import { Card, StatCell } from '@/components/ui/card'
-
+import { IconInfoCircle } from '@/components/ui/icons'
 import { IconTrophy } from './icons'
 import type { ResultData } from '@/services/result/result.interface'
 import { useTranslation } from '@/i18n/useTranslation'
@@ -7,9 +7,11 @@ import { useTranslation } from '@/i18n/useTranslation'
 export function ScoreHero({
   skeleton,
   data,
+  onOpenScoringRules,
 }: {
   skeleton?: boolean
   data: ResultData
+  onOpenScoringRules?: () => void
 }) {
   const { t } = useTranslation()
   const isRanked =
@@ -58,12 +60,23 @@ export function ScoreHero({
 
       {/* Score */}
       <div className="flex flex-col items-center gap-1">
-        <p
-          className="text-[11px] font-semibold uppercase tracking-widest"
-          style={{ color: 'var(--ma-fg-subtle)' }}
-        >
-          {t.result.finalScore}
-        </p>
+        <div className="flex items-center gap-1.5">
+          <p
+            className="text-[11px] font-semibold uppercase tracking-widest"
+            style={{ color: 'var(--ma-fg-subtle)' }}
+          >
+            {t.result.finalScore}
+          </p>
+          <button
+            type="button"
+            onClick={onOpenScoringRules}
+            className="flex h-5 w-5 items-center justify-center rounded-full text-[var(--ma-fg-subtle)] hover:text-[var(--ma-brand)] hover:bg-[var(--ma-brand-soft)] active:scale-95 transition-all"
+            title={t.scoringRulesModal?.viewFullRules || 'Thông tin tính điểm'}
+            aria-label={t.scoringRulesModal?.viewFullRules || 'Thông tin tính điểm'}
+          >
+            <IconInfoCircle size={14} />
+          </button>
+        </div>
         <p
           className="text-[56px] font-bold tabular-nums leading-none"
           style={{ color: 'var(--ma-fg)' }}

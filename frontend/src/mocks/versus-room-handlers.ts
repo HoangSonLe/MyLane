@@ -74,7 +74,7 @@ export const versusRoomHandlers = [
       code,
       link: `memoryarena.app/r/${code}`,
       seed: makeSeed(),
-      category: GameId.SEQUENCE,
+      category: GameId.COLOR,
       mode: MOCK_AVAILABLE_ROOMS[0].mode,
       difficulty: DifficultyId.MEDIUM,
       roomName: 'Quick Join Room',

@@ -96,6 +96,7 @@ tiết ở [`mock-server/README.md`](../../frontend/mock-server/README.md).
 |---|---|---|---|
 | POST | `/api/auth/guest` | `{ user, token }` | — |
 | POST | `/api/auth/login` | `{ user, token }` | `401 { message }` nếu email/password sai |
+| POST | `/api/auth/register` | `201 { user, token }` | `400 { message }` nếu thiếu dữ liệu; `409 { message }` nếu email đã tồn tại trong runtime mock |
 | POST | `/api/auth/oauth/:provider` | `{ user, token }` | — |
 | GET | `/api/auth/session` | `{ user }` (đọc token từ header `Authorization`) | `401` nếu token thiếu/hỏng |
 | POST | `/api/auth/logout` | `204` | — |
@@ -148,6 +149,10 @@ LandingScreen.tsx
 `apiClient` (trong `api-client.ts`) có một request interceptor tự gắn header
 `Authorization: Bearer <token>` từ `localStorage` vào **mọi** request — đây là lý do
 `authService` không cần tự thêm header đó ở từng hàm.
+
+Email/password có hai request tách biệt: `loginWithEmail()` chỉ gọi `/auth/login`, còn
+`registerWithEmail()` chỉ gọi `/auth/register`. Lỗi đăng nhập không được dùng làm tín hiệu tự động
+tạo tài khoản. Hai runtime mock giữ cùng contract này.
 
 ---
 

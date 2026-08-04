@@ -9,6 +9,7 @@ import type { ProfileStats } from './profile.interface'
 export const MOCK_PROFILE: ProfileStats = {
   username: 'Alex Rivera',
   handle: 'alexr',
+  avatarUrl: undefined,
   joinedLabel: 'Joined Jun 2024',
   overallElo: 1487,
   categoryElo: [
@@ -31,16 +32,16 @@ export const MOCK_PROFILE: ProfileStats = {
   draws: 24,
   matchHistory: [
     { id: 'm1',  category: 'number',   categoryLabel: 'Number',   mode: 'Solo Ranked',    outcome: 'win',  score: 3860, playedAt: 'Today' },
-    { id: 'm2',  category: 'sequence', categoryLabel: 'Sequence', mode: 'Versus Ranked',  outcome: 'win',  score: 2980, opponentName: 'Mia Torres',  eloChange: +18, playedAt: 'Today' },
-    { id: 'm3',  category: 'alphabet', categoryLabel: 'Alphabet', mode: 'Versus Ranked',  outcome: 'loss', score: 2410, opponentName: 'Priya Mehta', eloChange: -12, playedAt: 'Today' },
+    { id: 'm2',  category: 'sequence', categoryLabel: 'Sequence', mode: 'Versus Ranked',  outcome: 'win',  score: 2980, opponentName: 'Mia Torres',  playerRoundScore: 4, opponentRoundScore: 3, eloChange: +18, playedAt: 'Today' },
+    { id: 'm3',  category: 'alphabet', categoryLabel: 'Alphabet', mode: 'Versus Ranked',  outcome: 'loss', score: 2410, opponentName: 'Priya Mehta', playerRoundScore: 2, opponentRoundScore: 4, eloChange: -12, playedAt: 'Today' },
     { id: 'm4',  category: 'grid',     categoryLabel: 'Grid',     mode: 'Solo Practice',  outcome: 'win',  score: 3110, playedAt: 'Yesterday' },
-    { id: 'm5',  category: 'number',   categoryLabel: 'Number',   mode: 'Versus Ranked',  outcome: 'win',  score: 3540, opponentName: 'Jake Norris', eloChange: +14, playedAt: 'Yesterday' },
+    { id: 'm5',  category: 'number',   categoryLabel: 'Number',   mode: 'Versus Ranked',  outcome: 'win',  score: 3540, opponentName: 'Jake Norris', playerRoundScore: 5, opponentRoundScore: 2, eloChange: +14, playedAt: 'Yesterday' },
     { id: 'm6',  category: 'color',    categoryLabel: 'Color',    mode: 'Solo Practice',  outcome: 'win',  score: 1480, playedAt: 'Yesterday' },
     { id: 'm7',  category: 'alphabet', categoryLabel: 'Alphabet', mode: 'Solo Ranked',    outcome: 'loss', score: 2120, playedAt: '2d ago' },
-    { id: 'm8',  category: 'grid',     categoryLabel: 'Grid',     mode: 'Versus Unranked', outcome: 'draw', score: 2640, opponentName: 'Sam Okafor',  playedAt: '2d ago' },
+    { id: 'm8',  category: 'grid',     categoryLabel: 'Grid',     mode: 'Versus Unranked', outcome: 'draw', score: 2640, opponentName: 'Sam Okafor',  playerRoundScore: 3, opponentRoundScore: 3, playedAt: '2d ago' },
     { id: 'm9',  category: 'number',   categoryLabel: 'Number',   mode: 'Solo Practice',  outcome: 'win',  score: 4200, playedAt: '3d ago' },
-    { id: 'm10', category: 'sequence', categoryLabel: 'Sequence', mode: 'Versus Ranked',  outcome: 'loss', score: 2210, opponentName: 'Lena Park',   eloChange: -20, playedAt: '3d ago' },
+    { id: 'm10', category: 'sequence', categoryLabel: 'Sequence', mode: 'Versus Ranked',  outcome: 'loss', score: 2210, opponentName: 'Lena Park',   playerRoundScore: 1, opponentRoundScore: 4, eloChange: -20, playedAt: '3d ago' },
     { id: 'm11', category: 'grid',     categoryLabel: 'Grid',     mode: 'Solo Ranked',    outcome: 'win',  score: 2990, playedAt: '4d ago' },
-    { id: 'm12', category: 'alphabet', categoryLabel: 'Alphabet', mode: 'Versus Ranked',  outcome: 'win',  score: 2640, opponentName: 'Jake Norris', eloChange: +10, playedAt: '4d ago' },
+    { id: 'm12', category: 'alphabet', categoryLabel: 'Alphabet', mode: 'Versus Ranked',  outcome: 'win',  score: 2640, opponentName: 'Jake Norris', playerRoundScore: 4, opponentRoundScore: 2, eloChange: +10, playedAt: '4d ago' },
   ],
 }

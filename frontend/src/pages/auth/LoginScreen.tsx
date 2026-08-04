@@ -9,14 +9,19 @@ import { useNetworkStatus } from '@/lib/hooks/useNetworkStatus'
 import { useAuthStore } from '@/stores/auth.store'
 import { useTranslation } from '@/i18n/useTranslation'
 
+export type AuthMode = 'login' | 'register'
+
 // ─── Main component ───────────────────────────────────────────────
 export function LoginScreen({
   fromGuest = false,
+  initialMode,
   onSuccess,
   onBack,
 }: {
   /** Was this login triggered by a guest wanting to convert their account? */
   fromGuest?: boolean
+  /** Initial intent; both modes reuse this screen's component system. */
+  initialMode?: AuthMode
   /** Called after successful auth (and after merge decision if fromGuest). */
   onSuccess?: () => void
   /** Navigate back to landing / continue as guest. */
@@ -26,12 +31,14 @@ export function LoginScreen({
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [showMergeDialog, setShowMergeDialog] = useState(false)
+  const [mode, setMode] = useState<AuthMode>(initialMode ?? (fromGuest ? 'register' : 'login'))
 
   const { isOffline } = useNetworkStatus()
   const { t } = useTranslation()
   const isLoading = useAuthStore((s) => s.isLoading)
   const errorMessage = useAuthStore((s) => s.errorMessage)
   const loginWithEmail = useAuthStore((s) => s.loginWithEmail)
+  const registerWithEmail = useAuthStore((s) => s.registerWithEmail)
   const loginWithOAuth = useAuthStore((s) => s.loginWithOAuth)
   const clearError = useAuthStore((s) => s.clearError)
 
@@ -40,15 +47,20 @@ export function LoginScreen({
   const formRef = useRef<HTMLFormElement>(null)
 
   const isDisabled = isLoading || isOffline
+  const isRegisterMode = mode === 'register'
 
-  // Real Email/Password login with error handling
+  // Email/password login and registration have explicit, separate service calls.
   async function handleEmailSubmit(e: FormEvent) {
     e.preventDefault()
     if (!email || !password || isDisabled) return
     clearError()
 
     try {
-      await loginWithEmail({ email, password })
+      if (isRegisterMode) {
+        await registerWithEmail({ email, password })
+      } else {
+        await loginWithEmail({ email, password })
+      }
       if (fromGuest) {
         setShowMergeDialog(true)
       } else {
@@ -57,6 +69,13 @@ export function LoginScreen({
     } catch {
       // Error is stored in useAuthStore
     }
+  }
+
+  function switchMode(nextMode: AuthMode) {
+    clearError()
+    setMode(nextMode)
+    setPassword('')
+    setShowPassword(false)
   }
 
   // Real OAuth login (Google / Discord) with error handling
@@ -132,13 +151,13 @@ export function LoginScreen({
               className="text-[20px] font-bold leading-snug tracking-tight"
               style={{ color: 'var(--ma-fg)' }}
             >
-              {fromGuest ? t.auth.createAccount : t.auth.welcomeBack}
+              {isRegisterMode ? t.auth.createAccount : t.auth.welcomeBack}
             </h1>
             <p
               className="mt-1 text-[13px] leading-relaxed"
               style={{ color: 'var(--ma-fg-muted)' }}
             >
-              {fromGuest
+              {isRegisterMode
                 ? t.auth.createAccountSub
                 : t.auth.welcomeBackSub}
             </p>
@@ -257,7 +276,7 @@ export function LoginScreen({
                 value={password}
                 onChange={setPassword}
                 disabled={isDisabled}
-                autoComplete="current-password"
+                autoComplete={isRegisterMode ? 'new-password' : 'current-password'}
                 rightSlot={
                   <button
                     type="button"
@@ -293,10 +312,26 @@ export function LoginScreen({
                 }}
               >
                 {isLoading && <IconSpinner />}
-                {t.auth.logIn}
+                {isRegisterMode ? t.auth.signUp : t.auth.logIn}
               </button>
             </fieldset>
           </form>
+
+          <p
+            className="mt-5 text-center text-[12px] leading-relaxed"
+            style={{ color: 'var(--ma-fg-muted)' }}
+          >
+            {isRegisterMode ? t.auth.alreadyHaveAccount : t.auth.needAccount}{' '}
+            <button
+              type="button"
+              onClick={() => switchMode(isRegisterMode ? 'login' : 'register')}
+              disabled={isDisabled}
+              className="font-semibold underline underline-offset-2 focus-visible:outline-none focus-visible:rounded disabled:opacity-40"
+              style={{ color: 'var(--ma-brand)' }}
+            >
+              {isRegisterMode ? t.auth.logIn : t.auth.signUp}
+            </button>
+          </p>
         </Card>
 
         {/* ── Guest footnote ── */}

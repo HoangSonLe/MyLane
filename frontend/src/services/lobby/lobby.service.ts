@@ -32,6 +32,20 @@ export const lobbyService = {
     return data.friends.find((friend) => friend.id === friendId || (handle && friend.handle === handle)) ?? null
   },
 
+  /** Resolves a QR/deep-link profile id together with current relationship state. */
+  async getFriendById(friendId: string): Promise<Friend | null> {
+    if (isSupabaseConfigured()) {
+      return lobbySupabaseService.getFriendById(friendId)
+    }
+
+    try {
+      const { data } = await apiClient.get<{ friend: Friend | null }>(`/lobby/users/${encodeURIComponent(friendId)}`)
+      return data.friend
+    } catch {
+      return MOCK_FRIENDS.find((friend) => friend.id === friendId) ?? null
+    }
+  },
+
   /** Searches users by handle or name */
   async searchUsers(query: string): Promise<Friend[]> {
     if (isSupabaseConfigured()) {

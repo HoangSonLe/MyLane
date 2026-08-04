@@ -11,7 +11,7 @@ import { ReadyRoomView } from './components/ReadyRoomView'
 import { AccountWall } from './components/AccountWall'
 import { HostLeaveModal } from './components/HostLeaveModal'
 import { GAME_CATEGORIES } from '@/services/versus-room/versus-room.mock'
-import { versusRoomService, RoomNotFoundError, RoomFullError } from '@/services/versus-room/versus-room.service'
+import { versusRoomService, RoomExpiredError, RoomNotFoundError, RoomFullError } from '@/services/versus-room/versus-room.service'
 import { RoundMode, DifficultyId, RoomEntrySource, GameId } from '@/configs/enum'
 import { useNetworkStatus } from '@/lib/hooks/useNetworkStatus'
 import { useAuthStore } from '@/stores/auth.store'
@@ -45,7 +45,7 @@ export function VersusRoomScreen({
   const user = useAuthStore((s) => s.user)
   const isGuest = user?.isGuest ?? true
 
-  const [selectedCategory, setSelectedCategory] = useState<GameCategoryId | null>(GameId.NUMBER)
+  const [selectedCategory, setSelectedCategory] = useState<GameCategoryId | null>(GameId.COLOR)
   const [selectedMode, setSelectedMode] = useState<RoundMode>(RoundMode.VERSUS_RANKED)
   const [selectedDifficulty, setSelectedDifficulty] = useState<DifficultyId>(DifficultyId.MEDIUM)
   const [roomName, setRoomName] = useState('')
@@ -59,6 +59,10 @@ export function VersusRoomScreen({
 
   // Room the player is hosting or has joined — set to initialRoom if matched via Matchmaking/QuickJoin
   const [room, setRoom] = useState<Room | null>(initialRoom)
+  const showRoomExpired = useCallback(() => {
+    setRoom(null)
+    setInlineError('room-expired')
+  }, [])
   const isHost = !!room && (room.host.id ? room.host.id === user?.id : room.host.name === user?.name)
   const isQuickMatch = initialEntrySource === RoomEntrySource.QUICK_MATCH || room?.entrySource === RoomEntrySource.QUICK_MATCH
   const currentPlayerReady = isHost ? !!room?.host.ready : !!room?.opponent?.ready
@@ -93,7 +97,9 @@ export function VersusRoomScreen({
       setRoom(joined)
       onRoomLinkConsumed?.()
     } catch (err) {
-      if (err instanceof RoomNotFoundError) {
+      if (err instanceof RoomExpiredError) {
+        setInlineError('room-expired')
+      } else if (err instanceof RoomNotFoundError) {
         setInlineError('invalid-code')
       } else if (err instanceof RoomFullError) {
         setInlineError('room-full')
@@ -132,11 +138,15 @@ export function VersusRoomScreen({
     try {
       const startedRoom = await versusRoomService.startRoom(roomCode)
       setRoom(startedRoom)
-    } catch {
-      setInlineError('connection')
+    } catch (error) {
+      if (error instanceof RoomExpiredError || error instanceof RoomNotFoundError) {
+        showRoomExpired()
+      } else {
+        setInlineError('connection')
+      }
       throw new Error('Room start failed')
     }
-  }, [roomCode])
+  }, [roomCode, showRoomExpired])
 
   const handleToggleReady = async () => {
     if (!room || isUpdatingReady) return
@@ -144,8 +154,12 @@ export function VersusRoomScreen({
     setInlineError(null)
     try {
       setRoom(await versusRoomService.setRoomReady(room.code, !currentPlayerReady))
-    } catch {
-      setInlineError('connection')
+    } catch (error) {
+      if (error instanceof RoomExpiredError || error instanceof RoomNotFoundError) {
+        showRoomExpired()
+      } else {
+        setInlineError('connection')
+      }
     } finally {
       setIsUpdatingReady(false)
     }
@@ -168,12 +182,44 @@ export function VersusRoomScreen({
       try {
         const latest = await versusRoomService.getRoom(roomCode)
         setRoom(latest)
-      } catch {
-        // ignore
+      } catch (error) {
+        if (error instanceof RoomExpiredError || error instanceof RoomNotFoundError) {
+          showRoomExpired()
+        }
       }
     }, 800)
     return () => clearInterval(id)
-  }, [roomCode])
+  }, [roomCode, showRoomExpired])
+
+  // Presence is explicit and much slower than the read-only 800 ms poll. A
+  // participant heartbeat keeps an actively viewed waiting room alive without
+  // allowing passive reads or Realtime subscriptions to extend abandoned rooms.
+  useEffect(() => {
+    if (!roomCode || room?.status !== 'waiting') return
+
+    let disposed = false
+    const heartbeat = async () => {
+      try {
+        await versusRoomService.heartbeatRoom(roomCode)
+      } catch (error) {
+        if (!disposed && (error instanceof RoomExpiredError || error instanceof RoomNotFoundError)) {
+          showRoomExpired()
+        }
+      }
+    }
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') void heartbeat()
+    }
+
+    void heartbeat()
+    const id = setInterval(() => { void heartbeat() }, 60_000)
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    return () => {
+      disposed = true
+      clearInterval(id)
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+    }
+  }, [room?.status, roomCode, showRoomExpired])
 
   useEffect(() => {
     if (room?.status !== 'in_progress' || navigatedToGameRef.current) return

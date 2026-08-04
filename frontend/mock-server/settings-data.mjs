@@ -11,6 +11,8 @@ export const MOCK_SETTINGS = {
   notifications: true,
   sounds: true,
   haptics: false,
+  locale: 'vi',
+  theme: 'light',
 }
 
 export const GUEST_SETTINGS = {
@@ -18,4 +20,6 @@ export const GUEST_SETTINGS = {
   notifications: true,
   sounds: true,
   haptics: false,
+  locale: 'vi',
+  theme: 'light',
 }

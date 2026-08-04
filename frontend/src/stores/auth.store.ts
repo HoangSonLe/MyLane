@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { authService, UserSession } from '@/services/auth/auth.service'
 import type { AuthCredentials } from '@/services/auth/auth.interface'
+import { clearToken, getToken, saveToken } from '@/services/http/api-client'
 
 interface AuthState {
   user: UserSession | null
@@ -11,7 +12,9 @@ interface AuthState {
   checkSession: () => Promise<UserSession | null>
   loginAsGuest: () => Promise<UserSession>
   loginWithEmail: (creds: AuthCredentials) => Promise<UserSession>
+  registerWithEmail: (creds: AuthCredentials) => Promise<UserSession>
   loginWithOAuth: (provider: 'google' | 'discord') => Promise<UserSession>
+  updateProfileIdentity: (identity: { name: string; avatarUrl?: string }) => void
   logout: () => Promise<void>
   clearError: () => void
 }
@@ -64,6 +67,19 @@ export const useAuthStore = create<AuthState>((set) => ({
     }
   },
 
+  registerWithEmail: async (creds) => {
+    set({ isLoading: true, errorMessage: null })
+    try {
+      const user = await authService.registerWithEmail(creds)
+      set({ user, isLoading: false })
+      return user
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Account registration failed.'
+      set({ isLoading: false, errorMessage: msg })
+      throw err
+    }
+  },
+
   loginWithOAuth: async (provider) => {
     set({ isLoading: true, errorMessage: null })
     try {
@@ -77,10 +93,30 @@ export const useAuthStore = create<AuthState>((set) => ({
     }
   },
 
+  updateProfileIdentity: (identity) => {
+    set((state) => {
+      if (!state.user) return state
+      const user = {
+        ...state.user,
+        name: identity.name,
+        avatarUrl: identity.avatarUrl,
+      }
+      const token = getToken()
+      if (token) saveToken(token, user)
+      return { ...state, user }
+    })
+  },
+
   logout: async () => {
     set({ isLoading: true })
-    await authService.logout()
-    set({ user: null, isLoading: false })
+    try {
+      await authService.logout()
+    } catch {
+      // Remote sign-out is best effort; local sign-out must always complete.
+    } finally {
+      clearToken()
+      set({ user: null, isLoading: false, errorMessage: null })
+    }
   },
 
   clearError: () => set({ errorMessage: null }),

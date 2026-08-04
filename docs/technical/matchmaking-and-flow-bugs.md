@@ -95,8 +95,10 @@ Tài liệu này tổng hợp toàn bộ 13 lỗi logic flow, race condition và
 Các sửa lỗi mở rộng đi kèm:
 
 - Quick Join/Available Room/Invite đều truyền `Room` và `RoomEntrySource` qua App, không còn navigate vào form phòng rỗng.
+- Nút Thách đấu từ `ProfileScreen` mở cùng `ChallengeModal` với Lobby và chuyển room code đã accept qua App; không còn điều hướng nhầm sang Quick Match mà không tạo invite.
 - Custom Room có ready state thật cho từng participant; host không còn bị deadlock do `opponent.ready` suy từ `status`.
 - Invite hết hạn sau 30 giây ở database; chỉ còn một global incoming-invite listener/modal.
+- Phòng còn ở `waiting` hết hạn sau 10 phút không có participant heartbeat hoặc room-state mutation; RLS ẩn phòng hết hạn ngay theo đồng hồ database và RPC cleanup xóa bản ghi mồ côi.
 - Mute `session` chỉ tồn tại trong memory của phiên hiện tại, không còn được lưu giả thành 24 giờ.
 - Score đối thủ không còn sinh bằng `Math.random()` ở production flow. Round, winner, forfeit và category Elo được chốt idempotent phía database.
 - RLS không còn cho client ghi trực tiếp `versus_rooms`, `matchmaking_queue`, `match_invites` hoặc `category_elo`; mutation đi qua RPC kiểm tra `auth.uid()`.

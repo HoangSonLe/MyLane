@@ -10,11 +10,13 @@ import { getInitials } from '@/lib/utils'
  */
 export function Avatar({
   name,
+  imageUrl,
   size = '2.5rem',
   fontSize = '13px',
   children,
 }: {
   name: string
+  imageUrl?: string
   size?: string
   fontSize?: string
   /** Rendered inside the same relatively-positioned container, e.g. a presence dot. */
@@ -31,9 +33,13 @@ export function Avatar({
         border: '1px solid var(--ma-border)',
       }}
     >
-      <span className="font-bold" style={{ fontSize, color: 'var(--ma-fg-muted)' }}>
-        {getInitials(name)}
-      </span>
+      {imageUrl ? (
+        <img src={imageUrl} alt="" className="absolute inset-0 h-full w-full object-cover" style={{ borderRadius: 'inherit' }} />
+      ) : (
+        <span className="font-bold" style={{ fontSize, color: 'var(--ma-fg-muted)' }}>
+          {getInitials(name)}
+        </span>
+      )}
       {children}
     </div>
   )

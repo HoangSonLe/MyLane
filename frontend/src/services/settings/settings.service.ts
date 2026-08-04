@@ -15,7 +15,7 @@ export const settingsService = {
         sounds: remote?.sounds_enabled ?? true,
         haptics: remote?.haptics_enabled ?? true,
         locale: (remote?.preferred_language as Locale) || 'vi',
-        theme: (remote?.theme as Theme) || 'dark',
+        theme: (remote?.theme as Theme) || 'light',
         linkedMethods: [],
       }
     }

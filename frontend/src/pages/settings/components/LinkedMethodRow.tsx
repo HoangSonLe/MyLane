@@ -1,4 +1,5 @@
 import { IconLink, IconGoogle, IconDiscord } from './icons'
+import { useTranslation } from '@/i18n/useTranslation'
 
 interface LinkedMethod {
   id: string
@@ -18,6 +19,8 @@ interface LinkedMethodRowProps {
 }
 
 export function LinkedMethodRow({ method, skeleton }: LinkedMethodRowProps) {
+  const { t } = useTranslation()
+
   if (skeleton) {
     return (
       <div className="flex items-center gap-3 px-4 py-3">
@@ -61,9 +64,9 @@ export function LinkedMethodRow({ method, skeleton }: LinkedMethodRowProps) {
           background: 'var(--ma-success)',
           color: 'oklch(0.14 0.04 145)',
         }}
-        aria-label={`${method.label} linked`}
+        aria-label={`${method.label} ${t.settings.linked}`}
       >
-        Linked
+        {t.settings.linked}
       </div>
     </div>
   )

@@ -8,12 +8,17 @@ import { useThemeStore } from '@/stores/theme.store'
 import { settingsService } from '@/services/settings/settings.service'
 import { lobbyService } from '@/services/lobby/lobby.service'
 import { matchInviteService } from '@/services/match-invite/match-invite.service'
+import type { MatchInviteData } from '@/services/match-invite/match-invite.interface'
 import { normalizeRoomCode, versusRoomService } from '@/services/versus-room/versus-room.service'
+import { isSupabaseConfigured } from '@/services/backend-config'
+import { supabaseService } from '@/services/supabase'
 import { IncomingInviteModal, type IncomingInviteData } from '@/pages/lobby/components/IncomingInviteModal'
 import { MuteInviteModal } from '@/pages/lobby/components/MuteInviteModal'
+import { WelcomeOnboardingModal } from '@/components/ui/modal/WelcomeOnboardingModal'
 import { LandingScreen } from '@/pages/landing/LandingScreen'
 import { LoginScreen } from '@/pages/auth/LoginScreen'
 import { HomeScreen } from '@/pages/home/HomeScreen'
+import { StoryScreen } from '@/pages/story/StoryScreen'
 import { LobbyScreen } from '@/pages/lobby/LobbyScreen'
 import { VersusRoomScreen } from '@/pages/versus-room/VersusRoomScreen'
 import { VersusGameplayScreen } from '@/pages/versus-gameplay/VersusGameplayScreen'
@@ -22,11 +27,16 @@ import { GameplayScreen } from '@/pages/gameplay/GameplayScreen'
 import { SettingsScreen } from '@/pages/settings/SettingsScreen'
 import { ResultScreen } from '@/pages/result/ResultScreen'
 import { ProfileScreen } from '@/pages/profile/ProfileScreen'
+import { EditProfileScreen } from '@/pages/profile/EditProfileScreen'
 import { LeaderboardScreen } from '@/pages/leaderboard/LeaderboardScreen'
 import { MatchmakingScreen } from '@/pages/matchmaking/MatchmakingScreen'
 import type { GameResultInput } from '@/services/result/result.interface'
 import type { Room } from '@/services/versus-room/versus-room.interface'
-import { useInviteMuteStore, type MuteDurationOption } from '@/stores/invite-mute.store'
+import {
+  useInviteMuteStore,
+  type InviteMuteTarget,
+  type MuteDurationOption,
+} from '@/stores/invite-mute.store'
 import {
   clearResumeState,
   loadResumeState,
@@ -39,6 +49,7 @@ type Screen =
   | 'landing'
   | 'login'
   | 'home'
+  | 'story'
   | 'lobby'
   | 'versus-room'
   | 'versus-game'
@@ -48,6 +59,7 @@ type Screen =
   | 'leaderboard'
   | 'result'
   | 'profile'
+  | 'edit-profile'
   | 'matchmaking'
 
 const GUEST_BLOCKED: Screen[] = ['lobby', 'versus-room', 'versus-game', 'leaderboard', 'matchmaking']
@@ -67,6 +79,12 @@ function getSharedRoomCodeFromLocation(): string {
   return match ? normalizeRoomCode(match[1]) : ''
 }
 
+function getSharedFriendIdFromLocation(): string {
+  const params = new URLSearchParams(window.location.search)
+  if (params.get('v') !== '1') return ''
+  return params.get('friend')?.trim() || ''
+}
+
 export default function App() {
   const [history, setHistory] = useState<Screen[]>(['landing'])
   const screen = history[history.length - 1]
@@ -74,24 +92,87 @@ export default function App() {
 
   const syncFromServer = useLocaleStore((s) => s.syncFromServer)
   const user = useAuthStore((s) => s.user)
+  const inviteAccountId = user && !user.isGuest ? user.id : null
   const isInviteMuted = useInviteMuteStore((state) => state.isMuted)
   const muteInviter = useInviteMuteStore((state) => state.muteUser)
+  const syncInviteMutes = useInviteMuteStore((state) => state.syncAccount)
+  const subscribeToInviteMutes = useInviteMuteStore((state) => state.subscribeToAccount)
+  const clearInviteMutes = useInviteMuteStore((state) => state.clearAccount)
+  const inviteMutesHydrated = useInviteMuteStore((state) => state.isHydrated)
+  const accountMutedMap = useInviteMuteStore((state) => state.accountMutedMap)
+  const sessionMutedMap = useInviteMuteStore((state) => state.sessionMutedMap)
   const [globalIncomingInvite, setGlobalIncomingInvite] = useState<IncomingInviteData | null>(null)
-  const [globalMuteTarget, setGlobalMuteTarget] = useState<{ handle: string; name: string } | null>(null)
+  const [globalMuteTarget, setGlobalMuteTarget] = useState<(InviteMuteTarget & { name: string }) | null>(null)
   const [sharedRoomCode, setSharedRoomCode] = useState(getSharedRoomCodeFromLocation)
+  const [sharedFriendId, setSharedFriendId] = useState(getSharedFriendIdFromLocation)
+  const [welcomeModalVisible, setWelcomeModalVisible] = useState(false)
 
-  /**
-   * Global Realtime listener + 2s Active Polling for incoming 1v1 match challenges from friends
-   */
+  // Trigger Welcome Onboarding modal ONCE per account — synced with Database & localStorage
   useEffect(() => {
-    if (!user || user.isGuest) return
+    if (user && !user.isGuest && user.id) {
+      const storageKey = `gb_has_seen_onboarding_${user.id}`
+      const localHasSeen = localStorage.getItem(storageKey) === 'true'
 
-    const handleNewInvite = (inviteData: any) => {
-      if (isInviteMuted(inviteData.inviterHandle)) return
+      if (localHasSeen) return
+
+      if (isSupabaseConfigured()) {
+        supabaseService.getSettings().then((remoteSettings) => {
+          if (remoteSettings?.has_seen_onboarding) {
+            localStorage.setItem(storageKey, 'true')
+          } else {
+            setWelcomeModalVisible(true)
+          }
+        }).catch(() => {
+          setWelcomeModalVisible(true)
+        })
+      } else {
+        setWelcomeModalVisible(true)
+      }
+    }
+  }, [user])
+
+  const handleCloseWelcomeModal = useCallback(() => {
+    if (user?.id) {
+      const storageKey = `gb_has_seen_onboarding_${user.id}`
+      localStorage.setItem(storageKey, 'true')
+      if (isSupabaseConfigured()) {
+        void supabaseService.updateSettings({ hasSeenOnboarding: true })
+      }
+    }
+    setWelcomeModalVisible(false)
+  }, [user?.id])
+
+  /** Hydrate account-scoped mutes before incoming invite listeners start. */
+  useEffect(() => {
+    if (!inviteAccountId) {
+      clearInviteMutes()
+      return
+    }
+
+    let disposed = false
+    let unsubscribe = () => {}
+    void syncInviteMutes(inviteAccountId).then(() => {
+      if (!disposed) unsubscribe = subscribeToInviteMutes(inviteAccountId)
+    })
+
+    return () => {
+      disposed = true
+      unsubscribe()
+      clearInviteMutes()
+    }
+  }, [clearInviteMutes, inviteAccountId, subscribeToInviteMutes, syncInviteMutes])
+
+  /** Global Realtime listener + 2s polling for incoming 1v1 challenges. */
+  useEffect(() => {
+    if (!inviteAccountId || !inviteMutesHydrated) return
+
+    const handleNewInvite = (inviteData: MatchInviteData) => {
+      if (isInviteMuted({ userId: inviteData.inviterId, handle: inviteData.inviterHandle })) return
       setGlobalIncomingInvite((current) => {
         if (!current || current.id !== inviteData.id) {
           return {
             id: inviteData.id,
+            inviterId: inviteData.inviterId,
             inviterName: inviteData.inviterName,
             inviterHandle: inviteData.inviterHandle,
             inviterElo: inviteData.inviterElo,
@@ -106,11 +187,11 @@ export default function App() {
     }
 
     // 1. Realtime WebSocket listener
-    const unsubscribe = matchInviteService.subscribeToIncomingInvites(user.id, handleNewInvite)
+    const unsubscribe = matchInviteService.subscribeToIncomingInvites(inviteAccountId, handleNewInvite)
 
     // 2. Active 2-second fast polling backup
     const pollInterval = setInterval(() => {
-      void matchInviteService.checkPendingInvite(user.id)
+      void matchInviteService.checkPendingInvite(inviteAccountId)
         .then((invite) => {
           if (invite) handleNewInvite(invite)
         })
@@ -121,7 +202,18 @@ export default function App() {
       unsubscribe()
       clearInterval(pollInterval)
     }
-  }, [isInviteMuted, user])
+  }, [inviteAccountId, inviteMutesHydrated, isInviteMuted])
+
+  /** A mute arriving from another device also dismisses a visible invite. */
+  useEffect(() => {
+    if (!globalIncomingInvite) return
+    if (isInviteMuted({
+      userId: globalIncomingInvite.inviterId,
+      handle: globalIncomingInvite.inviterHandle,
+    })) {
+      setGlobalIncomingInvite(null)
+    }
+  }, [accountMutedMap, globalIncomingInvite, isInviteMuted, sessionMutedMap])
 
   /**
    * Heartbeat to keep user presence ('online' | 'in-game') updated in Supabase
@@ -175,7 +267,7 @@ export default function App() {
   const [pendingScreen, setPendingScreen] = useState<Screen | null>(null)
   const [roomTab, setRoomTab] = useState<'create' | 'join'>(() => sharedRoomCode ? 'join' : 'create')
   const [session, setSession] = useState<{ game: GameId; mode: ModeId; difficulty: DifficultyId }>({
-    game: GameId.SEQUENCE,
+    game: GameId.COLOR,
     mode: ModeId.SOLO_PRACTICE,
     difficulty: DifficultyId.MEDIUM,
   })
@@ -240,6 +332,49 @@ export default function App() {
     goTo('versus-room')
   }
 
+  function openSharedFriendEntry() {
+    const activeUser = useAuthStore.getState().user
+    if (!activeUser || activeUser.isGuest) {
+      setPendingScreen('profile')
+      push('login')
+      return
+    }
+    push('profile')
+  }
+
+  function openLandingDestination() {
+    if (sharedRoomCode) openSharedRoomEntry()
+    else if (sharedFriendId) openSharedFriendEntry()
+    else push('home')
+  }
+
+  function openLandingLoginDestination() {
+    if (sharedRoomCode) openSharedRoomEntry()
+    else if (sharedFriendId) openSharedFriendEntry()
+    else goTo('login')
+  }
+
+  // Bug fix: a room created while waiting for an opponent (Quick Match's
+  // "auto-create room" branch or a manual Custom Room) has no server-side
+  // expiry — only `leave_versus_room` removes it. Logging out previously
+  // skipped this entirely, so the room stayed 'waiting' forever (visible to
+  // other accounts / re-joinable) even after the host signed out. Only the
+  // 'waiting' case is left here; an in-progress match must keep going through
+  // forfeit, not a silent logout side-effect.
+  async function leaveActiveWaitingRoom() {
+    const activeRoom = matchedVersusRoom
+    if (!activeRoom || activeRoom.status === 'in_progress') return
+    await versusRoomService.leaveRoom(activeRoom.code).catch(() => {})
+    setMatchedVersusRoom(null)
+  }
+
+  async function logOutFromHeader() {
+    await leaveActiveWaitingRoom()
+    await lobbyService.updatePresence('offline').catch(() => {})
+    await useAuthStore.getState().logout()
+    resetTo('landing')
+  }
+
   function handleTabNav(id: string) {
     const target = TAB_TARGETS[id]
     if (target) push(target)
@@ -250,8 +385,8 @@ export default function App() {
       case 'landing':
         return (
           <LandingScreen
-            onPlayNow={() => sharedRoomCode ? openSharedRoomEntry() : push('home')}
-            onLogIn={() => sharedRoomCode ? openSharedRoomEntry() : goTo('login')}
+            onPlayNow={openLandingDestination}
+            onLogIn={openLandingLoginDestination}
             resumeTarget={resumeTarget}
             onResume={async (resume) => {
               if (resume.screen === 'game') {
@@ -281,6 +416,7 @@ export default function App() {
       case 'login':
         return (
           <LoginScreen
+            fromGuest={Boolean(user?.isGuest)}
             onSuccess={() => {
               const next = pendingScreen ?? 'home'
               setPendingScreen(null)
@@ -296,18 +432,24 @@ export default function App() {
       case 'home':
         return (
           <HomeScreen
-            onLogOut={() => {
-              lobbyService.updatePresence('offline').catch(() => {})
-              resetTo('landing')
-            }}
+            onLogOut={logOutFromHeader}
             onNavigate={(id) => {
               if (id === 'game') push('game-select')
               else if (id === 'lobby') goTo('lobby')
               else if (id === 'leaderboard') goTo('leaderboard')
               else if (id === 'settings') push('settings')
               else if (id === 'profile') push('profile')
+              else if (id === 'story') push('story')
               else handleTabNav(id)
             }}
+          />
+        )
+
+      case 'story':
+        return (
+          <StoryScreen
+            onBack={() => back('home')}
+            onPlay={() => push('game-select')}
           />
         )
 
@@ -315,10 +457,7 @@ export default function App() {
         return (
           <LobbyScreen
             onBack={() => back('home')}
-            onLogOut={() => {
-              lobbyService.updatePresence('offline').catch(() => {})
-              resetTo('landing')
-            }}
+            onLogOut={logOutFromHeader}
             onNavigate={(id, room, source) => {
               if (id === 'matchmaking') goTo('matchmaking')
               else if (id === 'game-select' || id === 'game') push('game-select')
@@ -483,14 +622,37 @@ export default function App() {
         return (
           <ProfileScreen
             onBack={() => back('home')}
-            onEditProfile={() => push('settings')}
+            onEditProfile={() => push('edit-profile')}
             onSettings={() => push('settings')}
+            onChallengeAccepted={async (roomCode) => {
+              const room = await versusRoomService.joinRoom(roomCode)
+              setMatchedVersusRoom(room)
+              setRoomEntrySource(RoomEntrySource.CHALLENGE)
+              goTo('versus-room')
+            }}
+            initialFriendCode={sharedFriendId}
+            onFriendCodeConsumed={() => {
+              if (!sharedFriendId) return
+              setSharedFriendId('')
+              const url = new URL(window.location.href)
+              url.searchParams.delete('friend')
+              url.searchParams.delete('v')
+              window.history.replaceState({}, '', `${url.pathname}${url.search}${url.hash}`)
+            }}
             onNavigate={(id) => {
               if (id === 'result') push('result')
               else if (id === 'settings') push('settings')
               else if (id === 'login') goTo('login')
               else handleTabNav(id)
             }}
+          />
+        )
+
+      case 'edit-profile':
+        return (
+          <EditProfileScreen
+            onBack={() => back('profile')}
+            onSaved={() => back('profile')}
           />
         )
 
@@ -511,6 +673,7 @@ export default function App() {
         return (
           <SettingsScreen
             onBack={() => back('home')}
+            onBeforeLogOut={leaveActiveWaitingRoom}
             onLogOut={() => {
               lobbyService.updatePresence('offline').catch(() => {})
               resetTo('landing')
@@ -557,14 +720,8 @@ export default function App() {
           }
           setGlobalIncomingInvite(null)
         }}
-        onOpenMute={() => {
-          if (globalIncomingInvite) {
-            setGlobalMuteTarget({
-              handle: globalIncomingInvite.inviterHandle,
-              name: globalIncomingInvite.inviterName,
-            })
-          }
-          setGlobalIncomingInvite(null)
+        onOpenMute={(userId, handle, name) => {
+          setGlobalMuteTarget({ userId, handle, name })
         }}
       />
 
@@ -573,9 +730,18 @@ export default function App() {
         inviterName={globalMuteTarget?.name ?? ''}
         show={!!globalMuteTarget}
         onClose={() => setGlobalMuteTarget(null)}
-        onConfirmMute={(handle: string, option: MuteDurationOption) => {
-          muteInviter(handle, option)
+        onConfirmMute={(_handle: string, option: MuteDurationOption) => {
+          if (globalMuteTarget) void muteInviter(globalMuteTarget, option)
+          setGlobalIncomingInvite(null)
           setGlobalMuteTarget(null)
+        }}
+      />
+
+      <WelcomeOnboardingModal
+        visible={welcomeModalVisible}
+        onClose={handleCloseWelcomeModal}
+        onStartPlaying={() => {
+          handleNavigate('game-select')
         }}
       />
     </>

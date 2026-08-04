@@ -30,7 +30,11 @@ import type { Friend } from '@/services/lobby/lobby.interface'
 import type { PublicRoomSummary, Room } from '@/services/versus-room/versus-room.interface'
 import { useNetworkStatus } from '@/lib/hooks/useNetworkStatus'
 import { useAuthStore } from '@/stores/auth.store'
-import { useInviteMuteStore, type MuteDurationOption } from '@/stores/invite-mute.store'
+import {
+  useInviteMuteStore,
+  type InviteMuteTarget,
+  type MuteDurationOption,
+} from '@/stores/invite-mute.store'
 import { useTranslation } from '@/i18n/useTranslation'
 import { GameId, RoomEntrySource } from '@/configs/enum'
 
@@ -61,7 +65,7 @@ export function LobbyScreen({
   const [addFriendModalVisible, setAddFriendModalVisible] = useState(false)
   const [notificationsModalVisible, setNotificationsModalVisible] = useState(false)
   const [incomingRequestsCount, setIncomingRequestsCount] = useState(0)
-  const [muteTarget, setMuteTarget] = useState<{ handle: string; name: string } | null>(null)
+  const [muteTarget, setMuteTarget] = useState<(InviteMuteTarget & { name: string }) | null>(null)
   const [toastMessage, setToastMessage] = useState<string | null>(null)
   const [headerMenuVisible, setHeaderMenuVisible] = useState(false)
 
@@ -201,7 +205,7 @@ export function LobbyScreen({
   }
 
   const handleConfirmMuteUser = (inviterHandle: string, option: MuteDurationOption, durationLabel: string) => {
-    muteUser(inviterHandle, option)
+    if (muteTarget) void muteUser(muteTarget, option)
     const targetName = muteTarget?.name ?? inviterHandle
     setToastMessage(t.lobby.mutedToast(targetName, durationLabel))
     setTimeout(() => setToastMessage(null), 4000)
@@ -263,8 +267,8 @@ export function LobbyScreen({
           setSelectedFriendForProfile(null)
           setChallengeTargetFriend(target)
         }}
-        onOpenMute={(handle, name) => {
-          setMuteTarget({ handle, name })
+        onOpenMute={(userId, handle, name) => {
+          setMuteTarget({ userId, handle, name })
         }}
       />
 

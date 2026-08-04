@@ -3,6 +3,16 @@ import { persist } from 'zustand/middleware'
 
 export type Locale = 'en' | 'vi'
 
+const DEFAULT_LOCALE: Locale = 'vi'
+
+function applyLocaleToDocument(locale: Locale) {
+  if (typeof document !== 'undefined') {
+    document.documentElement.lang = locale
+  }
+}
+
+applyLocaleToDocument(DEFAULT_LOCALE)
+
 interface LocaleState {
   locale: Locale
   /** User-triggered — updates state AND caller is responsible for saving to the server. */
@@ -25,10 +35,21 @@ interface LocaleState {
 export const useLocaleStore = create<LocaleState>()(
   persist(
     (set) => ({
-      locale: 'en',
-      setLocale: (locale) => set({ locale }),
-      syncFromServer: (locale) => set({ locale }),
+      locale: DEFAULT_LOCALE,
+      setLocale: (locale) => {
+        applyLocaleToDocument(locale)
+        set({ locale })
+      },
+      syncFromServer: (locale) => {
+        applyLocaleToDocument(locale)
+        set({ locale })
+      },
     }),
-    { name: 'ma-locale' },
+    {
+      name: 'ma-locale',
+      onRehydrateStorage: () => (state) => {
+        applyLocaleToDocument(state?.locale ?? DEFAULT_LOCALE)
+      },
+    },
   ),
 )

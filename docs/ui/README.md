@@ -25,6 +25,7 @@ Every screen named below is already referenced in the Design Bible ([`11-screen-
 | Screen | Purpose | Primary Action |
 |---|---|---|
 | Home | Encourage another play session, not statistics | Play |
+| Story | Explain the Brain Reset narrative and connect it to short memory-training sessions | Start Training |
 | Game Select | Let the player choose a game | Choose Game |
 | Gameplay | Support gameplay, nothing else | *(game-specific — Missing in source documentation)* |
 | Result | Celebrate progress, encourage replay | Play Again |
@@ -46,6 +47,7 @@ The flow below is inferred from the primary actions above; it has not been expli
 ```
 Home ─Play→ Game Select ─Choose Game→ Gameplay ─(finish)→ Result ─Play Again→ Gameplay (same game + mode)
                                                               └─(back)→ Home
+Home ─Read Story→ Story ─Start Training→ Game Select
 Home ──→ Profile ──→ Edit Profile
 Home ──→ Settings
 Home ──→ Leaderboard

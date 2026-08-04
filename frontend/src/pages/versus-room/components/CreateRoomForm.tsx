@@ -18,6 +18,12 @@ import { SectionLabel } from '@/components/ui/SectionLabel'
 import { DifficultyId, type GameCategoryId, type RoomMode } from '@/services/versus-room/versus-room.interface'
 import { GAME_CATEGORIES } from '@/services/versus-room/versus-room.mock'
 import { useTranslation } from '@/i18n/useTranslation'
+import {
+  getDifficultyLabels,
+  getLocalizedGameLabel,
+  getModeLabels,
+} from '@/services/gameplay/gameplay-screen.types'
+import { ModeId } from '@/configs/enum'
 import type { ComponentType } from 'react'
 
 const CATEGORY_SVG_ICONS: Record<string, ComponentType<{ width?: number; height?: number }>> = {
@@ -58,6 +64,8 @@ export function CreateRoomForm({
   onCreate: () => void
 }) {
   const { t } = useTranslation()
+  const difficultyLabels = getDifficultyLabels(t)
+  const modeLabels = getModeLabels(t)
 
   if (skeleton) {
     return (
@@ -73,10 +81,10 @@ export function CreateRoomForm({
   }
 
   const DIFFICULTY_ITEMS = [
-    { id: DifficultyId.EASY, label: t.challenge?.easy || 'Dễ', icon: IconDiffEasy, color: 'var(--ma-success)' },
-    { id: DifficultyId.MEDIUM, label: t.challenge?.medium || 'Trung Bình', icon: IconDiffMedium, color: 'var(--ma-brand)' },
-    { id: DifficultyId.HARD, label: t.challenge?.hard || 'Khó', icon: IconDiffHard, color: 'var(--ma-danger)' },
-    { id: DifficultyId.SUPER_HARD, label: t.challenge?.superHard || 'Siêu Khó', icon: IconDiffSuperHard, color: '#f59e0b' },
+    { id: DifficultyId.EASY, label: difficultyLabels[DifficultyId.EASY], icon: IconDiffEasy, color: 'var(--ma-success)' },
+    { id: DifficultyId.MEDIUM, label: difficultyLabels[DifficultyId.MEDIUM], icon: IconDiffMedium, color: 'var(--ma-brand)' },
+    { id: DifficultyId.HARD, label: difficultyLabels[DifficultyId.HARD], icon: IconDiffHard, color: 'var(--ma-danger)' },
+    { id: DifficultyId.SUPER_HARD, label: difficultyLabels[DifficultyId.SUPER_HARD], icon: IconDiffSuperHard, color: '#f59e0b' },
   ]
 
   return (
@@ -88,13 +96,14 @@ export function CreateRoomForm({
           {GAME_CATEGORIES.map((cat) => {
             const isSelected = selectedCategory === cat.id
             const CatIcon = CATEGORY_SVG_ICONS[cat.id] || IconCategoryNumber
+            const categoryLabel = getLocalizedGameLabel(t, cat.id)
             return (
               <button
                 key={cat.id}
                 type="button"
                 onClick={() => onSelectCategory(cat.id)}
                 aria-pressed={isSelected}
-                aria-label={`${cat.label} — ${cat.description}${isSelected ? t.gameSelect.selectedSuffix : ''}`}
+                aria-label={`${categoryLabel} — ${cat.description}${isSelected ? t.gameSelect.selectedSuffix : ''}`}
                 className={[
                   'flex w-full items-center gap-3 text-left',
                   'transition-all duration-[var(--ma-duration-micro)] active:scale-[0.98]',
@@ -128,7 +137,7 @@ export function CreateRoomForm({
                     <span style={{ color: isSelected ? 'var(--ma-active)' : 'var(--ma-fg-subtle)' }}>
                       <CatIcon width={16} height={16} />
                     </span>
-                    <span>{cat.label}</span>
+                    <span>{categoryLabel}</span>
                   </p>
                   <p className="text-[11px] truncate mt-0.5" style={{ color: 'var(--ma-fg-muted)' }}>
                     {cat.description}
@@ -183,12 +192,12 @@ export function CreateRoomForm({
           {[
             {
               id: 'versus-ranked' as RoomMode,
-              label: t.challenge?.rankedMode || '🏆 Đấu Xếp Hạng (+/- Elo)',
+              label: modeLabels[ModeId.VERSUS_RANKED],
               desc: 'Cộng / trừ điểm Elo theo kết quả trận đấu',
             },
             {
               id: 'versus-unranked' as RoomMode,
-              label: t.challenge?.unrankedMode || '🎯 Đấu Thường (Luyện tập)',
+              label: modeLabels[ModeId.VERSUS_UNRANKED],
               desc: 'Thi đấu giải trí không ảnh hưởng xếp hạng',
             },
           ].map((mode) => {

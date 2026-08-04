@@ -10,6 +10,7 @@ export const settingsSupabaseService = {
     haptics?: boolean
     language?: 'en' | 'vi'
     theme?: string
+    hasSeenOnboarding?: boolean
   }) {
     const supabase = getSupabaseClient()
     if (!supabase) return
@@ -26,7 +27,7 @@ export const settingsSupabaseService = {
           name: userData?.user?.user_metadata?.full_name || userData?.user?.email?.split('@')[0] || 'Player',
           handle: userData?.user?.email?.split('@')[0] || 'player',
         },
-        { onConflict: 'id' }
+        { onConflict: 'id', ignoreDuplicates: true }
       )
 
       const payload: Record<string, any> = {
@@ -37,6 +38,7 @@ export const settingsSupabaseService = {
       if (typeof settings.notifications === 'boolean') payload.notifications_enabled = settings.notifications
       if (typeof settings.sounds === 'boolean') payload.sounds_enabled = settings.sounds
       if (typeof settings.haptics === 'boolean') payload.haptics_enabled = settings.haptics
+      if (typeof settings.hasSeenOnboarding === 'boolean') payload.has_seen_onboarding = settings.hasSeenOnboarding
       if (settings.language) payload.preferred_language = settings.language
       if (settings.theme) payload.theme = settings.theme
 
@@ -73,7 +75,7 @@ export const settingsSupabaseService = {
           name: userData?.user?.user_metadata?.full_name || userData?.user?.email?.split('@')[0] || 'Player',
           handle: userData?.user?.email?.split('@')[0] || 'player',
         },
-        { onConflict: 'id' }
+        { onConflict: 'id', ignoreDuplicates: true }
       )
 
       // If no row exists yet, initialize default settings row in Database
@@ -83,7 +85,8 @@ export const settingsSupabaseService = {
         sounds_enabled: true,
         haptics_enabled: true,
         preferred_language: 'vi',
-        theme: 'dark',
+        theme: 'light',
+        has_seen_onboarding: false,
       }
 
       await supabase.from('user_settings').upsert(defaultSettings, { onConflict: 'user_id' })

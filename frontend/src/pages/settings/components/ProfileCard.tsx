@@ -11,9 +11,12 @@ export function ProfileCard({ skeleton, user }: ProfileCardProps) {
   const isGuest = user?.isGuest ?? true
   const name = user ? (isGuest ? t.home.guest : user.name) : t.home.guest
   const initial = (name[0] ?? 'G').toUpperCase()
+  const eloFormatted = (user?.elo ?? 1000).toLocaleString()
   const subtext = isGuest
-    ? 'Guest Account · Saved locally'
-    : (user?.email ?? `Elo Rating: ${user?.elo ?? 0}`)
+    ? t.settings.guestAccountSubtext
+    : user?.email
+      ? `${user.email} · Elo: ${eloFormatted}`
+      : `Elo: ${eloFormatted}`
 
   return (
     <div
@@ -71,10 +74,10 @@ export function ProfileCard({ skeleton, user }: ProfileCardProps) {
           {!skeleton && (
             <div className="flex items-center gap-1.5 rounded-xl bg-[var(--ma-surface-raised)] px-3 py-1.5">
               <span className="text-[11px] font-medium text-[var(--ma-fg-muted)]">
-                {isGuest ? 'GUEST' : 'ELO'}
+                {isGuest ? t.settings.guestBadgeLabel : 'ELO'}
               </span>
               <span className="text-[13px] font-semibold text-[var(--ma-fg)]">
-                {isGuest ? 'Local' : (user?.elo ?? 0).toLocaleString()}
+                {isGuest ? t.settings.guestBadgeValue : (user?.elo ?? 0).toLocaleString()}
               </span>
             </div>
           )}

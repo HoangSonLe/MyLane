@@ -85,7 +85,14 @@ When a participant forfeits an active Versus match, the server immediately final
    - **Incoming Challenge Notification**: When receiving a match invite from another player, a floating toast/modal pops up displaying inviter name, Elo, game category, and action buttons (`Accept`, `Decline`, `Mute`).
    - **Accept**: Instantly joins the room and moves player to `VersusRoomScreen`.
    - **Decline**: Dismisses the challenge notification.
-   - **Mute Player Invites (Tắt nhận lời mời)**: Option to mute incoming challenge invitations from a specific player for **5 minutes**, **15 minutes**, **30 minutes**, or **until the end of current session**. Subsequent invites from muted users within the duration are silently suppressed.
+   - **Mute Player Invites (Tắt nhận lời mời)**: Option to mute incoming challenge invitations from a specific player for **5 minutes**, **15 minutes**, **30 minutes**, or **until the end of current session**. Subsequent invites from muted users within the duration are silently suppressed. Timed mutes are synchronized by account; the session option remains local to the current app session.
+
+### Versus Lifecycle Timeouts
+
+- The three deadlines are independent: a Quick Match queue attempt lasts **60 seconds**, a pending challenge invitation lasts **30 seconds**, and a room that remains in `waiting` lasts **10 minutes** without activity.
+- Waiting-room activity means an authenticated participant heartbeat or a successful join, leave/host transfer, ready, or privacy mutation. `VersusRoomScreen` heartbeats every 60 seconds while actively open; read polling, Realtime updates, and Presence reads do not extend the TTL.
+- Expiry uses the database clock. Expired waiting rooms disappear from reads and cannot be joined, readied, or started; cleanup deletes them. Once status becomes `in_progress` or `finished`, the waiting-room TTL no longer applies.
+- The 30-second invite deadline remains authoritative before acceptance. After acceptance, the joined room follows the independent 10-minute waiting-room lifecycle.
 
 6. **Public Friend Profile Popup (Popup xem thông tin cá nhân công khai của bạn bè)**:
    - **Clicking a Friend**: Clicking any friend row in the Lobby or social list opens a modal displaying their public profile stats: Avatar, Name, Handle, Presence status, Overall Elo rating, games played, win rate %, and game category records.

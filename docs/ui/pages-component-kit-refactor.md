@@ -177,7 +177,7 @@ Nên tách thành:
 Lý do:
 
 - Hiện tại phần auth có shell, form, message, and action riêng.
-- Dù chưa lặp nhiều, đây là nơi dễ chuẩn hóa nếu sau này thêm register hoặc forgot password.
+- Login và register hiện đã dùng chung shell/form component trong `LoginScreen`, nhưng giữ mode, nhãn, autocomplete và service submit riêng. Có thể tiếp tục tách `AuthPanel` nếu sau này thêm forgot password.
 
 ### 9. Settings composition
 

@@ -64,7 +64,7 @@ export function VersusGameplayScreen({
   const { t } = useTranslation()
   const gameLabels = getGameLabels(t)
   const user = useAuthStore((state) => state.user)
-  const gameType = requestedGameType ?? room?.category ?? GameId.SEQUENCE
+  const gameType = requestedGameType ?? room?.category ?? GameId.COLOR
   const roundMode = requestedRoundMode ?? room?.mode ?? RoundMode.VERSUS_RANKED
   const difficulty = requestedDifficulty ?? room?.difficulty ?? DifficultyId.MEDIUM
   const matchSeed = requestedSeed ?? room?.seed ?? 'LOCAL-DEMO'
@@ -134,6 +134,11 @@ export function VersusGameplayScreen({
   const autoStartedRoundsRef = useRef(new Set<number>())
   const matchEndSentRef = useRef(false)
   const serverEloChangeRef = useRef(0)
+  // Presence-driven: true unless a sustained Realtime-presence absence says
+  // otherwise. syncRoom() below defers to this so a stale poll/push tick
+  // can't stomp a real disconnect back to CONNECTED before the opponent
+  // actually returns — see the presence effect further down.
+  const opponentPresentRef = useRef(true)
 
   function recordConsecutiveItems(count: number) {
     maxConsecutiveItemsRef.current = Math.max(maxConsecutiveItemsRef.current, count)
@@ -152,8 +157,13 @@ export function VersusGameplayScreen({
     }
   }, [])
 
-  // Room polling is the durable recovery path for Realtime loss. Opponent
-  // score/status and the final outcome come from server-owned room state.
+  // Realtime push (instant) + polling (durable recovery path for Realtime
+  // loss/reconnect) both drive the same sync — opponent score/status and the
+  // final outcome always come from server-owned room state, never simulated
+  // locally. `subscribeToRoomUpdates` fires the moment the opponent's round
+  // submission/forfeit touches this room's row (Supabase Realtime, already
+  // enabled for `versus_rooms` — see database/schema.sql); the 800ms poll
+  // stays as a safety net for a dropped Realtime connection.
   useEffect(() => {
     if (!room?.code) return
     let cancelled = false
@@ -174,7 +184,12 @@ export function VersusGameplayScreen({
         setOpponentScore(otherScore)
         setPlayerRoundsCompleted(ownRounds)
         setOpponentRoundsCompleted(otherRounds)
-        setOpponentStatus(otherRounds >= round ? OpponentStatus.ANSWERED : OpponentStatus.CONNECTED)
+        // Presence (see effect below) is the authority on "is the opponent's
+        // browser even open" — don't let a poll/push tick stomp a real,
+        // sustained disconnect back to CONNECTED/ANSWERED.
+        if (opponentPresentRef.current) {
+          setOpponentStatus(otherRounds >= round ? OpponentStatus.ANSWERED : OpponentStatus.CONNECTED)
+        }
 
         if (latest.status === 'finished') {
           setFinishReason(latest.finishReason ?? 'completed')
@@ -198,11 +213,50 @@ export function VersusGameplayScreen({
 
     void syncRoom()
     const interval = setInterval(() => { void syncRoom() }, 800)
+    const unsubscribe = versusRoomService.subscribeToRoomUpdates(room.code, () => { void syncRoom() })
     return () => {
       cancelled = true
       clearInterval(interval)
+      unsubscribe()
     }
   }, [currentPlayerIsHost, room?.code, round, user?.id])
+
+  // Opponent disconnect detection (Supabase Presence). The row poll/push
+  // above only reflects *actions* (a submitted round) — it has no way to
+  // tell "opponent is mid-round, thinking" apart from "opponent's browser is
+  // gone". Presence answers that directly: leaving the channel (tab closed,
+  // network dropped, crash) fires automatically, no heartbeat table needed.
+  // A short grace period absorbs a brief reconnect blip so the 60s countdown
+  // doesn't flash for nothing; only a sustained absence counts as a real
+  // disconnect. Reaching 0 still does NOT self-award a win — see the
+  // existing comment on the reconnect-countdown effect below: only a
+  // dedicated server can confirm a disconnect forfeit (known-gaps.md).
+  useEffect(() => {
+    if (!room?.code || !user?.id || !roomOpponent?.id) return
+    const opponentId = roomOpponent.id
+    let absenceTimer: ReturnType<typeof setTimeout> | null = null
+
+    const unsubscribe = versusRoomService.subscribeToRoomPresence(room.code, user.id, (onlineUserIds) => {
+      const opponentOnline = onlineUserIds.includes(opponentId)
+      if (opponentOnline) {
+        if (absenceTimer) { clearTimeout(absenceTimer); absenceTimer = null }
+        if (!opponentPresentRef.current) {
+          opponentPresentRef.current = true
+          setOpponentStatus(OpponentStatus.CONNECTED)
+        }
+      } else if (!absenceTimer) {
+        absenceTimer = setTimeout(() => {
+          opponentPresentRef.current = false
+          setOpponentStatus(OpponentStatus.RECONNECTING)
+        }, 4000)
+      }
+    })
+
+    return () => {
+      if (absenceTimer) clearTimeout(absenceTimer)
+      unsubscribe()
+    }
+  }, [room?.code, user?.id, roomOpponent?.id])
 
   // Answer timer
   useEffect(() => {

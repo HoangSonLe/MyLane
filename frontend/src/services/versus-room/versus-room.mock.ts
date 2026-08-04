@@ -22,11 +22,11 @@ export const MOCK_OPPONENT: PlayerSlot = {
 }
 
 export const GAME_CATEGORIES: GameCategory[] = [
+  { id: GameId.COLOR,    label: 'Color Memory',     description: 'Repeat growing color sequences'  },
   { id: GameId.NUMBER,   label: 'Number Memory',   description: 'Recall growing digit sequences'  },
   { id: GameId.ALPHABET, label: 'Alphabet Memory',  description: 'Memorise letter sequences'       },
   { id: GameId.GRID,     label: 'Grid Memory',      description: 'Recall highlighted cell patterns' },
   { id: GameId.SEQUENCE, label: 'Sequence Memory',  description: 'Replay growing tile sequences'   },
-  { id: GameId.COLOR,    label: 'Color Memory',     description: 'Repeat growing color sequences'  },
 ]
 
 export const MOCK_AVAILABLE_ROOMS: PublicRoomSummary[] = [

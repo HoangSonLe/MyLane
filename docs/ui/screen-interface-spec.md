@@ -57,20 +57,21 @@ Nguồn gốc quyết định:
 
 ### Login / Auth
 
-**Purpose**: Xác thực tài khoản.
+**Purpose**: Đăng nhập tài khoản hiện có hoặc tạo tài khoản mới với intent rõ ràng.
 
-**Primary action**: Sign in.
+**Primary action**: Đăng nhập hoặc Tạo tài khoản theo mode đang chọn.
 
 **Interface**:
 - Header ngắn.
 - Social sign-in buttons cho Google và Discord.
 - Form email/password đặt dưới social options.
+- Link chuyển mode `Đăng nhập` ↔ `Tạo tài khoản`; hai mode dùng chung layout và component, nhưng submit vào hai service/API riêng.
 - Back action rõ ràng để quay lại Landing.
 
 **Trạng thái** (suy ra từ nguyên tắc chung — cần xác nhận nếu muốn khác):
 - Loading: nút social/sign-in chuyển trạng thái loading (disable + spinner) khi đang xác thực, không đổi layout.
 - Empty: không áp dụng.
-- Error: sai email/password hoặc social login thất bại → thông báo lỗi ngắn ngay dưới form, giữ nguyên input đã nhập, có Retry.
+- Error: sai email/password, email đã tồn tại khi đăng ký hoặc social login thất bại → thông báo lỗi ngắn ngay dưới form, giữ nguyên email đã nhập, có Retry.
 
 **Why this layout**:
 - Xác thực là bước hỗ trợ, không phải trải nghiệm chính.
@@ -79,6 +80,9 @@ Nguồn gốc quyết định:
 
 **Workflow**:
 - Login → Home
+- Register → Home
+- Login ↔ Register ngay trong Auth screen; không tự động đăng ký khi đăng nhập thất bại.
+- Guest mở Auth → mặc định Register; sau khi xác thực thành công → prompt merge tiến trình → Home.
 - Login → Back → Landing
 
 ---
@@ -131,6 +135,7 @@ Nguồn gốc quyết định:
   - 👥 **Lời mời kết bạn**: Danh sách người chơi gửi lời mời kết bạn kèm nút **`✓ Đồng ý`** & **`✕ Từ chối`**.
   - 📢 **Thông báo khác**: Danh sách thông báo hệ thống, cập nhật Elo và thách đấu.
 - **Modal Tìm Kiếm Bạn Bè (`AddFriendModal`)**: Cho phép tìm kiếm người chơi theo tên/handle. Nút bấm tự động chuyển trạng thái `⏳ Đang chờ xác nhận`, `✓ Bạn bè`, `📩 Đã gửi lời mời` hoặc `+ Kết bạn`.
+- **Modal QR Kết Bạn (`FriendQrModal`)**: Có hai tab Quét mã/Mã của tôi; hỗ trợ camera sau, chọn ảnh QR dự phòng, xem trước hồ sơ trước khi gửi lời mời, và hiển thị trạng thái quan hệ hiện tại. Link `?friend=<id>&v=1` tiếp tục đúng luồng sau khi đăng nhập.
 - **Màn Hình Xem Trước Hồ Sơ (`FriendProfileModal`)**: Khi bấm vào tên/avatar của bất kỳ người chơi nào (trong kết quả tìm kiếm, lời mời, hoặc danh sách bạn bè), Modal chi tiết hồ sơ sẽ hiển thị thông số Elo, Win Rate %, Kỷ lục game và nút Thách đấu 1v1.
 - **Hệ Thống Presence & Auto-Refresh**: Tự động cập nhật trạng thái `online`, `in_game` (khi vào ván), `offline` qua Heartbeat 30s. Danh sách bạn bè tự động làm mới ngầm 10s/lần.
 - Một cụm shortcut cho Profile, Leaderboard, Settings nếu người chơi muốn đi sâu.
@@ -147,6 +152,7 @@ Nguồn gốc quyết định:
 - **Match Challenge Invite Toast & Mute UI**:
   - **Incoming Challenge Toast/Modal**: Banner/modal nổi khi nhận lời mời thách đấu từ người chơi khác (gồm Avatar/Tên người mời, Elo, danh mục game, mã phòng, nút Accept, Decline, và Mute).
   - **Mute Duration Selector**: Khi bấm "Tắt nhận lời mời", hiển thị menu/modal cho phép chọn thời gian tạm tắt lời mời từ người đó: 5 phút, 15 phút, 30 phút, hoặc Hết phiên (End of session).
+  - **Mute Sync State**: Các lựa chọn 5/15/30 phút được lưu theo profile ID trong `invite_mutes` và đồng bộ qua Supabase Realtime; lựa chọn Hết phiên chỉ được giữ trong memory của phiên hiện tại.
 - **Public Friend Profile Popup**:
   - Khi nhấp vào bạn bè bất kỳ trong danh sách Lobby/Online friends, một Modal xem hồ sơ cá nhân công khai (`FriendProfileModal`) sẽ hiện ra.
   - Hiển thị Avatar, tên người chơi, handle, trạng thái Online/In-game, điểm Elo tổng, tổng số trận đấu, tỉ lệ thắng %, và kỷ lục các danh mục game.
@@ -199,12 +205,13 @@ Nguồn gốc quyết định:
 - Ready room state với Host badge, slot người chơi, privacy badge, share code/link, và nút start cho Host.
 - **1v1 Challenge Modal & Incoming Invite Modal**: Cho phép thách đấu chọn cấu hình Game trước khi gửi. Người nhận thách đấu có thể click mở rộng xem chi tiết luật chơi/môn đấu và click vào thẻ người mời để xem trước Pop-up Hồ Sơ (`FriendProfileModal`).
 - **Host Leave Confirm Modal**: Tự động đóng phòng mượt mà khi chỉ có 1 mình trong phòng; chỉ mở Modal xác nhận rời phòng khi phòng ĐÃ có đối thủ (thông báo quyền Host sẽ tự động chuyển ngầm cho người còn lại).
-- Inline error state cho code sai, phòng đầy, hoặc mất kết nối.
+- Inline error state cho code sai, phòng đầy, phòng `waiting` hết hạn sau 10 phút không hoạt động, hoặc mất kết nối. Khi một Ready Room đang mở bị hết hạn, UI bỏ room state cũ và quay về form với lỗi `room-expired`.
+- Ready Room gửi participant heartbeat mỗi 60 giây khi đang mở. Heartbeat là lifecycle action riêng; poll đọc room, Realtime và Presence không gia hạn TTL.
 
 **Trạng thái** (suy ra từ nguyên tắc chung — cần xác nhận nếu muốn khác):
 - Loading: trạng thái "Đang tạo phòng…" / "Đang tìm phòng…" rõ ràng khi chờ phản hồi server.
 - Empty: room chưa có player thứ 2 → hiển thị rõ "đang chờ đối thủ" (đã mô tả ở Interface).
-- Error: code sai / phòng đầy / mất kết nối đã mô tả ở Interface; bổ sung nút Retry cho join room khi lỗi.
+- Error: code sai / phòng đầy / phòng hết hạn / mất kết nối đã mô tả ở Interface; bổ sung nút Retry cho join room khi lỗi.
 
 **Why this layout**:
 - Đây là bước riêng giữa ý định Versus và trận đấu, nên tách thành một screen/state rõ ràng.
@@ -215,6 +222,7 @@ Nguồn gốc quyết định:
 - Lobby → Create Room → Ready room state → Gameplay
 - Lobby → Join Room → Ready room state → Gameplay
 - Ready room → Start → Gameplay
+- Ready room → TTL hết hạn → Form Create/Join với inline error
 
 ---
 
@@ -226,7 +234,8 @@ Nguồn gốc quyết định:
 
 **Interface**:
 - Back row ở phía trên.
-- Game cards cho 5 game: Sequence, Number, Alphabet, Grid, Color.
+- Game cards cho 5 game theo thứ tự: Color, Number, Alphabet, Grid, Sequence. Color được chọn mặc định khi mở màn lần đầu.
+- Tên game, chế độ và độ khó luôn lấy từ locale hiện tại; ID ổn định (`GameId`, `ModeId`, `DifficultyId`) không được hiển thị trực tiếp.
 - Mode selector đặt gần đầu màn để người chơi biết ngữ cảnh trước khi chọn game.
 - Lock state rõ cho mode cần account.
 - Hint hoặc metadata nhỏ cho best score / difficulty / eligibility.
@@ -365,14 +374,20 @@ Nguồn gốc quyết định:
 
 **Interface**:
 - Player card ở đầu màn.
+- Avatar thật nếu có; nếu chưa có thì dùng initials làm fallback.
 - Các stat card nhỏ, mỗi card một metric quan trọng.
 - Recent history hoặc session list ở phần dưới.
+- Mỗi lịch sử Versus hiển thị riêng điểm đạt được và tỉ số đúng-round của bản thân với đối thủ; không dùng một số cho cả hai ý nghĩa.
+- Thời gian trong lịch sử trận đấu dùng timestamp thật từ backend: dưới 7 ngày hiển thị tương đối theo locale (ví dụ “2 giờ trước”), cũ hơn hiển thị ngày và giờ địa phương; dữ liệu mock cũ như `Today`/`Yesterday` vẫn được chuẩn hóa.
 - Edit Profile là hành động nổi bật, nhưng không lấn át phần tiến bộ.
+- Nút QR kết bạn đặt cạnh Edit Profile để mở mã cá nhân; luồng quét cũng có thể mở từ modal tìm bạn.
+- Edit Profile mở màn riêng gồm ảnh đại diện, tên hiển thị và handle; ảnh chỉ nhận JPEG/PNG/WebP tối đa 2 MB và được thu về tối đa 512 px trước khi upload.
 
 **Trạng thái** (suy ra từ nguyên tắc chung — cần xác nhận nếu muốn khác):
 - Loading: skeleton cho player card, stat card, và history.
 - Empty: chưa có history/session nào (guest hoặc tài khoản mới) → thông báo ngắn kèm gợi ý đi chơi.
 - Error: tải profile thất bại → Retry/Reload, Back luôn khả dụng.
+- Edit error: handle trùng hoặc upload/lưu thất bại → giữ nguyên form và hiển thị lỗi tại chỗ; rời form khi chưa lưu phải xác nhận.
 
 **Why this layout**:
 - Profile trả lời câu hỏi “Tôi là ai và tôi tiến bộ thế nào?”.
@@ -382,6 +397,7 @@ Nguồn gốc quyết định:
 **Workflow**:
 - Home → Profile
 - Profile → Edit Profile
+- Profile/Add Friend → QR Kết Bạn → xem trước hồ sơ → gửi lời mời
 - Profile → Back → Home
 
 ---

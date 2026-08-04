@@ -4,6 +4,7 @@ import type { PublicRoomSummary } from '@/services/versus-room/versus-room.inter
 import { GAME_CATEGORIES } from '@/services/versus-room/versus-room.mock'
 import { useTranslation } from '@/i18n/useTranslation'
 import { RoundMode } from '@/configs/enum'
+import { getLocalizedGameLabel } from '@/services/gameplay/gameplay-screen.types'
 
 interface PublicRoomDetailModalProps {
   room: PublicRoomSummary | null
@@ -80,7 +81,7 @@ export function PublicRoomDetailModal({
               {room.roomName || room.code}
             </h3>
             <p className="text-[12px] font-medium" style={{ color: 'var(--ma-fg-muted)' }}>
-              {categoryMeta?.label ?? room.category} · {isRanked ? t.versusGameplay.ranked : t.versusGameplay.unranked}
+              {getLocalizedGameLabel(t, categoryMeta?.id ?? room.category)} · {isRanked ? t.versusGameplay.ranked : t.versusGameplay.unranked}
             </p>
           </div>
         </div>

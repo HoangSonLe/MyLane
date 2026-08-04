@@ -19,16 +19,31 @@ const PORT = process.env.MOCK_SERVER_PORT ?? 4310
 
 const app = express()
 app.use(express.json())
+const registeredEmails = new Set()
 
 // Minimal hand-rolled CORS — the Vite dev server runs on a different
 // origin/port, so the browser needs these headers to allow the request.
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*')
-  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS')
+  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PATCH,OPTIONS')
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization')
   if (req.method === 'OPTIONS') return res.sendStatus(204)
   next()
 })
+
+const profileIdentities = new Map()
+
+function ensureProfileIdentity(user) {
+  const existing = profileIdentities.get(user.id)
+  if (existing) return existing
+  const identity = {
+    username: user.name,
+    handle: toHandle(user.name),
+    avatarUrl: user.avatarUrl,
+  }
+  profileIdentities.set(user.id, identity)
+  return identity
+}
 
 app.post('/api/auth/guest', (req, res) => {
   const user = makeGuestUser()
@@ -42,6 +57,22 @@ app.post('/api/auth/login', (req, res) => {
   }
   const user = makeEmailUser(email ?? '')
   res.json({ user, token: encodeToken(user) })
+})
+
+app.post('/api/auth/register', (req, res) => {
+  const { email, password } = req.body ?? {}
+  const normalizedEmail = typeof email === 'string' ? email.trim().toLowerCase() : ''
+
+  if (!normalizedEmail || !password) {
+    return res.status(400).json({ message: 'Email and password are required.' })
+  }
+  if (registeredEmails.has(normalizedEmail)) {
+    return res.status(409).json({ message: 'An account with this email already exists.' })
+  }
+
+  registeredEmails.add(normalizedEmail)
+  const user = makeEmailUser(normalizedEmail)
+  res.status(201).json({ user, token: encodeToken(user) })
 })
 
 app.post('/api/auth/oauth/:provider', (req, res) => {
@@ -83,12 +114,41 @@ app.get('/api/lobby/friends', (req, res) => {
   res.json({ friends: MOCK_FRIENDS })
 })
 
+app.get('/api/lobby/users/:friendId', (req, res) => {
+  const token = req.headers.authorization?.replace('Bearer ', '')
+  const user = token ? decodeToken(token) : null
+  if (!user || user.isGuest) return res.status(401).json({ message: 'Account required.' })
+  if (!req.params.friendId || req.params.friendId === user.id) return res.json({ friend: null })
+
+  const identity = profileIdentities.get(req.params.friendId)
+  const friend = identity
+    ? { id: req.params.friendId, name: identity.username, handle: identity.handle, avatarUrl: identity.avatarUrl, elo: 1000, status: 'online', friendshipStatus: 'none' }
+    : MOCK_FRIENDS.find((item) => item.id === req.params.friendId) || null
+  res.json({ friend })
+})
+
 // Guests get a 401 (docs/product: guest progress has no server-side save).
 app.get('/api/profile', (req, res) => {
   const token = req.headers.authorization?.replace('Bearer ', '')
   const user = token ? decodeToken(token) : null
   if (!user || user.isGuest) return res.status(401).json({ message: 'Account required.' })
-  res.json({ profile: { ...MOCK_PROFILE, username: user.name, handle: toHandle(user.name), overallElo: user.elo } })
+  const identity = ensureProfileIdentity(user)
+  res.json({ profile: { ...MOCK_PROFILE, ...identity, overallElo: user.elo } })
+})
+
+app.patch('/api/profile', (req, res) => {
+  const token = req.headers.authorization?.replace('Bearer ', '')
+  const user = token ? decodeToken(token) : null
+  if (!user || user.isGuest) return res.status(401).json({ message: 'Account required.' })
+
+  const username = String(req.body?.username || user.name).trim()
+  const handle = String(req.body?.handle || toHandle(username)).trim().toLowerCase()
+  const duplicate = [...profileIdentities.entries()].some(([id, profile]) => id !== user.id && profile.handle === handle)
+  if (duplicate) return res.status(409).json({ message: 'PROFILE_HANDLE_TAKEN' })
+
+  const identity = { username, handle, avatarUrl: req.body?.avatarUrl }
+  profileIdentities.set(user.id, identity)
+  res.json({ profile: identity })
 })
 
 // Guests still get usable defaults — sound/notification prefs are
@@ -148,6 +208,9 @@ app.post('/api/game/result', (req, res) => {
       mode: MODE_LABELS[input.mode],
       outcome,
       score: breakdown.score,
+      opponentName: input.versusComparison?.opponentName,
+      playerRoundScore: input.versusComparison?.playerScore,
+      opponentRoundScore: input.versusComparison?.opponentScore,
       eloChange,
       playedAt: 'Just now',
     })

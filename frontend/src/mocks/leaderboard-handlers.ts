@@ -38,7 +38,15 @@ function isEmptyBoard(board: BoardType, category: Category): boolean {
   return board === 'endless' && category === 'alphabet'
 }
 
-function makeEntries(category: Category, metric: SortMetric, currentUserRank: number, meName: string, meHandle: string, meElo: number): LeaderboardEntry[] {
+function makeEntries(
+  category: Category,
+  metric: SortMetric,
+  currentUserRank: number,
+  meName: string,
+  meHandle: string,
+  meElo: number,
+  meAvatarUrl?: string,
+): LeaderboardEntry[] {
   const base = metric === 'score' ? BASE_SCORE[category] : 1900
   const entries: LeaderboardEntry[] = NAMES.map(([username, handle], i) => {
     const decay = metric === 'score' ? i * 140 + (i * 37) % 60 : i * 22 + (i * 7) % 10
@@ -52,6 +60,7 @@ function makeEntries(category: Category, metric: SortMetric, currentUserRank: nu
       userId: 'current-user',
       username: meName,
       handle: meHandle,
+      avatarUrl: meAvatarUrl,
       score: metric === 'score' ? (entries[idx]?.score ?? base - currentUserRank * 140) : meElo,
       elo: meElo,
       isCurrentUser: true,
@@ -60,8 +69,15 @@ function makeEntries(category: Category, metric: SortMetric, currentUserRank: nu
   return entries
 }
 
-function makePinnedEntry(metric: SortMetric, rank: number, meName: string, meHandle: string, meElo: number): LeaderboardEntry {
-  return { rank, userId: 'current-user', username: meName, handle: meHandle, score: metric === 'score' ? 3860 : meElo, elo: meElo, isCurrentUser: true }
+function makePinnedEntry(
+  metric: SortMetric,
+  rank: number,
+  meName: string,
+  meHandle: string,
+  meElo: number,
+  meAvatarUrl?: string,
+): LeaderboardEntry {
+  return { rank, userId: 'current-user', username: meName, handle: meHandle, avatarUrl: meAvatarUrl, score: metric === 'score' ? 3860 : meElo, elo: meElo, isCurrentUser: true }
 }
 
 export const leaderboardHandlers = [
@@ -82,8 +98,8 @@ export const leaderboardHandlers = [
 
     const rank = RANK_SEED[board][category]
     const userInTopRange = rank <= 20
-    const entries = makeEntries(category, metric, userInTopRange ? rank : 999, user.name, user.name.toLowerCase().replace(/\s+/g, '_'), user.elo)
-    const pinnedEntry = !userInTopRange ? makePinnedEntry(metric, rank, user.name, user.name.toLowerCase().replace(/\s+/g, '_'), user.elo) : null
+    const entries = makeEntries(category, metric, userInTopRange ? rank : 999, user.name, user.name.toLowerCase().replace(/\s+/g, '_'), user.elo, user.avatarUrl)
+    const pinnedEntry = !userInTopRange ? makePinnedEntry(metric, rank, user.name, user.name.toLowerCase().replace(/\s+/g, '_'), user.elo, user.avatarUrl) : null
 
     return HttpResponse.json({ entries, pinnedEntry, isEmpty: false })
   }),

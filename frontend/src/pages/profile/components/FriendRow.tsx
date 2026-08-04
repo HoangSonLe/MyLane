@@ -31,7 +31,7 @@ export function FriendRow({ friend, onSelect }: Props) {
       title="Bấm để xem thông tin bạn bè"
     >
       {/* Avatar */}
-      <Avatar name={friend.name} size="2.25rem" fontSize="12px">
+      <Avatar name={friend.name} imageUrl={friend.avatarUrl} size="2.25rem" fontSize="12px">
         <span
           className="absolute bottom-0 right-0 translate-x-0.5 translate-y-0.5"
           style={{

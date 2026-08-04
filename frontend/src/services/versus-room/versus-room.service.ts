@@ -5,6 +5,7 @@ import { versusSupabaseService } from '@/services/supabase'
 import type { GameCategoryId, PublicRoomSummary, Room, RoundMode, DifficultyId, RoomEntrySource, VersusRoundResult } from './versus-room.interface'
 
 export class RoomNotFoundError extends Error { name = 'RoomNotFoundError' }
+export class RoomExpiredError extends Error { name = 'RoomExpiredError' }
 export class RoomFullError extends Error { name = 'RoomFullError' }
 export class NoAvailableRoomsError extends Error { name = 'NoAvailableRoomsError' }
 
@@ -63,6 +64,9 @@ export const versusRoomService = {
       if (axios.isAxiosError(err) && err.response?.status === 404) {
         throw new RoomNotFoundError('Room not found')
       }
+      if (axios.isAxiosError(err) && err.response?.status === 410) {
+        throw new RoomExpiredError('Room expired')
+      }
       if (axios.isAxiosError(err) && err.response?.status === 409) {
         throw new RoomFullError('Room is full')
       }
@@ -113,6 +117,13 @@ export const versusRoomService = {
     return data
   },
 
+  /** Keeps a waiting room alive while an authenticated participant is present. */
+  async heartbeatRoom(code: string): Promise<void> {
+    if (isSupabaseConfigured()) {
+      return versusSupabaseService.heartbeatRoom(code)
+    }
+  },
+
   /** Toggles Public vs Private privacy setting for a room. */
   async toggleRoomPrivacy(code: string, isPrivate: boolean): Promise<Room> {
     if (isSupabaseConfigured()) {
@@ -137,14 +148,40 @@ export const versusRoomService = {
     if (isSupabaseConfigured()) {
       return versusSupabaseService.getRoom(code)
     }
-    const { data } = await apiClient.get<{ room: Room }>(`/versus-room/${encodeURIComponent(code)}`)
-    return data.room
+    try {
+      const { data } = await apiClient.get<{ room: Room }>(`/versus-room/${encodeURIComponent(code)}`)
+      return data.room
+    } catch (err) {
+      if (axios.isAxiosError(err) && err.response?.status === 404) {
+        throw new RoomNotFoundError('Room not found')
+      }
+      if (axios.isAxiosError(err) && err.response?.status === 410) {
+        throw new RoomExpiredError('Room expired')
+      }
+      throw err
+    }
   },
 
   /** Subscribes to real-time changes on available public rooms */
   subscribeToAvailableRooms(onChange: () => void): () => void {
     if (isSupabaseConfigured()) {
       return versusSupabaseService.subscribeToAvailableRooms(onChange)
+    }
+    return () => {}
+  },
+
+  /** Subscribes to real-time changes on one specific room (score, status, forfeit, finish). */
+  subscribeToRoomUpdates(code: string, onChange: () => void): () => void {
+    if (isSupabaseConfigured()) {
+      return versusSupabaseService.subscribeToRoomUpdates(code, onChange)
+    }
+    return () => {}
+  },
+
+  /** Tracks who's actually connected to a room right now (browser-close/network-drop detection). */
+  subscribeToRoomPresence(code: string, userId: string, onSync: (onlineUserIds: string[]) => void): () => void {
+    if (isSupabaseConfigured()) {
+      return versusSupabaseService.subscribeToRoomPresence(code, userId, onSync)
     }
     return () => {}
   },

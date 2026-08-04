@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS public.user_settings (
   sounds_enabled BOOLEAN DEFAULT true,
   haptics_enabled BOOLEAN DEFAULT true,
   preferred_language TEXT DEFAULT 'vi',
-  theme TEXT DEFAULT 'dark',
+  theme TEXT DEFAULT 'light',
   difficulty TEXT CHECK (difficulty IN ('easy', 'medium', 'hard', 'super_hard')) DEFAULT 'medium',
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -88,6 +88,8 @@ CREATE TABLE IF NOT EXISTS public.match_history (
   perfect BOOLEAN DEFAULT false,
   completed_all_levels BOOLEAN DEFAULT false,
   opponent_name TEXT,
+  player_round_score INTEGER CHECK (player_round_score IS NULL OR player_round_score >= 0),
+  opponent_round_score INTEGER CHECK (opponent_round_score IS NULL OR opponent_round_score >= 0),
   elo_change INTEGER DEFAULT 0,
   played_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -139,7 +141,8 @@ CREATE TABLE IF NOT EXISTS public.versus_rooms (
   guest_elo_delta INTEGER DEFAULT 0 NOT NULL,
   results_applied_at TIMESTAMPTZ,
   created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  expires_at TIMESTAMPTZ DEFAULT (NOW() + INTERVAL '10 minutes')
 );
 
 -- --------------------------------------------------------------------
@@ -147,7 +150,7 @@ CREATE TABLE IF NOT EXISTS public.versus_rooms (
 -- --------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS public.match_invites (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  room_code TEXT REFERENCES public.versus_rooms(code) ON DELETE CASCADE NOT NULL,
+  room_code TEXT REFERENCES public.versus_rooms(code) ON DELETE SET NULL,
   inviter_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
   invitee_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
   category TEXT NOT NULL,
@@ -164,10 +167,13 @@ CREATE TABLE IF NOT EXISTS public.match_invites (
 CREATE TABLE IF NOT EXISTS public.invite_mutes (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
+  muted_user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
   muted_handle TEXT NOT NULL,
-  until_timestamp TIMESTAMPTZ,
+  until_timestamp TIMESTAMPTZ NOT NULL,
   created_at TIMESTAMPTZ DEFAULT NOW(),
-  UNIQUE(user_id, muted_handle)
+  UNIQUE(user_id, muted_handle),
+  UNIQUE(user_id, muted_user_id),
+  CHECK (muted_user_id <> user_id)
 );
 
 -- --------------------------------------------------------------------
@@ -213,10 +219,13 @@ ALTER TABLE public.matchmaking_queue ALTER COLUMN user_elo SET DEFAULT 1000;
 ALTER TABLE public.matchmaking_queue ALTER COLUMN min_elo SET DEFAULT 900;
 ALTER TABLE public.matchmaking_queue ALTER COLUMN max_elo SET DEFAULT 1100;
 ALTER TABLE public.versus_rooms ADD COLUMN IF NOT EXISTS seed TEXT;
+ALTER TABLE public.versus_rooms ADD COLUMN IF NOT EXISTS expires_at TIMESTAMPTZ;
+ALTER TABLE public.versus_rooms ALTER COLUMN expires_at SET DEFAULT (NOW() + INTERVAL '10 minutes');
 
 -- Atomic matchmaking/room functions and restrictive policies are versioned in
--- database/migrations/20260803_atomic_versus_flows.sql. Apply migrations after
--- this base schema for both new and existing deployments.
+-- database/migrations/20260803_atomic_versus_flows.sql. Waiting-room expiry is
+-- versioned in database/migrations/20260804_waiting_room_ttl.sql. Apply every
+-- migration after this base schema for both new and existing deployments.
 
 -- --------------------------------------------------------------------
 -- Enable Row Level Security (RLS) across all 10 core tables
@@ -267,13 +276,31 @@ CREATE POLICY "Users manage match_history" ON public.match_history FOR ALL USING
 
 DROP POLICY IF EXISTS "Public friendships read" ON public.friendships;
 DROP POLICY IF EXISTS "Users manage friendships" ON public.friendships;
-CREATE POLICY "Public friendships read" ON public.friendships FOR SELECT USING (true);
-CREATE POLICY "Users manage friendships" ON public.friendships FOR ALL USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS "Participants read friendships" ON public.friendships;
+DROP POLICY IF EXISTS "Users send friend requests" ON public.friendships;
+DROP POLICY IF EXISTS "Participants update friendships" ON public.friendships;
+DROP POLICY IF EXISTS "Participants delete friendships" ON public.friendships;
+CREATE POLICY "Participants read friendships" ON public.friendships
+  FOR SELECT TO authenticated
+  USING (auth.uid() = requester_id OR auth.uid() = addressee_id);
+CREATE POLICY "Users send friend requests" ON public.friendships
+  FOR INSERT TO authenticated
+  WITH CHECK (auth.uid() = requester_id AND requester_id <> addressee_id);
+CREATE POLICY "Participants update friendships" ON public.friendships
+  FOR UPDATE TO authenticated
+  USING (auth.uid() = requester_id OR auth.uid() = addressee_id)
+  WITH CHECK (auth.uid() = requester_id OR auth.uid() = addressee_id);
+CREATE POLICY "Participants delete friendships" ON public.friendships
+  FOR DELETE TO authenticated
+  USING (auth.uid() = requester_id OR auth.uid() = addressee_id);
 
 DROP POLICY IF EXISTS "Public versus_rooms read" ON public.versus_rooms;
 DROP POLICY IF EXISTS "Users manage versus_rooms" ON public.versus_rooms;
 DROP POLICY IF EXISTS "Authenticated users read versus rooms" ON public.versus_rooms;
-CREATE POLICY "Authenticated users read versus rooms" ON public.versus_rooms FOR SELECT USING (auth.uid() IS NOT NULL);
+CREATE POLICY "Authenticated users read versus rooms" ON public.versus_rooms FOR SELECT USING (
+  auth.uid() IS NOT NULL
+  AND (status <> 'waiting' OR expires_at > NOW())
+);
 
 DROP POLICY IF EXISTS "Public match_invites read" ON public.match_invites;
 DROP POLICY IF EXISTS "Users manage match_invites" ON public.match_invites;
@@ -282,8 +309,14 @@ CREATE POLICY "Invite participants read" ON public.match_invites FOR SELECT USIN
 
 DROP POLICY IF EXISTS "Public invite_mutes read" ON public.invite_mutes;
 DROP POLICY IF EXISTS "Users manage invite_mutes" ON public.invite_mutes;
-CREATE POLICY "Public invite_mutes read" ON public.invite_mutes FOR SELECT USING (true);
-CREATE POLICY "Users manage invite_mutes" ON public.invite_mutes FOR ALL USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users read own invite mutes" ON public.invite_mutes;
+DROP POLICY IF EXISTS "Users insert own invite mutes" ON public.invite_mutes;
+DROP POLICY IF EXISTS "Users update own invite mutes" ON public.invite_mutes;
+DROP POLICY IF EXISTS "Users delete own invite mutes" ON public.invite_mutes;
+CREATE POLICY "Users read own invite mutes" ON public.invite_mutes FOR SELECT TO authenticated USING (auth.uid() = user_id);
+CREATE POLICY "Users insert own invite mutes" ON public.invite_mutes FOR INSERT TO authenticated WITH CHECK (auth.uid() = user_id AND muted_user_id <> auth.uid());
+CREATE POLICY "Users update own invite mutes" ON public.invite_mutes FOR UPDATE TO authenticated USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id AND muted_user_id <> auth.uid());
+CREATE POLICY "Users delete own invite mutes" ON public.invite_mutes FOR DELETE TO authenticated USING (auth.uid() = user_id);
 
 DROP POLICY IF EXISTS "Public matchmaking_queue read" ON public.matchmaking_queue;
 DROP POLICY IF EXISTS "Users manage matchmaking_queue" ON public.matchmaking_queue;
@@ -301,8 +334,9 @@ USING (
 );
 
 -- --------------------------------------------------------------------
--- Enable Supabase Realtime Publication for Match Invites, Versus Rooms & Queue
+-- Enable Supabase Realtime Publication for Match Invites, Invite Mutes, Versus Rooms & Queue
 -- --------------------------------------------------------------------
 ALTER PUBLICATION supabase_realtime ADD TABLE public.match_invites;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.invite_mutes;
 ALTER PUBLICATION supabase_realtime ADD TABLE public.versus_rooms;
 ALTER PUBLICATION supabase_realtime ADD TABLE public.matchmaking_queue;

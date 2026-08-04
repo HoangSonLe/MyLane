@@ -1,6 +1,7 @@
 import { http, HttpResponse } from 'msw'
 import { decodeToken } from './fake-users'
 import { MOCK_FRIENDS } from '@/services/lobby/lobby.mock'
+import { resolveMockProfile } from './profile-handlers'
 
 /**
  * Fake backend for Lobby friends (docs/ui/screen-inventory-and-flow.md § Lobby).
@@ -16,5 +17,18 @@ export const lobbyHandlers = [
       return HttpResponse.json({ message: 'Account required.' }, { status: 401 })
     }
     return HttpResponse.json({ friends: MOCK_FRIENDS })
+  }),
+  http.get('/api/lobby/users/:friendId', ({ params, request }) => {
+    const token = request.headers.get('authorization')?.replace('Bearer ', '')
+    const user = token ? decodeToken(token) : null
+    if (!user || user.isGuest) {
+      return HttpResponse.json({ message: 'Account required.' }, { status: 401 })
+    }
+    const friendId = String(params.friendId || '')
+    if (!friendId || friendId === user.id) {
+      return HttpResponse.json({ friend: null })
+    }
+    const friend = resolveMockProfile(friendId) || MOCK_FRIENDS.find((item) => item.id === friendId) || null
+    return HttpResponse.json({ friend })
   }),
 ]

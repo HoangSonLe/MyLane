@@ -16,6 +16,11 @@ import { GameId, ModeId, DifficultyId, EntryPoint } from '@/configs/enum'
 import { useNetworkStatus } from '@/lib/hooks/useNetworkStatus'
 import { useAuthStore } from '@/stores/auth.store'
 import { useTranslation } from '@/i18n/useTranslation'
+import {
+  getDifficultyLabels,
+  getGameLabels,
+  getModeLabels,
+} from '@/services/gameplay/gameplay-screen.types'
 
 // ─── Main component ──────────────────────────────────────────────
 export function GameSelectScreen({
@@ -32,7 +37,7 @@ export function GameSelectScreen({
   const isGuest = user?.isGuest ?? true
   const { t } = useTranslation()
 
-  const [selectedGame, setSelectedGame] = useState<GameId>(GameId.SEQUENCE)
+  const [selectedGame, setSelectedGame] = useState<GameId>(GameId.COLOR)
   const [selectedMode, setSelectedMode] = useState<ModeId>(ModeId.SOLO_PRACTICE)
   const [selectedDiff, setSelectedDiff] = useState<DifficultyId>(DifficultyId.MEDIUM)
 
@@ -56,7 +61,16 @@ export function GameSelectScreen({
     loadStats()
   }, [loadStats])
 
-  const currentMode = MODES.find((m) => m.id === selectedMode) ?? MODES[0]
+  const gameLabels = getGameLabels(t)
+  const modeLabels = getModeLabels(t)
+  const difficultyLabels = getDifficultyLabels(t)
+  const localizedGames = GAMES.map((game) => ({ ...game, label: gameLabels[game.id] }))
+  const localizedModes = MODES.map((mode) => ({ ...mode, label: modeLabels[mode.id] }))
+  const localizedDifficulties = DIFFICULTIES.map((difficulty) => ({
+    ...difficulty,
+    label: difficultyLabels[difficulty.id],
+  }))
+  const currentMode = localizedModes.find((mode) => mode.id === selectedMode) ?? localizedModes[0]
   const canStart = !isLoadingStats && !isOffline
 
   function handleStart() {
@@ -93,7 +107,7 @@ export function GameSelectScreen({
             <SectionLabel label={t.gameSelect.chooseGame} />
           )}
           <div className="flex flex-col gap-2.5 px-4">
-            {GAMES.map((game) => (
+            {localizedGames.map((game) => (
               <GameCard
                 key={game.id}
                 game={game}
@@ -120,7 +134,7 @@ export function GameSelectScreen({
             <SectionLabel label={t.gameSelect.mode} />
           )}
           <div className="flex gap-2 px-4">
-            {MODES.map((mode) => (
+            {localizedModes.map((mode) => (
               <ModeChip
                 key={mode.id}
                 mode={mode}
@@ -149,7 +163,7 @@ export function GameSelectScreen({
             <SectionLabel label={t.gameSelect.difficulty} />
           )}
           <div className="flex gap-2 px-4">
-            {DIFFICULTIES.map((diff) => (
+            {localizedDifficulties.map((diff) => (
               <DifficultyChip
                 key={diff.id}
                 difficulty={diff}

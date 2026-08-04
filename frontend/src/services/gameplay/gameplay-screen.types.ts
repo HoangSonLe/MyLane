@@ -2,7 +2,7 @@
  * gameplay-screen.types.ts — types và labels cho GameplayScreen.
  * Shared types (GameId, ModeId) được import từ configs/enum.ts.
  */
-import { GameId, ModeId } from '@/configs/enum'
+import { DifficultyId, GameId, ModeId } from '@/configs/enum'
 import { translations } from '@/i18n/translations'
 
 export { GameId, ModeId }
@@ -29,4 +29,28 @@ export function getModeLabels(t: Dictionary): Record<ModeId, string> {
     [ModeId.VERSUS_RANKED]:   t.modeLabels.versusRanked,
     [ModeId.VERSUS_UNRANKED]: t.modeLabels.versusUnranked,
   }
+}
+
+export function getDifficultyLabels(t: Dictionary): Record<DifficultyId, string> {
+  return {
+    [DifficultyId.EASY]:       t.difficultyLabels.easy,
+    [DifficultyId.MEDIUM]:     t.difficultyLabels.medium,
+    [DifficultyId.HARD]:       t.difficultyLabels.hard,
+    [DifficultyId.SUPER_HARD]: t.difficultyLabels.superHard,
+  }
+}
+
+export function getLocalizedGameLabel(t: Dictionary, game: string): string {
+  const normalized = game.trim().toLowerCase() as GameId
+  return getGameLabels(t)[normalized] ?? game
+}
+
+export function getLocalizedModeLabel(t: Dictionary, mode: string): string {
+  const normalized = mode.trim().toLowerCase().replace(/[\s_]+/g, '-') as ModeId
+  return getModeLabels(t)[normalized] ?? mode
+}
+
+export function getLocalizedDifficultyLabel(t: Dictionary, difficulty: string): string {
+  const normalized = difficulty.trim().toLowerCase().replace(/[\s_]+/g, '-') as DifficultyId
+  return getDifficultyLabels(t)[normalized] ?? difficulty
 }

@@ -119,6 +119,9 @@ export const gameSupabaseService = {
           bonus_seconds: input.bonusSeconds,
           perfect: input.perfect,
           completed_all_levels: input.completedAllLevels,
+          opponent_name: input.versusComparison?.opponentName || null,
+          player_round_score: input.versusComparison?.playerScore ?? null,
+          opponent_round_score: input.versusComparison?.opponentScore ?? null,
           elo_change: eloChange ?? 0,
           played_at: new Date().toISOString(),
         }
@@ -143,6 +146,13 @@ export const gameSupabaseService = {
                 bonus_seconds: input.bonusSeconds,
                 perfect: input.perfect,
                 completed_all_levels: input.completedAllLevels,
+                ...(input.versusComparison
+                  ? {
+                      opponent_name: input.versusComparison.opponentName,
+                      player_round_score: input.versusComparison.playerScore,
+                      opponent_round_score: input.versusComparison.opponentScore,
+                    }
+                  : {}),
               })
               .eq('id', existingHistory.id)
               .eq('user_id', userId)
@@ -231,7 +241,7 @@ export const gameSupabaseService = {
       // Sort by Elo Rating
       let query = supabase
         .from('category_elo')
-        .select('user_id, elo, profiles!inner(name, handle)')
+        .select('user_id, elo, profiles!inner(name, handle, avatar_url)')
         .eq('category', params.category)
         .order('elo', { ascending: false })
         .limit(100)
@@ -247,6 +257,7 @@ export const gameSupabaseService = {
         userId: row.user_id,
         username: row.profiles?.name || 'Player',
         handle: row.profiles?.handle || 'player',
+        avatarUrl: row.profiles?.avatar_url || undefined,
         score: 0,
         elo: row.elo || 1000,
         isCurrentUser: row.user_id === currentUserId,
@@ -255,7 +266,7 @@ export const gameSupabaseService = {
       // Sort by High Score
       let query = supabase
         .from('category_bests')
-        .select('user_id, ranked_score, practice_score, profiles!inner(name, handle), category_elo(elo)')
+        .select('user_id, ranked_score, practice_score, profiles!inner(name, handle, avatar_url), category_elo(elo)')
         .eq('category', params.category)
         .order('ranked_score', { ascending: false })
         .limit(100)
@@ -276,6 +287,7 @@ export const gameSupabaseService = {
           userId: row.user_id,
           username: row.profiles?.name || 'Player',
           handle: row.profiles?.handle || 'player',
+          avatarUrl: row.profiles?.avatar_url || undefined,
           score: row.ranked_score || row.practice_score || 0,
           elo: eloVal,
           isCurrentUser: row.user_id === currentUserId,
@@ -287,7 +299,7 @@ export const gameSupabaseService = {
     if (entries.length === 0) {
       let profileQuery = supabase
         .from('profiles')
-        .select('id, name, handle, overall_elo')
+        .select('id, name, handle, avatar_url, overall_elo')
         .order('overall_elo', { ascending: false })
         .limit(100)
 
@@ -302,6 +314,7 @@ export const gameSupabaseService = {
         userId: p.id,
         username: p.name || 'Player',
         handle: p.handle || 'player',
+        avatarUrl: p.avatar_url || undefined,
         score: 0,
         elo: p.overall_elo || 1000,
         isCurrentUser: p.id === currentUserId,
@@ -315,7 +328,7 @@ export const gameSupabaseService = {
     if (!currentUserInEntries && currentUserId) {
       const { data: curProfile } = await supabase
         .from('profiles')
-        .select('name, handle, overall_elo')
+        .select('name, handle, avatar_url, overall_elo')
         .eq('id', currentUserId)
         .maybeSingle()
 
@@ -325,6 +338,7 @@ export const gameSupabaseService = {
           userId: currentUserId,
           username: curProfile.name || 'Player',
           handle: curProfile.handle || 'player',
+          avatarUrl: curProfile.avatar_url || undefined,
           score: 0,
           elo: curProfile.overall_elo || 1000,
           isCurrentUser: true,

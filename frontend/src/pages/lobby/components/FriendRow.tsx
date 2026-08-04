@@ -52,7 +52,7 @@ export function FriendRow({ friend, onChallenge, onSelect }: FriendRowProps) {
       onClick={() => onSelect?.(friend)}
     >
       {/* Avatar */}
-      <Avatar name={friend.name} size="2.5rem" fontSize="13px">
+      <Avatar name={friend.name} imageUrl={friend.avatarUrl} size="2.5rem" fontSize="13px">
         {/* Presence dot — bottom-right corner */}
         <span
           className="absolute bottom-0 right-0 translate-x-0.5 translate-y-0.5"

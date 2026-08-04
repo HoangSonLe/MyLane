@@ -1,4 +1,5 @@
 import { ScreenHeaderWithBack, ScreenHeaderAction } from '@/components/ui/layout'
+import { IconInfoCircle } from '@/components/ui/icons'
 import { useTranslation } from '@/i18n/useTranslation'
 
 function IconSettings() {
@@ -17,10 +18,12 @@ export function ProfileHeader({
   skeleton,
   onBack,
   onSettings,
+  onOpenScoringRules,
 }: {
   skeleton?: boolean
   onBack?: () => void
   onSettings?: () => void
+  onOpenScoringRules?: () => void
 }) {
   const { t } = useTranslation()
   return (
@@ -30,12 +33,20 @@ export function ProfileHeader({
       title={t.profile.title}
       titleSkeletonWidth="4rem"
       trailing={
-        <ScreenHeaderAction
-          skeleton={skeleton}
-          onClick={onSettings}
-          ariaLabel={t.profile.settings}
-          icon={<IconSettings />}
-        />
+        <div className="flex items-center gap-1.5">
+          <ScreenHeaderAction
+            skeleton={skeleton}
+            onClick={onOpenScoringRules}
+            ariaLabel={t.scoringRulesModal?.viewFullRules || 'Thông tin tính điểm'}
+            icon={<IconInfoCircle size={18} />}
+          />
+          <ScreenHeaderAction
+            skeleton={skeleton}
+            onClick={onSettings}
+            ariaLabel={t.profile.settings}
+            icon={<IconSettings />}
+          />
+        </div>
       }
     />
   )
