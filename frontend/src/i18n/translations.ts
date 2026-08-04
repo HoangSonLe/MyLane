@@ -325,6 +325,9 @@ const en = {
     gamesCount: (n: number) => `${n} games`,
     maxLevel: 'Max Level',
     levelValue: (n: number) => `Level ${n}`,
+    startingLevel: 'Levels Reached',
+    recordBadge: '(Record)',
+    endlessUnlockRequirement: 'Reach Level 10 to unlock Endless mode',
     statsErrorNote: 'Could not load game stats.',
   },
 
@@ -730,6 +733,7 @@ const en = {
   modeLabels: {
     soloPractice: 'Solo Practice',
     soloRanked: 'Solo Ranked',
+    soloEndless: 'Solo Endless',
     versusRanked: 'Versus Ranked',
     versusUnranked: 'Versus Unranked',
   },
@@ -1319,6 +1323,9 @@ const vi: Dictionary = {
     gamesCount: (n: number) => `${n} trận`,
     maxLevel: 'Cấp độ cao nhất',
     levelValue: (n: number) => `Cấp ${n}`,
+    startingLevel: 'Các cấp độ đã đạt được',
+    recordBadge: '(Kỷ lục)',
+    endlessUnlockRequirement: 'Cần hoàn thành Level 10 để mở khóa',
     statsErrorNote: 'Không thể tải số liệu trò chơi.',
   },
 
@@ -1724,6 +1731,7 @@ const vi: Dictionary = {
   modeLabels: {
     soloPractice: 'Luyện Tập Đơn',
     soloRanked: 'Xếp Hạng Đơn',
+    soloEndless: 'Không Giới Hạn',
     versusRanked: 'Xếp Hạng Đối Kháng',
     versusUnranked: 'Đối Kháng Thường',
   },

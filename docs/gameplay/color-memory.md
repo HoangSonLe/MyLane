@@ -99,6 +99,8 @@ scoring pipeline, see [`docs/technical/known-gaps.md`](../technical/known-gaps.m
 
 ## Endless Mode
 
-Not defined yet for this game — the other 4 games' Endless Mode formulas
-come from the GDD or an earlier confirmed decision; Color Memory has
-neither. Leave unimplemented until a starting length/growth rate is chosen.
+Unlocks after Level 10. `colorCount` stays fixed at 6 (the board doesn't
+grow further); sequence length continues from Level 10's ending value of
+12, starting at **13** and +1 every 3 consecutive wins — same +1-per-3-wins
+convention as Number/Alphabet/Sequence Memory. Separate Endless
+leaderboard, same convention as [`README.md`](README.md#endless-mode).

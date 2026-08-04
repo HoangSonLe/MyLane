@@ -33,6 +33,7 @@ export enum GameId {
 export enum ModeId {
   SOLO_PRACTICE = 'solo-practice',
   SOLO_RANKED = 'solo-ranked',
+  SOLO_ENDLESS = 'solo-endless',
   VERSUS_RANKED = 'versus-ranked',
   VERSUS_UNRANKED = 'versus-unranked',
 }

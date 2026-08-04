@@ -275,7 +275,7 @@ export default function App() {
 
   const [pendingScreen, setPendingScreen] = useState<Screen | null>(null)
   const [roomTab, setRoomTab] = useState<'create' | 'join'>(() => sharedRoomCode ? 'join' : 'create')
-  const [session, setSession] = useState<{ game: GameId; mode: ModeId; difficulty: DifficultyId }>({
+  const [session, setSession] = useState<{ game: GameId; mode: ModeId; difficulty: DifficultyId; startLevel?: number }>({
     game: GameId.COLOR,
     mode: ModeId.SOLO_PRACTICE,
     difficulty: DifficultyId.MEDIUM,
@@ -587,10 +587,10 @@ export default function App() {
             onBack={() => back('home')}
             onNavigate={(id, meta) => {
               if (id === 'matchmaking') {
-                if (meta) setSession({ game: meta.game, mode: meta.mode, difficulty: meta.difficulty })
+                if (meta) setSession({ game: meta.game, mode: meta.mode, difficulty: meta.difficulty, startLevel: meta.startLevel })
                 goTo('matchmaking')
               } else if (id === 'game') {
-                if (meta) setSession({ game: meta.game, mode: meta.mode, difficulty: meta.difficulty })
+                if (meta) setSession({ game: meta.game, mode: meta.mode, difficulty: meta.difficulty, startLevel: meta.startLevel })
                 push('game')
               } else if (id === 'login') goTo('login')
               else if (id === 'settings') push('settings')
@@ -605,6 +605,7 @@ export default function App() {
             gameType={session.game}
             mode={session.mode}
             difficulty={session.difficulty}
+            initialLevel={session.startLevel}
             onBack={() => back('game-select')}
             onQuit={() => resetTo('home')}
             onGameOver={(result) => { setLastGameResult(result); push('result') }}

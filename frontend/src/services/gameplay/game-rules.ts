@@ -230,3 +230,27 @@ export function getRoundsToWin(gameType: GameId, level: number): number {
     case GameId.COLOR:    return getColorLevel(level).roundsToWin
   }
 }
+
+export interface EndlessConfig {
+  length: number
+  xAxis?: number
+  yAxis?: number
+  beginCount?: number
+  colorCount?: number
+}
+
+/** docs/gameplay/README.md Endless Mode progressive difficulty calculation per 3 consecutive wins. */
+export function getEndlessConfig(gameType: GameId, endlessWins: number): EndlessConfig {
+  const steps = Math.floor(Math.max(0, endlessWins) / 3)
+  switch (gameType) {
+    case GameId.NUMBER:
+    case GameId.ALPHABET:
+      return { length: 16 + steps }
+    case GameId.SEQUENCE:
+      return { length: 14 + steps }
+    case GameId.GRID:
+      return { xAxis: 10, yAxis: 10, beginCount: 26 + steps * 2, length: 26 + steps * 2 }
+    case GameId.COLOR:
+      return { colorCount: 6, length: 13 + steps }
+  }
+}

@@ -26,6 +26,7 @@ export function getModeLabels(t: Dictionary): Record<ModeId, string> {
   return {
     [ModeId.SOLO_PRACTICE]:   t.modeLabels.soloPractice,
     [ModeId.SOLO_RANKED]:     t.modeLabels.soloRanked,
+    [ModeId.SOLO_ENDLESS]:    t.modeLabels.soloEndless,
     [ModeId.VERSUS_RANKED]:   t.modeLabels.versusRanked,
     [ModeId.VERSUS_UNRANKED]: t.modeLabels.versusUnranked,
   }
@@ -41,7 +42,7 @@ export function getDifficultyLabels(t: Dictionary): Record<DifficultyId, string>
 }
 
 export function getLocalizedGameLabel(t: Dictionary, game: string): string {
-  const normalized = game.trim().toLowerCase() as GameId
+  const normalized = game.trim().toLowerCase().replace(/\s*memory$/, '') as GameId
   return getGameLabels(t)[normalized] ?? game
 }
 

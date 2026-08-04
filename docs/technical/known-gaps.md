@@ -19,6 +19,9 @@ lý xong một mục (đánh dấu hoặc xoá khỏi file).
 - **Tắt Lời Mời Đồng Bộ Theo Tài Khoản**: Mute 5/15/30 phút được lưu bằng profile ID trong `invite_mutes`, hydrate trước listener lời mời và đồng bộ thiết bị qua Supabase Realtime. Mute Hết phiên vẫn chỉ giữ trong phiên ứng dụng hiện tại.
 - **Hệ Thống Bảng Xếp Hạng Realtime (`LeaderboardScreen`)**: Tải dữ liệu xếp hạng thực tế từ Supabase Cloud. Hỗ trợ lọc theo 5 thể loại game (`number`, `alphabet`, `grid`, `sequence`, `color`), 2 tiêu chí sắp xếp (**Điểm Elo** vs **Điểm Kỷ Lục**), và 3 chế độ xem (**Bảng Toàn Cầu All-Time**, **Top 100**, và **Bảng Bạn Bè Friends Only**). Tự động ghim hàng **"Hạng Của Bạn" (`pinnedEntry`)** ở đáy bảng khi người chơi nằm ngoài Top 100.
 - **Shared Component `<CollapsibleCard>` UI Kit**: Tách thành phần Card thu gọn/mở rộng thành Component Dùng Chung (`components/ui/card/CollapsibleCard.tsx`), tích hợp **Icon SVG Chevron (`IconChevronDown`)** xoay 90° mượt mà, áp dụng cho `EloCard`, `BestScoresCard`, `RecordStatsCard`, `FriendsCard`, `MatchHistoryCard`, `AvailableRoomsCard`.
+- **Trang Chỉnh Sửa Hồ Sơ (`EditProfileScreen`)**: Đã hoàn thiện giao diện và luồng chỉnh sửa thông tin cá nhân (Tên người chơi, Handle, Bio và Avatar cá nhân), cập nhật đồng bộ lên Supabase Cloud (`profiles` table).
+- **Điều Khoản Dịch Vụ & Chính Sách Bảo Mật (`TermsOfServiceModal`, `PrivacyPolicyModal`)**: Đã hoàn thiện giao diện hiển thị văn bản Điều khoản dịch vụ và Chính sách bảo mật chi tiết, mở trực tiếp từ Trang Cài Đặt hoặc Hồ Sơ mà không còn thông báo tạm thời.
+- **Chế Độ Chơi Không Giới Hạn (`Endless Mode` / `SOLO_ENDLESS`)**: Đã triển khai đầy đủ chế độ Không giới hạn cho cả 5 game trí nhớ (*Number, Alphabet, Grid, Sequence, Color*). Tự động mở khóa khi người chơi đạt Level 10, tăng dần độ khó/chiều dài chuỗi sau mỗi 3 ván thắng liên tiếp và kết thúc ván ngay khi sai 1 lần.
 
 ---
 
@@ -210,10 +213,7 @@ Home/Game Select/Gameplay).
   đúng row" nhưng chưa có network layer thật cho việc ghi để case đó có ý
   nghĩa — cần quyết định trước khi làm (giống gap #5, cần một dạng "submit"
   thật).
-- Edit Profile, Add login method, Language, Privacy policy, Terms of
-  service, Reset all progress: chỉ dừng ở mức "thông báo đang phát triển",
-  chưa có UI/flow thật cho bất kỳ cái nào — không có trong docs nên không
-  tự bịa hành vi.
+- Add login method, Language, Reset all progress: chỉ dừng ở mức "thông báo đang phát triển" (Edit Profile, Terms of service, Privacy policy đã được phát triển hoàn chỉnh).
 
 **Versus Gameplay — đã dọn phần prototype:** 4 thanh `ProtoPill` đã bị gỡ;
 game/mode/difficulty/seed/player được nhận từ phòng thật, năm game đều dùng

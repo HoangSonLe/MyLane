@@ -30,6 +30,7 @@ import {
   COLOR_GAP_MS,
   clampLevel,
   getColorLevel,
+  getEndlessConfig,
   getGridLevel,
   getLinearLevel,
   getRoundsToWin,
@@ -50,6 +51,7 @@ interface Props {
   gameType?: GameId
   mode?: ModeId
   difficulty?: DifficultyId
+  initialLevel?: number
   onBack?: () => void
   onQuit?: () => void
   /** Loss-streak at current level reached the level's rounds-to-win threshold — navigate to Result. */
@@ -72,10 +74,11 @@ interface PausableTimeoutTask {
  * pre-existing length-scaled placeholder base is kept, with only the
  * documented difficulty delta newly applied on top of it.
  */
-function getAnswerTimeSeconds(gameType: GameId, level: number, difficulty: DifficultyId): number {
+function getAnswerTimeSeconds(gameType: GameId, level: number, difficulty: DifficultyId, isEndless?: boolean, roundsCleared: number = 0): number {
   const bonus = DIFFICULTY_SECONDS[difficulty]
   if (gameType === GameId.GRID) return GRID_ANSWER_TIME_SECONDS + bonus
-  return 10 + level * 3 + bonus
+  const effLevel = isEndless ? 10 + Math.floor(roundsCleared / 3) : level
+  return 10 + effLevel * 3 + bonus
 }
 
 // ─── Main export ───────────────────────────────────────────────────
@@ -83,10 +86,12 @@ export function GameplayScreen({
   gameType: initialGameType = GameId.COLOR,
   mode = ModeId.SOLO_PRACTICE,
   difficulty = DifficultyId.MEDIUM,
+  initialLevel,
   onBack,
   onQuit,
   onGameOver,
 }: Props) {
+  const isEndless = mode === ModeId.SOLO_ENDLESS
   const { isOffline } = useNetworkStatus()
   const { t } = useTranslation()
   const gameLabels = getGameLabels(t)
@@ -124,10 +129,14 @@ export function GameplayScreen({
   // mid-round board state — see docs/technical/known-gaps.md "Resume-on-reload".
   // Read once at mount, never updated again; a stale/mismatched checkpoint
   // (different game/mode/difficulty) is ignored by loadGameplayCheckpoint itself.
-  const checkpoint = useRef(loadGameplayCheckpoint(gameType, mode, difficulty)).current
+  const rawCheckpoint = useRef(loadGameplayCheckpoint(gameType, mode, difficulty)).current
+  // An explicit `initialLevel` (player picked a Starting Level in Game Select)
+  // always wins — discard the whole checkpoint rather than mixing an old
+  // run's streak/loss/tally state with a freshly-picked level.
+  const checkpoint = initialLevel !== undefined && rawCheckpoint?.level !== initialLevel ? undefined : rawCheckpoint
 
   // Shared game state
-  const [level, setLevel]         = useState(checkpoint?.level ?? 1)
+  const [level, setLevel]         = useState(initialLevel ?? checkpoint?.level ?? 1)
   // Consecutive wins at the current level (docs: needs `roundsToWin` in a row to advance).
   const [winStreak, setWinStreak] = useState(checkpoint?.winStreak ?? 0)
   // Losses accumulated at the current level, not necessarily consecutive
@@ -280,7 +289,7 @@ export function GameplayScreen({
   // Reset the countdown to the round's max when a new answering phase begins.
   useEffect(() => {
     if (phase === 'answering') {
-      setTimer(getAnswerTimeSeconds(gameType, level, difficulty))
+      setTimer(getAnswerTimeSeconds(gameType, level, difficulty, isEndless, roundsClearedRef.current))
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase])
@@ -314,7 +323,7 @@ export function GameplayScreen({
   }
 
   function startNumberRound(lvl: number) {
-    const { length } = getLinearLevel(NUMBER_LEVELS, lvl)
+    const { length } = isEndless ? getEndlessConfig(GameId.NUMBER, roundsClearedRef.current) : getLinearLevel(NUMBER_LEVELS, lvl)
     const seq = buildNumSeq(length)
     setNumSeq(seq)
     setNumAnswer('')
@@ -351,7 +360,7 @@ export function GameplayScreen({
   }
 
   function startAlphaRound(lvl: number) {
-    const { length } = getLinearLevel(ALPHABET_LEVELS, lvl)
+    const { length } = isEndless ? getEndlessConfig(GameId.ALPHABET, roundsClearedRef.current) : getLinearLevel(ALPHABET_LEVELS, lvl)
     const seq = buildAlphaSeq(length)
     setAlphaSeq(seq)
     setAlphaAnswer('')
@@ -391,9 +400,9 @@ export function GameplayScreen({
   }
 
   function startGridRound(lvl: number) {
-    const cfg = getGridLevel(lvl)
-    const totalCells = cfg.xAxis * cfg.yAxis
-    const lit = buildGridLit(cfg.beginCount, totalCells)
+    const cfg = isEndless ? getEndlessConfig(GameId.GRID, roundsClearedRef.current) : getGridLevel(lvl)
+    const totalCells = (cfg.xAxis ?? 10) * (cfg.yAxis ?? 10)
+    const lit = buildGridLit(cfg.beginCount ?? 26, totalCells)
     hasWrongSelectRef.current = false
     setGridLit(lit)
     setGridTapped([])
@@ -410,7 +419,7 @@ export function GameplayScreen({
 
   function handleGridTap(i: number) {
     if (phase !== Phase.ANSWERING) return
-    const cfg = getGridLevel(level)
+    const cfg = isEndless ? getEndlessConfig(GameId.GRID, roundsClearedRef.current) : getGridLevel(level)
     // gridLit[0] is the cell assigned "1", gridLit[1] is "2", etc. (the
     // order the player was shown, not sorted by cell index) — the correct
     // next tap is whichever cell holds the next number.
@@ -430,7 +439,7 @@ export function GameplayScreen({
     const next = [...gridTapped, i]
     setGridTapped(next)
     recordConsecutiveItems(next.length)
-    if (next.length === cfg.beginCount) {
+    if (next.length === (cfg.beginCount ?? 26)) {
       if (hasWrongSelectRef.current) {
         handleWrong()
       } else {
@@ -455,7 +464,7 @@ export function GameplayScreen({
   }
 
   function startSeqRound(lvl: number) {
-    const { length } = getLinearLevel(SEQUENCE_LEVELS, lvl)
+    const { length } = isEndless ? getEndlessConfig(GameId.SEQUENCE, roundsClearedRef.current) : getLinearLevel(SEQUENCE_LEVELS, lvl)
     const newSeq = Array.from({ length }, () => Math.floor(Math.random() * SEQUENCE_TILE_COUNT))
     setSeqSequence(newSeq)
     setSeqInput([])
@@ -496,8 +505,8 @@ export function GameplayScreen({
   }
 
   function startColorRound(lvl: number) {
-    const cfg = getColorLevel(lvl)
-    const newSeq = Array.from({ length: cfg.length }, () => Math.floor(Math.random() * cfg.colorCount))
+    const cfg = isEndless ? getEndlessConfig(GameId.COLOR, roundsClearedRef.current) : getColorLevel(lvl)
+    const newSeq = Array.from({ length: cfg.length }, () => Math.floor(Math.random() * (cfg.colorCount ?? 6)))
     setColorSequence(newSeq)
     setColorInput([])
     setColorPressed(null)
@@ -529,6 +538,12 @@ export function GameplayScreen({
     setPhase(Phase.CORRECT)
     roundsClearedRef.current += 1
     bonusSecondsRef.current += Math.max(0, timer)
+    if (isEndless) {
+      scheduleTimeout(() => {
+        startRound(level)
+      }, 1200)
+      return
+    }
     const roundsToWin = getRoundsToWin(gameType, level)
     const nextWinStreak = winStreak + 1
     setWinStreak(nextWinStreak)
@@ -560,7 +575,7 @@ export function GameplayScreen({
     perfectRef.current = false
   }
 
-  const isGameOver = lossCount >= getRoundsToWin(gameType, level)
+  const isGameOver = isEndless ? lossCount >= 1 : lossCount >= getRoundsToWin(gameType, level)
 
   // Package this session's tallies for Result — docs/gameplay/README.md §
   // Scoring Formula. Result itself submits this and shows the computed score.

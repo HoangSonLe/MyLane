@@ -18,6 +18,7 @@ const GAME_LABELS: Record<GameId, string> = {
 const MODE_LABELS: Record<ModeId, string> = {
   [ModeId.SOLO_PRACTICE]: 'Solo Practice',
   [ModeId.SOLO_RANKED]: 'Solo Ranked',
+  [ModeId.SOLO_ENDLESS]: 'Solo Endless',
   [ModeId.VERSUS_RANKED]: 'Versus Ranked',
   [ModeId.VERSUS_UNRANKED]: 'Versus Unranked',
 }

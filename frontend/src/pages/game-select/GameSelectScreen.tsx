@@ -30,7 +30,7 @@ export function GameSelectScreen({
 }: {
   entryPoint?: EntryPoint
   onBack?: () => void
-  onNavigate?: (id: string, meta?: { game: GameId; mode: ModeId; difficulty: DifficultyId }) => void
+  onNavigate?: (id: string, meta?: { game: GameId; mode: ModeId; difficulty: DifficultyId; startLevel?: number }) => void
 }) {
   const { isOffline } = useNetworkStatus()
   const user = useAuthStore((s) => s.user)
@@ -44,6 +44,10 @@ export function GameSelectScreen({
   const [stats, setStats] = useState<GameStats[] | null>(null)
   const [isLoadingStats, setIsLoadingStats] = useState(true)
   const [statsError, setStatsError] = useState(false)
+
+  const selectedGameStats = stats?.find((s) => s.id === selectedGame)
+  const maxUnlockedLevel = Math.max(1, selectedGameStats?.highestLevel ?? 1)
+  const [selectedStartLevel, setSelectedStartLevel] = useState<number>(1)
 
   const loadStats = useCallback(async () => {
     setIsLoadingStats(true)
@@ -61,6 +65,10 @@ export function GameSelectScreen({
     loadStats()
   }, [loadStats])
 
+  useEffect(() => {
+    setSelectedStartLevel(maxUnlockedLevel)
+  }, [selectedGame, maxUnlockedLevel])
+
   const gameLabels = getGameLabels(t)
   const modeLabels = getModeLabels(t)
   const difficultyLabels = getDifficultyLabels(t)
@@ -75,7 +83,7 @@ export function GameSelectScreen({
 
   function handleStart() {
     if (!canStart) return
-    const meta = { game: selectedGame, mode: selectedMode, difficulty: selectedDiff }
+    const meta = { game: selectedGame, mode: selectedMode, difficulty: selectedDiff, startLevel: selectedStartLevel }
     if (currentMode.versusFlow) {
       onNavigate?.('matchmaking', meta)
     } else {
@@ -134,21 +142,27 @@ export function GameSelectScreen({
             <SectionLabel label={t.gameSelect.mode} />
           )}
           <div className="flex gap-2 px-4">
-            {localizedModes.map((mode) => (
-              <ModeChip
-                key={mode.id}
-                mode={mode}
-                selected={!isLoadingStats && selectedMode === mode.id}
-                isGuest={isGuest}
-                skeleton={isLoadingStats}
-                onLogIn={() => onNavigate?.('login')}
-                onSelect={() => {
-                  if (!isGuest || !mode.requiresAccount) {
-                    setSelectedMode(mode.id)
-                  }
-                }}
-              />
-            ))}
+            {localizedModes.map((mode) => {
+              // Endless's own Level-10 unlock only applies once account-gating already let the
+              // player in — guests are blocked by `requiresAccount` below, not by this check.
+              const isEndlessLevelLocked = mode.id === ModeId.SOLO_ENDLESS && !isGuest && (selectedGameStats?.highestLevel ?? 1) < 10
+              return (
+                <ModeChip
+                  key={mode.id}
+                  mode={mode}
+                  selected={!isLoadingStats && selectedMode === mode.id}
+                  isGuest={isGuest}
+                  customLocked={isEndlessLevelLocked ? true : undefined}
+                  skeleton={isLoadingStats}
+                  onLogIn={() => onNavigate?.('login')}
+                  onSelect={() => {
+                    if (!isEndlessLevelLocked && (!isGuest || !mode.requiresAccount)) {
+                      setSelectedMode(mode.id)
+                    }
+                  }}
+                />
+              )
+            })}
           </div>
         </div>
 
@@ -174,6 +188,43 @@ export function GameSelectScreen({
             ))}
           </div>
         </div>
+
+        {/* ── Starting Level selector — solo only; not wired into the Versus flow yet ── */}
+        {selectedMode !== ModeId.SOLO_ENDLESS && !currentMode.versusFlow && (
+          <div className="flex flex-col gap-3">
+            {isLoadingStats ? (
+              <div
+                className="skeleton mx-4"
+                style={{ height: '0.75rem', width: '6rem', borderRadius: 'var(--radius-sm)' }}
+              />
+            ) : (
+              <SectionLabel label={t.gameSelect.startingLevel} />
+            )}
+            <div className="flex flex-wrap gap-2 px-4">
+              {Array.from({ length: maxUnlockedLevel }, (_, i) => i + 1).map((lvl) => {
+                const isSelected = selectedStartLevel === lvl
+                const isMax = lvl === maxUnlockedLevel && maxUnlockedLevel > 1
+                return (
+                  <button
+                    key={lvl}
+                    type="button"
+                    onClick={() => setSelectedStartLevel(lvl)}
+                    className={[
+                      'flex items-center gap-1 px-3 py-1.5 text-[12px] font-semibold rounded-xl transition-all',
+                      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ma-ring)]',
+                      isSelected
+                        ? 'bg-[var(--ma-active)] text-white shadow-sm'
+                        : 'bg-[var(--ma-surface-raised)] text-[var(--ma-fg-muted)] border border-[var(--ma-border)] hover:border-[var(--ma-active-soft)]',
+                    ].join(' ')}
+                  >
+                    <span>{t.gameSelect.levelValue(lvl)}</span>
+                    {isMax && <span className="text-[10px] opacity-80">{t.gameSelect.recordBadge}</span>}
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+        )}
 
         {/* Guest nudge — shown when logged in as guest */}
         {isGuest && !isLoadingStats && (

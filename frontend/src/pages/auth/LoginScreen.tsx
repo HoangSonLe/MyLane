@@ -3,7 +3,6 @@ import { StatusBanner } from '@/components/ui/StatusBanner'
 import { Card } from '@/components/ui/card'
 import { ScreenShell, ScreenMain } from '@/components/ui/layout'
 import { InputField } from './components/InputField'
-import { MergeDialog } from './components/MergeDialog'
 import { IconSpinner, IconGoogle, IconDiscord, IconMail, IconEye } from './components/icons'
 import { useNetworkStatus } from '@/lib/hooks/useNetworkStatus'
 import { useAuthStore } from '@/stores/auth.store'
@@ -22,7 +21,7 @@ export function LoginScreen({
   fromGuest?: boolean
   /** Initial intent; both modes reuse this screen's component system. */
   initialMode?: AuthMode
-  /** Called after successful auth (and after merge decision if fromGuest). */
+  /** Called after successful auth. */
   onSuccess?: () => void
   /** Navigate back to landing / continue as guest. */
   onBack?: () => void
@@ -30,7 +29,6 @@ export function LoginScreen({
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
-  const [showMergeDialog, setShowMergeDialog] = useState(false)
   const [mode, setMode] = useState<AuthMode>(initialMode ?? (fromGuest ? 'register' : 'login'))
 
   const { isOffline } = useNetworkStatus()
@@ -61,11 +59,7 @@ export function LoginScreen({
       } else {
         await loginWithEmail({ email, password })
       }
-      if (fromGuest) {
-        setShowMergeDialog(true)
-      } else {
-        onSuccess?.()
-      }
+      onSuccess?.()
     } catch {
       // Error is stored in useAuthStore
     }
@@ -85,24 +79,10 @@ export function LoginScreen({
 
     try {
       await loginWithOAuth(provider)
-      if (fromGuest) {
-        setShowMergeDialog(true)
-      } else {
-        onSuccess?.()
-      }
+      onSuccess?.()
     } catch {
       // Error is stored in useAuthStore
     }
-  }
-
-  function handleMerge() {
-    setShowMergeDialog(false)
-    onSuccess?.()
-  }
-
-  function handleSkip() {
-    setShowMergeDialog(false)
-    onSuccess?.()
   }
 
   return (
@@ -350,13 +330,6 @@ export function LoginScreen({
           </button>
         </p>
       </ScreenMain>
-
-      {/* ── Merge dialog ── */}
-      <MergeDialog
-        visible={showMergeDialog}
-        onMerge={handleMerge}
-        onSkip={handleSkip}
-      />
     </ScreenShell>
   )
 }

@@ -368,19 +368,6 @@ export function SettingsScreen({
             />
           </SettingsSection>
 
-          {/* Danger zone — only when content is loaded */}
-          {!isLoading && (
-            <SettingsSection title={t.settings.dangerZone}>
-              <SettingsRow
-                icon={<IconTrash />}
-                label={t.settings.resetProgress}
-                description={t.settings.resetProgressDesc}
-                variant="danger"
-                onClick={notImplemented}
-              />
-            </SettingsSection>
-          )}
-
           {/* Admin Zone — Only visible to Admin users */}
           {user?.isAdmin && (
             <SettingsSection title="Quản Trị Viên (Admin Zone)">

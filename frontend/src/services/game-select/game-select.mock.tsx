@@ -101,6 +101,7 @@ export const GAME_STATS_SEED: GameStats[] = [
 export const MODES: ModeMeta[] = [
   { id: ModeId.SOLO_PRACTICE,   label: 'Solo Practice',    requiresAccount: false, versusFlow: false },
   { id: ModeId.SOLO_RANKED,     label: 'Solo Ranked',      requiresAccount: true,  versusFlow: false },
+  { id: ModeId.SOLO_ENDLESS,    label: 'Solo Endless',     requiresAccount: true,  versusFlow: false },
   { id: ModeId.VERSUS_RANKED,   label: 'Versus Ranked',    requiresAccount: true,  versusFlow: true  },
   { id: ModeId.VERSUS_UNRANKED, label: 'Versus Unranked',  requiresAccount: true,  versusFlow: true  },
 ]

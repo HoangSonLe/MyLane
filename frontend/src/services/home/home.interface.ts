@@ -4,4 +4,5 @@ export interface LastPlayed {
   score: number
   maxScore: number
   roundsPlayed: number
+  level?: number
 }

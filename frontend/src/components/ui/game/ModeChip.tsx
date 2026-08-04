@@ -15,6 +15,7 @@ export function ModeChip({
   mode,
   selected,
   isGuest,
+  customLocked,
   skeleton,
   onSelect,
   onLogIn,
@@ -22,12 +23,13 @@ export function ModeChip({
   mode: ModeMeta
   selected: boolean
   isGuest: boolean
+  customLocked?: boolean
   skeleton?: boolean
   onSelect?: () => void
   onLogIn?: () => void
 }) {
   const { t } = useTranslation()
-  const locked = isGuest && mode.requiresAccount
+  const locked = customLocked ?? (isGuest && mode.requiresAccount)
 
   if (skeleton) {
     return (
@@ -43,14 +45,15 @@ export function ModeChip({
       type="button"
       onClick={() => {
         if (locked) {
+          if (customLocked) return
           onLogIn?.()
         } else {
           onSelect?.()
         }
       }}
       aria-pressed={selected}
-      aria-label={locked ? `${mode.label} — ${t.gameSelect.requiresAccount}` : mode.label}
-      title={locked ? t.gameSelect.signInToUnlock : undefined}
+      aria-label={customLocked ? `${mode.label} — ${t.gameSelect.endlessUnlockRequirement}` : locked ? `${mode.label} — ${t.gameSelect.requiresAccount}` : mode.label}
+      title={customLocked ? t.gameSelect.endlessUnlockRequirement : locked ? t.gameSelect.signInToUnlock : undefined}
       className={[
         'flex flex-1 flex-col items-center justify-center gap-0.5 px-2 py-2.5 text-center',
         'transition-all duration-[var(--ma-duration-micro)] active:scale-95',
