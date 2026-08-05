@@ -108,6 +108,11 @@ export function GameplayScreen({
 
   const [phase, setPhase]             = useState<Phase>(Phase.IDLE)
   const [paused, setPaused]           = useState(false)
+  // docs/gameplay/grid-memory.md: Grid-only quick toggle between showing the
+  // whole grid (Full) or only the cells that ever had a number (Simple) —
+  // display-only, doesn't change win/lose rules. Session-local by design,
+  // same as the other in-round quick settings.
+  const [gridDisplayMode, setGridDisplayMode] = useState<'simple' | 'full'>('full')
   const tutorialStorageKey = `gb_tutorial_seen_${gameType}_v1`
   const [showTutorial, setShowTutorial] = useState(() => {
     try {
@@ -788,15 +793,36 @@ export function GameplayScreen({
           )}
 
           {gameType === 'grid' && gridCfg && (
-            <GridBoard
-              xAxis={gridCfg.xAxis}
-              yAxis={gridCfg.yAxis}
-              litTiles={phase === 'viewing' || isRevealed ? gridLit : (phase === 'answering' ? [] : gridLit)}
-              tappedTiles={gridTapped}
-              wrongTile={gridWrongTile}
-              onTap={handleGridTap}
-              phase={isRevealed ? Phase.CORRECT : phase}
-            />
+            <>
+              <div className="flex w-full justify-end gap-1.5">
+                {(['full', 'simple'] as const).map((mode) => (
+                  <button
+                    key={mode}
+                    type="button"
+                    onClick={() => setGridDisplayMode(mode)}
+                    className="rounded-full px-2.5 py-1 text-[11px] font-semibold transition-colors"
+                    style={{
+                      background: gridDisplayMode === mode ? 'var(--ma-brand-soft)' : 'var(--ma-surface)',
+                      border: gridDisplayMode === mode ? '1px solid var(--ma-brand)' : '1px solid var(--ma-border-subtle)',
+                      color: gridDisplayMode === mode ? 'var(--ma-brand)' : 'var(--ma-fg-subtle)',
+                    }}
+                  >
+                    {mode === 'full' ? t.gameplayScreen.gridFullLayout : t.gameplayScreen.gridSimpleLayout}
+                  </button>
+                ))}
+              </div>
+              <GridBoard
+                xAxis={gridCfg.xAxis}
+                yAxis={gridCfg.yAxis}
+                litTiles={phase === 'viewing' || isRevealed ? gridLit : (phase === 'answering' ? [] : gridLit)}
+                activeCells={gridLit}
+                tappedTiles={gridTapped}
+                wrongTile={gridWrongTile}
+                onTap={handleGridTap}
+                phase={isRevealed ? Phase.CORRECT : phase}
+                displayMode={gridDisplayMode}
+              />
+            </>
           )}
 
           {gameType === 'number' && (

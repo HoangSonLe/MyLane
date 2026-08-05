@@ -6,10 +6,12 @@ export function GridBoard({
   xAxis,
   yAxis,
   litTiles,
+  activeCells,
   tappedTiles,
   wrongTile,
   onTap,
   phase,
+  displayMode = 'full',
 }: {
   /** Grid columns — docs/gameplay/grid-memory.md "x_Axis × y_Axis" (not always square). */
   xAxis: number
@@ -19,14 +21,27 @@ export function GridBoard({
    * Cell indices carrying numbers 1..beginCount, IN THAT ORDER — litTiles[0]
    * is the cell labeled "1", litTiles[1] is "2", etc. (docs: "some cells
    * contain numbers 1 through beginCount; the rest are empty"). Every other
-   * cell renders blank, not its own grid position.
+   * cell renders blank, not its own grid position. Empty (`[]`) during
+   * Answering so the board doesn't leak the numbers — see `activeCells`
+   * below for which cells are still tappable then.
    */
   litTiles: number[]
+  /**
+   * Same cell indices as `litTiles`, but populated for the full round
+   * (including Answering) — used only to decide which cells are part of the
+   * puzzle for `displayMode: 'simple'`. Doesn't leak the answer *order*,
+   * only *which* positions matter, which is what the doc's "Simple" layout
+   * intentionally reveals.
+   */
+  activeCells: number[]
   tappedTiles: number[]
   /** Tile just tapped incorrectly — flashes an error effect, doesn't block further taps. */
   wrongTile?: number | null
   onTap: (i: number) => void
   phase: Phase
+  /** docs/gameplay/grid-memory.md: Simple hides cells that never had a
+   * number; Full always shows the whole grid. */
+  displayMode?: 'simple' | 'full'
 }) {
   const total = xAxis * yAxis
   const isAnswering = phase === 'answering'
@@ -39,6 +54,10 @@ export function GridBoard({
       aria-label="Grid memory board"
     >
       {Array.from({ length: total }).map((_, i) => {
+        if (displayMode === 'simple' && !activeCells.includes(i)) {
+          return <div key={i} className="aspect-square" aria-hidden="true" />
+        }
+
         const litOrder = litTiles.indexOf(i)
         const isLit    = litOrder !== -1
         const isTapped = tappedTiles.includes(i)

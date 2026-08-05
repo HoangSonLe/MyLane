@@ -28,6 +28,8 @@ export const supabaseService = {
   loginWithEmail: authSupabaseService.loginWithEmail.bind(authSupabaseService),
   loginAsGuest: authSupabaseService.loginAsGuest.bind(authSupabaseService),
   logout: authSupabaseService.logout.bind(authSupabaseService),
+  linkOAuthIdentity: authSupabaseService.linkOAuthIdentity.bind(authSupabaseService),
+  getLinkedIdentities: authSupabaseService.getLinkedIdentities.bind(authSupabaseService),
 
   // Profile & Stats
   getProfile: profileSupabaseService.getProfile.bind(profileSupabaseService),

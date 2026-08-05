@@ -4,18 +4,21 @@ import { useTranslation } from '@/i18n/useTranslation'
 export function PrimaryButton({
   onClick,
   isVersus,
+  disabled,
 }: {
   onClick?: () => void
   isVersus: boolean
+  disabled?: boolean
 }) {
   const { t } = useTranslation()
   return (
     <button
       type="button"
       onClick={onClick}
+      disabled={disabled}
       className={[
         'mx-4 flex h-14 w-[calc(100%-2rem)] items-center justify-center gap-2.5',
-        'text-[15px] font-semibold',
+        'text-[15px] font-semibold disabled:opacity-60',
         'transition-transform duration-[var(--ma-duration-micro)] active:scale-[0.97]',
         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ma-ring)]',
       ].join(' ')}

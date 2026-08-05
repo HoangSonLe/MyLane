@@ -14,11 +14,14 @@ import { SecondaryActions } from './components/SecondaryActions'
 import { VersusComparisonCard } from './components/VersusComparisonCard'
 import { Toast } from '@/components/ui/Toast'
 import { ScoringRulesModal, type ScoringSectionId } from '@/components/ui/modal/ScoringRulesModal'
+import { ChallengeModal } from '@/pages/lobby/components/ChallengeModal'
 import { resultService } from '@/services/result/result.service'
 import { computeScore } from '@/services/gameplay/game-rules'
 import { getGameLabels, getModeLabels } from '@/services/gameplay/gameplay-screen.types'
 import { EntryPoint, ModeId } from '@/configs/enum'
 import type { GameResultInput, ResultData } from '@/services/result/result.interface'
+import type { Friend } from '@/services/lobby/lobby.interface'
+import { lobbyService } from '@/services/lobby/lobby.service'
 import { useAuthStore } from '@/stores/auth.store'
 import { useTranslation } from '@/i18n/useTranslation'
 
@@ -31,6 +34,8 @@ interface Props {
   onViewDetail?: () => void
   onLogIn?: () => void
   onNavigate?: (screen: string) => void
+  /** Rematch invite was accepted — join the newly created room and enter it. */
+  onChallengeAccepted?: (roomCode: string) => void | Promise<void>
 }
 
 const PLACEHOLDER: ResultData = {
@@ -47,12 +52,20 @@ export function ResultScreen({
   onViewDetail,
   onLogIn,
   onNavigate,
+  onChallengeAccepted,
 }: Props) {
   const user = useAuthStore((s) => s.user)
   const isGuest = user?.isGuest ?? true
   const { t } = useTranslation()
   const gameLabels = getGameLabels(t)
   const modeLabels = getModeLabels(t)
+
+  // Rematch: reopens ChallengeModal pre-filled with the same opponent/
+  // category/difficulty/mode as the match that just finished — see
+  // database/migrations/20260804_rematch_bypasses_friend_check.sql for why
+  // this works even when the opponent isn't a friend.
+  const [rematchTarget, setRematchTarget] = useState<Friend | null>(null)
+  const [isLoadingRematch, setIsLoadingRematch] = useState(false)
 
   const [data, setData] = useState<ResultData | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(result !== null)
@@ -127,6 +140,27 @@ export function ResultScreen({
   const isVersus = data?.mode === ModeId.VERSUS_RANKED || data?.mode === ModeId.VERSUS_UNRANKED
   const effectiveEntryPoint: EntryPoint = isVersus ? EntryPoint.LOBBY : entryPoint
 
+  const opponentId = result?.versusComparison?.opponentId
+  const canRematch = isVersus && !!opponentId && !!result?.roomCode
+
+  async function handlePrimaryClick() {
+    if (!canRematch || !opponentId) {
+      onPlayAgain?.()
+      return
+    }
+    setIsLoadingRematch(true)
+    try {
+      const opponent = await lobbyService.getFriendById(opponentId)
+      if (opponent) {
+        setRematchTarget(opponent)
+      } else {
+        onPlayAgain?.()
+      }
+    } finally {
+      setIsLoadingRematch(false)
+    }
+  }
+
   return (
     <ScreenShell>
       <Toast
@@ -187,7 +221,7 @@ export function ResultScreen({
 
         {/* ── Actions ── */}
         <div className="flex flex-col gap-3 mt-auto">
-          <PrimaryButton onClick={onPlayAgain} isVersus={!!isVersus} />
+          <PrimaryButton onClick={handlePrimaryClick} isVersus={!!isVersus} disabled={isLoadingRematch} />
           <SecondaryActions
             entryPoint={effectiveEntryPoint}
             onHome={onHome}
@@ -195,6 +229,22 @@ export function ResultScreen({
           />
         </div>
       </ScreenMain>
+
+      {canRematch && (
+        <ChallengeModal
+          friend={rematchTarget}
+          show={!!rematchTarget}
+          onClose={() => setRematchTarget(null)}
+          onAccepted={(roomCode) => {
+            setRematchTarget(null)
+            void onChallengeAccepted?.(roomCode)
+          }}
+          initialCategory={result?.game}
+          initialDifficulty={result?.difficulty?.replace(/-/g, '_')}
+          initialMode={result?.mode?.replace(/-/g, '_')}
+          rematchRoomCode={result?.roomCode}
+        />
+      )}
     </ScreenShell>
   )
 }

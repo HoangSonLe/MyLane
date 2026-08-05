@@ -30,6 +30,15 @@ interface Props {
   show: boolean
   onClose: () => void
   onAccepted: (roomCode: string) => void
+  /** Pre-select category/difficulty/mode (e.g. Rematch: same settings as the
+   * match that just finished) instead of defaulting to Color/Medium/Ranked. */
+  initialCategory?: GameId
+  initialDifficulty?: string
+  initialMode?: string
+  /** versus_rooms.code of a just-finished match against this exact `friend`
+   * — lets the invite bypass the friend-only check for a non-friend
+   * opponent. See database/migrations/20260804_rematch_bypasses_friend_check.sql. */
+  rematchRoomCode?: string
 }
 
 const CATEGORY_OPTIONS = [
@@ -40,11 +49,20 @@ const CATEGORY_OPTIONS = [
   { id: GameId.SEQUENCE, iconComponent: IconCategorySequence, label: 'Sequence Memory', desc: 'Nhớ thứ tự phím sáng nhịp điệu' },
 ]
 
-export function ChallengeModal({ friend, show, onClose, onAccepted }: Props) {
+export function ChallengeModal({
+  friend,
+  show,
+  onClose,
+  onAccepted,
+  initialCategory,
+  initialDifficulty,
+  initialMode,
+  rematchRoomCode,
+}: Props) {
   const { t } = useTranslation()
-  const [selectedCategory, setSelectedCategory] = useState<GameId>(GameId.COLOR)
-  const [selectedDifficulty, setSelectedDifficulty] = useState<string>('medium')
-  const [selectedMode, setSelectedMode] = useState<string>('versus_ranked')
+  const [selectedCategory, setSelectedCategory] = useState<GameId>(initialCategory ?? GameId.COLOR)
+  const [selectedDifficulty, setSelectedDifficulty] = useState<string>(initialDifficulty ?? 'medium')
+  const [selectedMode, setSelectedMode] = useState<string>(initialMode ?? 'versus_ranked')
   const [isSending, setIsSending] = useState(false)
   const [inviteState, setInviteState] = useState<{ inviteId: string; roomCode: string } | null>(null)
   const [countdown, setCountdown] = useState(30)
@@ -156,7 +174,8 @@ export function ChallengeModal({ friend, show, onClose, onAccepted }: Props) {
         friend.id,
         selectedCategory,
         selectedDifficulty,
-        selectedMode
+        selectedMode,
+        rematchRoomCode
       )
       setInviteState(result)
     } catch {

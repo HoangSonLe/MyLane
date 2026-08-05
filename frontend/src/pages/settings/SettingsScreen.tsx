@@ -7,6 +7,7 @@ import { Toast } from '@/components/ui/Toast'
 import { ProfileCard } from './components/ProfileCard'
 import { LogOutDialog } from './components/LogOutDialog'
 import { LinkedMethodRow } from './components/LinkedMethodRow'
+import { AddLoginMethodModal } from './components/AddLoginMethodModal'
 import {
   IconBell,
   IconVolume,
@@ -89,6 +90,7 @@ export function SettingsScreen({
   const [termsOfServiceModalVisible, setTermsOfServiceModalVisible] = useState(false)
   const [appVersionModalVisible, setAppVersionModalVisible] = useState(false)
   const [adminLogsModalVisible, setAdminLogsModalVisible] = useState(false)
+  const [addLoginMethodModalVisible, setAddLoginMethodModalVisible] = useState(false)
 
   const showToast = useCallback((message: string) => {
     if (toastTimer.current) clearTimeout(toastTimer.current)
@@ -120,13 +122,17 @@ export function SettingsScreen({
     try {
       await checkSession()
       if (isSupabaseConfigured()) {
-        const remote = await supabaseService.getSettings()
+        const [remote, identities] = await Promise.all([
+          supabaseService.getSettings(),
+          supabaseService.getLinkedIdentities(),
+        ])
         if (remote) {
           if (remote.preferred_language) setLocale(remote.preferred_language)
           if (typeof remote.sounds_enabled === 'boolean') setSoundsEnabled(remote.sounds_enabled)
           if (typeof remote.haptics_enabled === 'boolean') setHapticEnabled(remote.haptics_enabled)
           if (typeof remote.notifications_enabled === 'boolean') setNotifications(remote.notifications_enabled)
         }
+        setLinkedMethods(identities)
       } else {
         const settings = await settingsService.getSettings()
         setLinkedMethods(settings.linkedMethods)
@@ -144,14 +150,6 @@ export function SettingsScreen({
   useEffect(() => {
     load()
   }, [load])
-
-  /** Toggle rows save locally only for now — see docs/technical/known-gaps.md. */
-  function handleToggle<T>(setter: (v: T) => void) {
-    return (v: T) => {
-      setter(v)
-      showToast(t.settings.saved)
-    }
-  }
 
   function notImplemented() {
     showToast(t.settings.notImplemented)
@@ -248,14 +246,14 @@ export function SettingsScreen({
               <LinkedMethodRow key={m.id} method={m} skeleton={isLoading} />
             ))}
 
-            {/* Add login method — disabled offline */}
+            {/* Add login method — needs a real account backend + connection */}
             {!isLoading && (
               <SettingsRow
                 icon={<IconLink />}
                 label={t.settings.addLoginMethod}
                 description={isOffline ? t.settings.needsConnection : undefined}
                 variant="nav"
-                onClick={isOffline ? undefined : notImplemented}
+                onClick={isOffline ? undefined : (isSupabaseConfigured() ? () => setAddLoginMethodModalVisible(true) : notImplemented)}
                 disabled={isOffline}
               />
             )}
@@ -269,7 +267,11 @@ export function SettingsScreen({
               description={t.settings.notificationsDesc}
               variant="toggle"
               checked={notifications}
-              onToggle={handleToggle(setNotifications)}
+              onToggle={(next) => {
+                setNotifications(next)
+                showToast(t.settings.saved)
+                if (isSupabaseConfigured()) supabaseService.updateSettings({ notifications: next })
+              }}
               skeleton={isLoading}
             />
             <SettingsRow
@@ -431,6 +433,12 @@ export function SettingsScreen({
       <AdminAccessLogsModal
         isOpen={adminLogsModalVisible}
         onClose={() => setAdminLogsModalVisible(false)}
+      />
+
+      <AddLoginMethodModal
+        show={addLoginMethodModalVisible}
+        onClose={() => setAddLoginMethodModalVisible(false)}
+        linkedProviderIds={linkedMethods.map((m) => m.id)}
       />
 
       {/* ── NAVIGATION ── */}

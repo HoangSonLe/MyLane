@@ -9,10 +9,11 @@ export const matchInviteService = {
     inviteeId: string,
     category: GameId,
     difficulty: string = 'medium',
-    mode: string = 'versus_ranked'
+    mode: string = 'versus_ranked',
+    rematchRoomCode?: string
   ): Promise<{ inviteId: string; roomCode: string }> {
     if (isSupabaseConfigured()) {
-      return matchInviteSupabaseService.sendChallengeInvite(inviteeId, category, difficulty, mode)
+      return matchInviteSupabaseService.sendChallengeInvite(inviteeId, category, difficulty, mode, rematchRoomCode)
     }
     return {
       inviteId: 'mock-invite-123',

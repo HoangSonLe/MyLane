@@ -570,6 +570,7 @@ export function VersusGameplayScreen({
     const outcome = forcedOutcome ?? (playerScore > opponentScore ? 'win' : playerScore < opponentScore ? 'loss' : 'draw')
     return {
       matchId: room?.matchId,
+      roomCode: room?.code,
       game: gameType,
       mode,
       difficulty,
@@ -587,6 +588,7 @@ export function VersusGameplayScreen({
         playerScore,
         opponentScore,
         totalRounds,
+        opponentId: roomOpponent?.id,
       },
       opponentElo,
       serverEloChange: serverEloChangeRef.current,
@@ -682,6 +684,7 @@ export function VersusGameplayScreen({
                     xAxis={getGridLevel(level).xAxis}
                     yAxis={getGridLevel(level).yAxis}
                     litTiles={phase === Phase.VIEWING ? gridLit : phase === Phase.ANSWERING ? [] : gridLit}
+                    activeCells={gridLit}
                     tappedTiles={gridTapped}
                     wrongTile={gridWrongTile}
                     onTap={handleGridTap}

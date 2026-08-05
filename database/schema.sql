@@ -56,14 +56,27 @@ CREATE TABLE IF NOT EXISTS public.category_elo (
 -- --------------------------------------------------------------------
 -- 4. Category Bests Table (Kỷ lục cá nhân theo từng loại game)
 -- --------------------------------------------------------------------
+-- solo_ranked_*/versus_ranked_* are tracked separately (docs/gameplay/README.md
+-- "best score ... per category + mode"); ranked_score/ranked_level are kept
+-- as GENERATED (GREATEST of both modes) so every existing reader (Leaderboard
+-- sort, Lobby/Profile "Ranked Score") keeps working unchanged. A deployment
+-- that already ran an older version of this file (plain ranked_score/
+-- ranked_level columns) is migrated in-place by
+-- database/migrations/20260804_split_category_bests_by_mode.sql — apply that
+-- migration after this file on such a deployment; a brand-new deployment gets
+-- this final shape directly and the migration becomes a no-op on it.
 CREATE TABLE IF NOT EXISTS public.category_bests (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
   category TEXT NOT NULL CHECK (category IN ('number', 'alphabet', 'grid', 'sequence', 'color')),
   practice_score INTEGER DEFAULT 0,
   practice_level INTEGER DEFAULT 1,
-  ranked_score INTEGER DEFAULT 0,
-  ranked_level INTEGER DEFAULT 1,
+  solo_ranked_score INTEGER DEFAULT 0 NOT NULL,
+  solo_ranked_level INTEGER DEFAULT 1 NOT NULL,
+  versus_ranked_score INTEGER DEFAULT 0 NOT NULL,
+  versus_ranked_level INTEGER DEFAULT 1 NOT NULL,
+  ranked_score INTEGER GENERATED ALWAYS AS (GREATEST(solo_ranked_score, versus_ranked_score)) STORED,
+  ranked_level INTEGER GENERATED ALWAYS AS (GREATEST(solo_ranked_level, versus_ranked_level)) STORED,
   highest_level INTEGER DEFAULT 1,
   updated_at TIMESTAMPTZ DEFAULT NOW(),
   UNIQUE(user_id, category)

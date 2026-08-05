@@ -638,6 +638,12 @@ export default function App() {
               if (id === 'login') goTo('login')
               else handleTabNav(id)
             }}
+            onChallengeAccepted={async (roomCode) => {
+              const room = await versusRoomService.joinRoom(roomCode)
+              setMatchedVersusRoom(room)
+              setRoomEntrySource(RoomEntrySource.CHALLENGE)
+              goTo('versus-room')
+            }}
           />
         )
 

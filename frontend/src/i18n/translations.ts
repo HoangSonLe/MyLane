@@ -821,6 +821,8 @@ const en = {
 
   gameplayScreen: {
     offlineBanner: "You're offline — scores won't sync until reconnected.",
+    gridSimpleLayout: 'Simple',
+    gridFullLayout: 'Full grid',
   },
 
   offlinePauseOverlay: {
@@ -1819,6 +1821,8 @@ const vi: Dictionary = {
 
   gameplayScreen: {
     offlineBanner: 'Bạn đang ngoại tuyến — điểm sẽ không đồng bộ cho đến khi kết nối lại.',
+    gridSimpleLayout: 'Đơn giản',
+    gridFullLayout: 'Đầy đủ',
   },
 
   offlinePauseOverlay: {

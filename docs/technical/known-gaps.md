@@ -26,6 +26,16 @@ lý xong một mục (đánh dấu hoặc xoá khỏi file).
 - **Điều Khoản Dịch Vụ & Chính Sách Bảo Mật (`TermsOfServiceModal`, `PrivacyPolicyModal`)**: Đã hoàn thiện giao diện hiển thị văn bản Điều khoản dịch vụ và Chính sách bảo mật chi tiết, mở trực tiếp từ Trang Cài Đặt hoặc Hồ Sơ mà không còn thông báo tạm thời.
 - **Chế Độ Chơi Không Giới Hạn (`Endless Mode` / `SOLO_ENDLESS`)**: Đã triển khai đầy đủ chế độ Không giới hạn cho cả 5 game trí nhớ (*Number, Alphabet, Grid, Sequence, Color*). Tự động mở khóa khi người chơi đạt Level 10, tăng dần độ khó/chiều dài chuỗi sau mỗi 3 ván thắng liên tiếp và kết thúc ván ngay khi sai 1 lần.
 
+## 🚀 Đã hoàn thành gần đây (2026-08-05 — Account/Progression + Versus + Grid):
+- **Overall Elo weighted average**: `calculateOverallElo()` (`lib/utils.ts`) giờ bỏ qua category chưa từng chơi Ranked thay vì mặc định 1000 — xem mục 12.
+- **`category_bests` tách theo mode** (Solo Ranked vs Versus Ranked) — migration `20260804_split_category_bests_by_mode.sql`, xem mục 12. **Cần chạy migration này trên Supabase project thật.**
+- **Rematch thật** — nút "Chơi lại" ở Result (Versus) gửi lời mời thách đấu trực tiếp tới đúng đối thủ vừa đấu qua hệ thống Thách đấu sẵn có, kể cả khi không phải bạn bè — migration `20260804_rematch_bypasses_friend_check.sql`, xem mục 12.
+- **Add login method + OAuth đăng nhập chính** — cả 2 giờ dùng Supabase thật (`signInWithOAuth`/`linkIdentity`), trước đó đăng nhập chính chỉ chạy qua mock API dù Supabase đã bật. Cần cấu hình OAuth app trên Supabase Dashboard mới chạy end-to-end được — xem chi tiết ở mục Profile+Settings bên dưới.
+- **Grid Memory Simple/Full display toggle** — đã làm, xem mục 10.
+- **Base viewTime/answerTime Number/Alphabet/Sequence/Color** — đã chính thức hóa vào docs/gameplay, xem mục 10.
+- **Đính chính (thông tin cũ sai trong chính file này, không phải thay đổi mới)**: Versus seed đã server-generated từ trước (mục 4), Endless Mode Color đã có công thức từ trước (mục 10), Settings Language/Sounds/Haptics đã lưu Supabase thật từ trước (mục Profile+Settings) — các dòng cũ nói "chưa làm" cho những mục này là lỗi thời, không phải gap thật.
+- **Cố ý chưa làm (đã hỏi, người dùng chọn để sau)**: RPC `claim_opponent_disconnect_forfeit` (mục 15) và Guest→tài khoản thật merge best score/level (mục 6) — cả 2 vẫn còn nguyên là gap, không đụng tới lượt này.
+
 ---
 
 ## 1. Các trang còn state-switcher prototype (`StatePill`)
@@ -209,14 +219,33 @@ Home/Game Select/Gameplay).
   toggle thật hiện toast "Saved", nút "Language" hiện toast "chưa có",
   label Back đúng.
 
-**Còn thiếu (cố ý, ghi lại để track):**
-- Việc lưu thay đổi Settings (toggle Notifications/Sounds/Haptics) chỉ là
-  local-optimistic — không có `PATCH /api/settings` thật nào được gọi.
-  Docs Settings có nhắc tới case "lưu setting thất bại → thông báo lỗi tại
-  đúng row" nhưng chưa có network layer thật cho việc ghi để case đó có ý
-  nghĩa — cần quyết định trước khi làm (giống gap #5, cần một dạng "submit"
-  thật).
-- Add login method, Language, Reset all progress: chỉ dừng ở mức "thông báo đang phát triển" (Edit Profile, Terms of service, Privacy policy đã được phát triển hoàn chỉnh).
+**Đính chính + đóng thêm (2026-08-05):**
+- Dòng "toggle Notifications/Sounds/Haptics chỉ local-optimistic" ở đây đã
+  cũ/sai một phần: **Sounds và Haptics đã lưu Supabase thật từ trước**
+  (`supabaseService.updateSettings({ sounds/haptics })` gọi ngay trong
+  handler), chỉ riêng **Notifications** thật sự thiếu 1 dòng gọi lưu — đã
+  thêm cho khớp đúng pattern của 2 toggle kia. **Language** cũng đã lưu
+  Supabase thật từ trước (`toggleLanguage()` → `supabaseService.updateSettings({ language })`),
+  không hề dừng ở "thông báo đang phát triển" như dòng cũ bên dưới từng ghi.
+  Vẫn chưa có network layer thật cho case lỗi "lưu setting thất bại → thông
+  báo lỗi tại đúng row" (docs Settings có nhắc, nhưng cả 3 toggle hiện luôn
+  optimistic, không có lỗi thật nào để hiện — vẫn còn thiếu).
+- **Add login method**: đã làm thật. Phát hiện khi làm: đăng nhập
+  Google/Discord chính (`authService.loginWithOAuth`) trước đó **chỉ gọi
+  mock API** (`/auth/oauth/{provider}`) dù `isSupabaseConfigured()` đang
+  bật — `authSupabaseService` không hề có method OAuth nào, chỉ có email/
+  password. Đã sửa cả 2 cùng lúc: `authSupabaseService` có thêm
+  `loginWithOAuth()` (dùng `supabase.auth.signInWithOAuth()`) và
+  `linkOAuthIdentity()` (dùng `supabase.auth.linkIdentity()`, cho "Add login
+  method"). Cả 2 đều redirect nguyên trang sang provider rồi quay lại — tận
+  dụng `LandingScreen`'s `checkSession()` sẵn có (mục 14) để tự nhận session
+  mới sau redirect, không cần thêm `onAuthStateChange` listener nào. **Cần
+  bạn tự cấu hình Google/Discord OAuth app trong Supabase Dashboard
+  (Client ID/Secret)** — việc này ngoài phạm vi code, chưa verify được đăng
+  nhập Google/Discord thật chạy end-to-end cho tới khi cấu hình xong.
+- Reset all progress: vẫn chỉ dừng ở mức "thông báo đang phát triển" — chưa
+  làm (Edit Profile, Terms of service, Privacy policy đã được phát triển
+  hoàn chỉnh).
 
 **Versus Gameplay — đã dọn phần prototype:** 4 thanh `ProtoPill` đã bị gỡ;
 game/mode/difficulty/seed/player được nhận từ phòng thật, năm game đều dùng
@@ -325,21 +354,24 @@ Vẫn còn thiếu so với docs — chỉ dùng tín hiệu mạng thật (`nav
 
 ---
 
-## 4. Versus — shared seed đã nối, nguồn sinh vẫn chưa authoritative
+## 4. Versus — shared seed — ĐÃ ĐÓNG (server-generated thật)
 
 `docs/technical/README.md`:
 
 > Versus matches must use a single server-generated `seed` so both players
 > receive an identical puzzle.
 
-`VersusGameplayScreen.tsx` không còn tự sinh seed. Seed được tạo cùng phòng,
-persist trong `versus_rooms`, truyền qua Room → App → Gameplay, rồi dùng PRNG
-xác định theo round/game nên hai client nhận cùng đề khi cùng đọc một phòng.
+**Cập nhật (2026-08-05):** mục này ghi sai — đã đọc lại `create_versus_room`
+và `poll_matchmaking` trong `database/migrations/20260803_atomic_versus_flows.sql`:
+cả 2 RPC `SECURITY DEFINER` đều tự sinh seed bằng
+`UPPER(SUBSTRING(MD5(gen_random_uuid()::TEXT), 1, 16))` **trước khi** insert
+row, phía client (`versusRoomService.createRoom`) chỉ gọi RPC và nhận lại
+seed đã sinh sẵn — không có nhánh nào client tự sinh seed. Yêu cầu
+"server-generated" đã đáp ứng đầy đủ từ trước, không phải chỉ "đã nối,
+chưa authoritative" như dòng cũ ở đây từng ghi.
 
-Phần còn thiếu: nhánh Supabase hiện vẫn sinh seed ở client tạo phòng trước khi
-insert. Vì vậy đã đóng lỗi "mỗi client một seed", nhưng chưa đáp ứng tuyệt đối
-yêu cầu **server-generated**. Cần database default/RPC hoặc match service phía
-server cấp seed.
+`VersusGameplayScreen.tsx` dùng seed đó làm PRNG xác định theo round/game nên
+hai client nhận cùng đề khi cùng đọc một phòng — phần này không đổi.
 
 ---
 
@@ -492,20 +524,35 @@ tra thắng/thua/timer/level đúng như kỳ vọng.
   Solo Practice có thể reveal/replay đúng cho Number, Alphabet, Grid, Sequence
   và Color.
 
+**Đã đóng thêm (2026-08-05):**
+- **Grid Memory Simple/Full display layout toggle** — đã làm.
+  `GridBoard.tsx` nhận thêm `activeCells`/`displayMode`; `GameplayScreen.tsx`
+  thêm 2 nút chuyển layout ngay trên bàn cờ Grid (Full mặc định). `activeCells`
+  luôn = `gridLit` thật kể cả lúc Answering (khác `litTiles`, vẫn bị ẩn `[]`
+  lúc Answering để không lộ số) — chỉ tiết lộ **vị trí nào thuộc puzzle**,
+  không tiết lộ **thứ tự đúng**, đúng tinh thần "Simple" trong docs. Chưa làm
+  phần còn lại của "In-Round Settings" trong `grid-memory.md` (đổi level/
+  beginCount giữa chừng ván) — không nằm trong yêu cầu lần này.
+- **Base viewTime/answerTime cho Number/Alphabet/Sequence/Color** — đã
+  chính thức hóa (không đổi số, chỉ ghi vào docs): mỗi file
+  `docs/gameplay/{number,alphabet,sequence,color}-memory.md` có thêm mục
+  "Default Timing" ghi đúng công thức đang chạy
+  (`getAnswerTimeSeconds()`/`startNumberRound()`/`startAlphaRound()` trong
+  `GameplayScreen.tsx`) làm default chính thức, thay vì để là "chưa có
+  trong docs".
+- **Endless Mode Color — công thức thực ra ĐÃ có trong docs từ trước.**
+  Dòng "Color ghi rõ chưa định nghĩa công thức Endless" ở mục cũ ngay dưới
+  đây là thông tin cũ/sai — `docs/gameplay/color-memory.md` § Endless Mode
+  đã ghi rõ (`colorCount` cố định 6, length bắt đầu 13 + 1/3 win liên tiếp),
+  và `getEndlessConfig()` trong `game-rules.ts` implement đúng y hệt. Không
+  có gì cần sửa ở mục này, chỉ đính chính.
+
 **Còn thiếu, chưa làm (cố ý, không tự bịa số)**:
-- **Grid Memory Simple/Full display layout toggle** — chưa làm, tính năng
-  phụ (settings trong lúc chơi), không phải core win/lose rule.
-- **Endless Mode UI/unlock persistence** — rule cho Number/Alphabet/Grid/
-  Sequence có trong gameplay docs nhưng Game Select chưa có entry/flow thật;
-  Color ghi rõ chưa định nghĩa công thức Endless. **Missing in source
-  documentation:** flow sản phẩm chính xác để chọn/tiếp tục Endless và rule
-  Endless cho Color.
-- **Base viewTime/answerTime cho Number/Alphabet/Sequence** — khác Grid
-  Memory (có số cụ thể 18s/40s trong docs), 3 game này chỉ nói tên biến
-  `viewTime`/`answerTime` mà **không cho số mặc định**. Difficulty-seconds
-  đã được cộng đúng vào, nhưng con số NỀN (trước khi cộng difficulty) vẫn
-  là công thức tự chọn cũ (scale theo độ dài), không có nguồn từ docs — ghi
-  rõ trong comment code, không tự bịa số thay cho docs.
+- **Endless Mode UI/unlock persistence** — rule cho cả 5 game có trong
+  gameplay docs (kể cả Color, xem đính chính ngay trên) và Game Select đã có
+  entry/flow thật (`SOLO_ENDLESS` nối tới `GameSelectScreen.tsx`) — dòng cũ ở
+  đây nói "Game Select chưa có entry/flow thật" cũng đã lỗi thời. Không còn
+  gì thiếu ở mục này.
 
 ---
 
@@ -534,20 +581,35 @@ vẫn hard-code trong frontend. Đây là yêu cầu ở tầm backend/hạ tầ
 
 ---
 
-## 12. Hai contract dữ liệu Ranked cần quyết định schema
+## 12. Hai contract dữ liệu Ranked — ĐÃ ĐÓNG cả 3 mục (2026-08-05)
 
-- Gameplay docs yêu cầu overall Elo là **weighted average** của 5 category
-  Elo, nhưng không định nghĩa trọng số. Matchmaking và Versus hiện đã dùng
-  category Elo authoritative; match finalizer cố ý chưa tự cập nhật
-  `profiles.overall_elo`. **Missing in source documentation:** trọng số và
-  cách xử lý category chưa từng chơi.
-- Gameplay docs yêu cầu best score theo `category + mode`, trong khi
-  `category_bests` hiện chỉ có một cặp `ranked_score/ranked_level`, nên Solo
-  Ranked và Versus Ranked dùng chung kỷ lục. Cần migration/schema contract
-  riêng cho từng mode trước khi tách mà không làm mất dữ liệu hiện có.
-- Result của Versus ghi nút Tái đấu, nhưng `App.tsx` hiện đưa người chơi về
-  Quick Match; flow gửi/accept/decline rematch với đúng đối thủ chưa có API
-  hoặc event contract phía server.
+- **Overall Elo weighted average**: đã quyết định trọng số — trung bình đều
+  của các category **đã có** Ranked record (loại hẳn category chưa từng
+  chơi khỏi phép tính, không kéo về 1000 mặc định). Hóa ra việc tính này đã
+  tồn tại từ trước (`calculateOverallElo()` trong `lib/utils.ts`, dùng ở
+  Profile/Lobby/Auth mỗi lần hiển thị) — chỉ sai ở chỗ trước đây category
+  chưa chơi bị mặc định `elo: 1000` thay vì bị loại ra. Đã sửa đúng hàm này;
+  không cần RPC/migration nào vì overall Elo chưa bao giờ được ghi xuống
+  `profiles.overall_elo`, luôn tính lại mỗi lần đọc.
+- **`category_bests` tách theo mode**: đã migration
+  (`database/migrations/20260804_split_category_bests_by_mode.sql`) — thêm
+  `solo_ranked_score/level` và `versus_ranked_score/level` riêng biệt,
+  migrate dữ liệu `ranked_score/ranked_level` cũ (vốn gộp cả 2 mode) vào
+  `solo_ranked_*`. Cột `ranked_score`/`ranked_level` cũ được giữ lại dưới
+  dạng **GENERATED** (`GREATEST` của 2 mode) nên mọi nơi đọc cũ (Leaderboard
+  sort, Lobby/Profile "Ranked Score") không cần đổi gì. `gameSupabaseService.submitResult()`
+  đã ghi đúng cặp cột theo mode. **Cần chạy migration này trên Supabase
+  project thật** — code không tự áp dụng migration.
+- **Rematch**: đã nối. Nút "Chơi lại" ở Result (Versus) giờ mở lại
+  `ChallengeModal` với đúng category/difficulty/mode vừa chơi, gửi lời mời
+  thách đấu thật qua `create_match_invite` tới đúng đối thủ vừa đấu — kể cả
+  khi đối thủ không phải bạn bè (ví dụ tới từ Quick Match). RPC
+  `create_match_invite` được thêm tham số `p_rematch_room_code` (migration
+  `database/migrations/20260804_rematch_bypasses_friend_check.sql`): bỏ qua
+  check bạn bè CHỈ khi room code đó là 1 trận `finished` thật giữa đúng 2
+  người — không mở cửa mời spam người lạ bất kỳ. Chấp nhận lời mời điều
+  hướng qua đúng `versus-room` như luồng thách đấu bạn bè sẵn có
+  (`ProfileScreen`'s `onChallengeAccepted` pattern, tái dùng y hệt).
 
 ---
 

@@ -45,8 +45,13 @@ export function StoryBookCard({
   beginJourneyLabel,
 }: StoryBookCardProps) {
   const [transitionPhase, setTransitionPhase] = useState<TransitionPhase>('idle')
+  const [isImageLoaded, setIsImageLoaded] = useState(false)
   const phaseHandledRef = useRef(false)
   const isBusy = transitionPhase !== 'idle'
+
+  useEffect(() => {
+    setIsImageLoaded(false)
+  }, [chapter.image])
 
   const advanceTransition = useCallback(() => {
     if (phaseHandledRef.current || transitionPhase === 'idle') return
@@ -175,12 +180,29 @@ export function StoryBookCard({
       <div className="grid min-w-0 md:grid-cols-[minmax(0,1.05fr)_minmax(20rem,0.95fr)]">
         <div className="relative aspect-[16/10] min-h-0 overflow-hidden bg-surface md:aspect-auto md:min-h-[32rem]">
           {chapter.image ? (
-            <img
-              src={chapter.image}
-              alt={chapter.title}
-              className="absolute inset-0 h-full w-full object-cover"
-              loading="eager"
-            />
+            <>
+              {!isImageLoaded && (
+                <div
+                  className="absolute inset-0 bg-surface-raised animate-pulse"
+                  aria-hidden="true"
+                />
+              )}
+              <img
+                key={chapter.image}
+                src={chapter.image}
+                alt={chapter.title}
+                ref={(el) => {
+                  if (el?.complete && el.naturalWidth > 0) {
+                    setIsImageLoaded(true)
+                  }
+                }}
+                onLoad={() => setIsImageLoaded(true)}
+                className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-300 ${
+                  isImageLoaded ? 'opacity-100' : 'opacity-0'
+                }`}
+                loading="eager"
+              />
+            </>
           ) : null}
 
           <div

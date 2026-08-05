@@ -60,6 +60,23 @@ Added on top of both `viewTime` and `answerTime`:
 | Hard | +3s |
 | Super Hard | +2s |
 
+## Default Timing
+
+This game's own spec never gave `viewTime`/`answerTime` concrete default
+seconds (only Grid Memory's doc did) — implementation shipped with a
+length-scaled placeholder that was never promoted to a documented default.
+Promoted here as-is, formalizing shipped/tested behavior rather than
+changing it:
+
+- `viewTime` = `max(0.8s, characters × 0.6s)`, before adding the Difficulty
+  Mode seconds above.
+- `answerTime` = `10s + level × 3s` (Endless: level is treated as
+  `10 + floor(consecutive wins ÷ 3)`), before adding the Difficulty Mode
+  seconds above.
+
+Source: `getAnswerTimeSeconds()`/`startNumberRound()` in
+`frontend/src/pages/gameplay/GameplayScreen.tsx`.
+
 ## Controls
 
 Player can **Pause** mid-round and **Resume** at the exact same state, or **Reset** the round at any time. During the Viewing phase, player can also **Skip** ahead to Answering early (see Round Flow).

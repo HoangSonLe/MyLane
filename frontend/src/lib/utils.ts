@@ -22,7 +22,12 @@ export const ALL_GAME_CATEGORIES = ['number', 'alphabet', 'grid', 'sequence', 'c
 
 /**
  * Calculates overall Elo rating as the average of the 5 game categories per docs/gameplay/README.md.
- * Missing categories default to 1000.
+ * docs/gameplay/README.md doesn't define a weighting scheme (see
+ * docs/technical/known-gaps.md #12), so this averages only categories the
+ * player has an actual Versus Ranked record for (a `category_elo` row is
+ * only ever inserted by `finalize_versus_room` on that category's first
+ * Ranked match) — a category never played isn't counted, instead of
+ * silently dragging the average toward 1000.
  */
 export function calculateOverallElo(
   eloEntries?: Array<{ category: string; elo?: number | null }> | null,
@@ -31,11 +36,12 @@ export function calculateOverallElo(
   if (!eloEntries || eloEntries.length === 0) {
     return fallbackElo
   }
-  const total = ALL_GAME_CATEGORIES.reduce((acc, cat) => {
-    const entry = eloEntries.find((item) => item.category === cat)
-    return acc + (entry?.elo ?? 1000)
-  }, 0)
-  return Math.round(total / ALL_GAME_CATEGORIES.length)
+  const played = eloEntries.filter((entry) => typeof entry.elo === 'number')
+  if (played.length === 0) {
+    return fallbackElo
+  }
+  const total = played.reduce((acc, entry) => acc + (entry.elo as number), 0)
+  return Math.round(total / played.length)
 }
 
 /**

@@ -216,12 +216,38 @@ export const authService = {
       throw new Error(`You are offline. ${provider.toUpperCase()} login requires an active connection.`)
     }
 
+    if (isSupabaseConfigured()) {
+      try {
+        await authSupabaseService.loginWithOAuth(provider)
+      } catch (err) {
+        throw toFriendlyError(err, `${provider.toUpperCase()} login failed.`)
+      }
+      // Unreachable in practice — signInWithOAuth navigates the page away
+      // before this would resolve. Kept only to satisfy the return type.
+      return new Promise<UserSession>(() => {})
+    }
+
     try {
       const { data } = await apiClient.post<AuthResponse>(`/auth/oauth/${provider}`)
       saveToken(data.token, data.user)
       return data.user
     } catch (err) {
       throw toFriendlyError(err, `${provider.toUpperCase()} login failed.`)
+    }
+  },
+
+  /** Link an additional OAuth provider to the already signed-in account. */
+  async linkOAuthMethod(provider: 'google' | 'discord'): Promise<void> {
+    if (!navigator.onLine) {
+      throw new Error(`You are offline. Linking ${provider.toUpperCase()} requires an active connection.`)
+    }
+    if (!isSupabaseConfigured()) {
+      throw new Error('Linking a login method requires a real account backend.')
+    }
+    try {
+      await authSupabaseService.linkOAuthIdentity(provider)
+    } catch (err) {
+      throw toFriendlyError(err, `Linking ${provider.toUpperCase()} failed.`)
     }
   },
 

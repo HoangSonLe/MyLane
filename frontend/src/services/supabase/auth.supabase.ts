@@ -75,6 +75,63 @@ export const authSupabaseService = {
   },
 
   /**
+   * Supabase Auth: OAuth login (Google/Discord). Redirects the whole page to
+   * the provider's consent screen and back — this promise only rejects on
+   * an immediate client-side error (e.g. provider not enabled in the
+   * Supabase project); it does not resolve with a session, since the page
+   * navigates away before that would happen. `LandingScreen`'s existing
+   * `checkSession()` on mount picks up the new session once the redirect
+   * lands back on the app (see lib/utils/session-resume.ts's resume flow —
+   * the same "already authenticated on load" path, no dedicated
+   * auth-state listener needed here).
+   */
+  async loginWithOAuth(provider: 'google' | 'discord'): Promise<void> {
+    const supabase = getSupabaseClient()
+    if (!supabase) throw new Error('Supabase client uninitialized')
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider,
+      options: { redirectTo: window.location.origin },
+    })
+    if (error) throw error
+  },
+
+  /**
+   * Supabase Auth: link an additional OAuth provider to the signed-in
+   * account (Settings § Add login method). Same redirect-away caveat as
+   * loginWithOAuth above.
+   */
+  async linkOAuthIdentity(provider: 'google' | 'discord'): Promise<void> {
+    const supabase = getSupabaseClient()
+    if (!supabase) throw new Error('Supabase client uninitialized')
+    const { error } = await supabase.auth.linkIdentity({
+      provider,
+      options: { redirectTo: window.location.origin },
+    })
+    if (error) throw error
+  },
+
+  /**
+   * Supabase Auth: OAuth identities linked to the signed-in account, for
+   * Settings § Linked methods. Excludes the 'email' identity — that section
+   * only ever displayed Google/Discord-style methods.
+   */
+  async getLinkedIdentities(): Promise<{ id: string; label: string; handle: string }[]> {
+    const supabase = getSupabaseClient()
+    if (!supabase) return []
+    const { data, error } = await supabase.auth.getUserIdentities()
+    if (error || !data?.identities) return []
+    return data.identities
+      .filter((identity) => identity.provider !== 'email')
+      .map((identity) => ({
+        id: identity.provider,
+        label: identity.provider === 'google' ? 'Google' : identity.provider === 'discord' ? 'Discord' : identity.provider,
+        handle: (identity.identity_data?.email as string | undefined)
+          || (identity.identity_data?.name as string | undefined)
+          || identity.provider,
+      }))
+  },
+
+  /**
    * Supabase Auth: Anonymous Guest Login
    */
   async loginAsGuest(): Promise<UserSession | null> {

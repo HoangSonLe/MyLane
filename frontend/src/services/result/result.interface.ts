@@ -10,12 +10,17 @@ export interface VersusComparisonData {
   playerScore: number
   opponentScore: number
   totalRounds: number
+  /** Opponent's profile id — needed to send a direct Rematch challenge. */
+  opponentId?: string
 }
 
 /** Raw session tallies GameplayScreen hands off at game-over — see docs/gameplay/README.md § Scoring Formula. */
 export interface GameResultInput {
   /** Server match identity for idempotent Versus result persistence. */
   matchId?: string
+  /** versus_rooms.code of the finished match — lets a Rematch challenge
+   * bypass the friend-only check for this exact opponent. */
+  roomCode?: string
   game: GameId
   mode: ModeId
   difficulty: DifficultyId

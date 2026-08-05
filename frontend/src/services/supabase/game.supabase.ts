@@ -78,8 +78,13 @@ export const gameSupabaseService = {
           .maybeSingle()
         throwIfSupabaseError(prevBestError, 'Read previous category best')
 
+        // category_bests tracks Solo Ranked and Versus Ranked bests separately
+        // (docs/gameplay/README.md "best score ... per category + mode") — see
+        // database/migrations/20260804_split_category_bests_by_mode.sql.
         if (prevBest) {
-          previousBestScore = usesRankedScoring ? prevBest.ranked_score : prevBest.practice_score
+          previousBestScore = usesRankedScoring
+            ? (isVersusRanked ? prevBest.versus_ranked_score : prevBest.solo_ranked_score)
+            : prevBest.practice_score
           previousBestLevel = prevBest.highest_level
         }
 
@@ -184,9 +189,13 @@ export const gameSupabaseService = {
           throwIfSupabaseError(historyInsertError, 'Insert match history')
         }
 
-        // 4. Upsert category bests
+        // 4. Upsert category bests — solo_ranked_*/versus_ranked_* stay
+        // independent; ranked_score/ranked_level are DB-generated
+        // (GREATEST of the two) and must not be written here.
+        const isSoloRanked = usesRankedScoring && !isVersusRanked
         const newPracticeScore = Math.max(prevBest?.practice_score || 0, !usesRankedScoring ? breakdown.score : 0)
-        const newRankedScore = Math.max(prevBest?.ranked_score || 0, usesRankedScoring ? breakdown.score : 0)
+        const newSoloRankedScore = Math.max(prevBest?.solo_ranked_score || 0, isSoloRanked ? breakdown.score : 0)
+        const newVersusRankedScore = Math.max(prevBest?.versus_ranked_score || 0, isVersusRanked ? breakdown.score : 0)
         const newHighestLevel = Math.max(prevBest?.highest_level || 0, input.levelReached)
 
         const { error: bestWriteError } = await supabase.from('category_bests').upsert(
@@ -195,8 +204,10 @@ export const gameSupabaseService = {
             category: input.game,
             practice_score: newPracticeScore,
             practice_level: Math.max(prevBest?.practice_level || 0, !usesRankedScoring ? input.levelReached : 1),
-            ranked_score: newRankedScore,
-            ranked_level: Math.max(prevBest?.ranked_level || 0, usesRankedScoring ? input.levelReached : 1),
+            solo_ranked_score: newSoloRankedScore,
+            solo_ranked_level: Math.max(prevBest?.solo_ranked_level || 0, isSoloRanked ? input.levelReached : 1),
+            versus_ranked_score: newVersusRankedScore,
+            versus_ranked_level: Math.max(prevBest?.versus_ranked_level || 0, isVersusRanked ? input.levelReached : 1),
             highest_level: newHighestLevel,
             updated_at: new Date().toISOString(),
           },

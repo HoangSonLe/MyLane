@@ -31,6 +31,16 @@ export function StoryScreen({ onBack, onPlay }: StoryScreenProps) {
   const currentChapter = chapters[currentChapterIndex]
   const totalChapters = chapters.length
 
+  // Preload all chapter images when screen loads
+  useEffect(() => {
+    chapters.forEach((chapter) => {
+      if (chapter.image) {
+        const img = new Image()
+        img.src = chapter.image
+      }
+    })
+  }, [chapters])
+
   const triggerHaptic = () => {
     if (!hapticsEnabled || typeof navigator === 'undefined' || !('vibrate' in navigator)) return
     try {

@@ -49,7 +49,11 @@ export const matchInviteSupabaseService = {
     inviteeId: string,
     category: GameId,
     difficulty = 'medium',
-    mode = 'versus_ranked'
+    mode = 'versus_ranked',
+    /** Room code of a just-finished match against this exact opponent — lets
+     * a non-friend Rematch bypass the friend-check. See
+     * database/migrations/20260804_rematch_bypasses_friend_check.sql. */
+    rematchRoomCode?: string
   ): Promise<{ inviteId: string; roomCode: string }> {
     const supabase = requireSupabase()
     const { data, error } = await supabase.rpc('create_match_invite', {
@@ -57,6 +61,7 @@ export const matchInviteSupabaseService = {
       p_category: category,
       p_difficulty: difficulty.replace(/-/g, '_'),
       p_mode: mode.replace(/-/g, '_'),
+      p_rematch_room_code: rematchRoomCode ?? null,
     })
     if (error) throwInviteError(error)
     const row = Array.isArray(data) ? data[0] : data

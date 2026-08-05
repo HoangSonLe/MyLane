@@ -60,6 +60,18 @@ Added to `answerTime`, same pattern as the other games:
 | Hard | +3s |
 | Super Hard | +2s |
 
+## Default Timing
+
+`answerTime` never had a documented base default (only Grid Memory's doc
+gives one). Promoted here as shipped/tested behavior, same situation as
+[Number Memory § Default Timing](number-memory.md#default-timing):
+
+- `answerTime` = `10s + level × 3s` (Endless: level is treated as
+  `10 + floor(consecutive wins ÷ 3)`), before adding the Difficulty Mode
+  seconds above. Same formula as Number/Alphabet Memory.
+
+Source: `getAnswerTimeSeconds()` in `frontend/src/pages/gameplay/GameplayScreen.tsx`.
+
 ## Controls
 
 Pause/Resume at the exact same state, or Reset the round at any time — same as the other games.
