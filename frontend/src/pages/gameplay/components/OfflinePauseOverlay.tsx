@@ -24,10 +24,11 @@ function IconWifiOff() {
 /**
  * Shown when the network drops mid-answering. Not a real server-controlled
  * timer (docs/technical/README.md's requirement — see
- * docs/technical/known-gaps.md #3/#10) — this only reacts to the real
- * navigator online/offline signal (useNetworkStatus). The answering countdown
- * is paused (not reset) while this is up and resumes automatically once back
- * online; see the timer effect in GameplayScreen.tsx.
+ * docs/technical/known-gaps.md "Gameplay — timer vẫn client-side") — this
+ * only reacts to the real navigator online/offline signal
+ * (useNetworkStatus). The answering countdown is paused (not reset) while
+ * this is up and resumes automatically once back online; see the timer
+ * effect in GameplayScreen.tsx.
  */
 export function OfflinePauseOverlay({ onQuit }: { onQuit: () => void }) {
   const { t } = useTranslation()

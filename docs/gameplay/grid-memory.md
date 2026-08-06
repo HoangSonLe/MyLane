@@ -53,12 +53,14 @@ Viewing 18s · Answering 40s · Wrong-tap penalty 3s.
 
 ## In-Round Settings
 
-Player can open a quick settings panel to change the level (grid size) and the max cell count for the current round. Two display layouts:
+Two display layouts, switchable during play:
 
 - **Simple**: only cells with numbers are shown.
 - **Full**: the entire grid is shown, including empty cells.
 
 Supports Pause and Reset, same as the other games. Also supports **Skip** during the Viewing phase (see Mechanics).
+
+> Mid-round level (grid size) / max-cell-count change is intentionally out of scope — decided against building it.
 
 ## Endless Mode
 

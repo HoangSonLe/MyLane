@@ -79,7 +79,7 @@ export const resultHandlers = [
       MOCK_LAST_PLAYED.maxScore = 10
       MOCK_LAST_PLAYED.roundsPlayed = input.roundsCleared
 
-      // Sync to ProfileStats (docs/technical/known-gaps.md item 5)
+      // Sync to ProfileStats
       MOCK_PROFILE.totalGames += 1
       if (outcome === 'win') MOCK_PROFILE.wins += 1
       else if (outcome === 'draw') MOCK_PROFILE.draws += 1

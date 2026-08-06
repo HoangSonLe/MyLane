@@ -245,14 +245,20 @@ export const gameSupabaseService = {
     const supabase = getSupabaseClient()
     if (!supabase) return []
 
-    const { data: userData } = await supabase.auth.getUser()
+    const { data: userData, error: authError } = await supabase.auth.getUser()
+    throwIfSupabaseError(authError, 'Read authenticated user')
     const userId = userData?.user?.id
     if (!userId) return []
 
-    const [{ data: eloRows }, { data: bestRows }] = await Promise.all([
+    const [
+      { data: eloRows, error: eloError },
+      { data: bestRows, error: bestError },
+    ] = await Promise.all([
       supabase.from('category_elo').select('*').eq('user_id', userId),
       supabase.from('category_bests').select('*').eq('user_id', userId),
     ])
+    throwIfSupabaseError(eloError, 'Read category Elo')
+    throwIfSupabaseError(bestError, 'Read category bests')
 
     const eloMap = new Map((eloRows || []).map((e: any) => [e.category, e]))
     const bestMap = new Map((bestRows || []).map((b: any) => [b.category, b]))
@@ -482,19 +488,79 @@ export const gameSupabaseService = {
     if (!currentUserInEntries && currentUserId) {
       const { data: curProfile } = await supabase
         .from('profiles')
-        .select('name, handle, avatar_url, overall_elo')
+        .select('name, handle, avatar_url')
         .eq('id', currentUserId)
         .maybeSingle()
 
       if (curProfile) {
+        // Mirror whichever branch above built `entries`, scoped to just this
+        // user, so the pinned row's score/elo mean the same thing as every
+        // other row on this exact board/metric — previously this always
+        // hardcoded score: 0 and elo: overall_elo (wrong metric entirely for
+        // a category board), which read as "you have 0 points" even when
+        // the player had a real score.
+        let pinnedScore = 0
+        let pinnedElo = 1000
+
+        if (params.board === 'endless') {
+          const { data: row } = await supabase
+            .from('match_history')
+            .select('rounds_cleared')
+            .eq('user_id', currentUserId)
+            .eq('category', params.category)
+            .eq('mode', 'solo_endless')
+            .order('rounds_cleared', { ascending: false })
+            .limit(1)
+            .maybeSingle()
+          pinnedScore = row?.rounds_cleared || 0
+        } else if (params.board === 'weekly' || params.board === 'monthly') {
+          const { data: row } = await supabase
+            .from('match_history')
+            .select('score')
+            .eq('user_id', currentUserId)
+            .eq('category', params.category)
+            .in('mode', ['solo_ranked', 'versus_ranked'])
+            .gte('played_at', getPeriodStart(params.board))
+            .order('score', { ascending: false })
+            .limit(1)
+            .maybeSingle()
+          pinnedScore = row?.score || 0
+        } else if (params.metric === 'elo') {
+          const { data: row } = await supabase
+            .from('category_elo')
+            .select('elo')
+            .eq('user_id', currentUserId)
+            .eq('category', params.category)
+            .maybeSingle()
+          pinnedElo = row?.elo || 1000
+          // score stays 0 — every entry on the "By Elo" view shows score: 0.
+        } else {
+          const [{ data: bestRow }, { data: eloRow }] = await Promise.all([
+            supabase
+              .from('category_bests')
+              .select('ranked_score')
+              .eq('user_id', currentUserId)
+              .eq('category', params.category)
+              .maybeSingle(),
+            supabase
+              .from('category_elo')
+              .select('elo')
+              .eq('user_id', currentUserId)
+              .eq('category', params.category)
+              .maybeSingle(),
+          ])
+          pinnedScore = bestRow?.ranked_score || 0
+          pinnedElo = eloRow?.elo || 1000
+        }
+
         pinnedEntry = {
           rank: 999,
           userId: currentUserId,
           username: curProfile.name || 'Player',
           handle: curProfile.handle || 'player',
           avatarUrl: curProfile.avatar_url || undefined,
-          score: 0,
-          elo: curProfile.overall_elo || 1000,
+          score: pinnedScore,
+          elo: pinnedElo,
           isCurrentUser: true,
         }
       }

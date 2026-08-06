@@ -301,8 +301,9 @@ export function GameplayScreen({
 
   // Tick — separate from the reset above so going offline mid-answering
   // pauses the countdown instead of resetting it. Not a real
-  // server-controlled timer (see docs/technical/known-gaps.md #3/#10) — this
-  // only reacts to the real navigator online/offline signal.
+  // server-controlled timer (see docs/technical/known-gaps.md "Gameplay —
+  // timer vẫn client-side") — this only reacts to the real navigator
+  // online/offline signal.
   useEffect(() => {
     if (phase === 'answering' && !isOffline && !paused) {
       timerRef.current = setInterval(() => {
