@@ -1,6 +1,6 @@
 import { Avatar } from '@/components/ui/Avatar'
 
-import type { Friend } from '@/services/lobby/lobby.interface'
+import { friendStatusColor, type Friend } from '@/services/lobby/lobby.interface'
 import { useTranslation } from '@/i18n/useTranslation'
 
 interface Props {
@@ -10,12 +10,7 @@ interface Props {
 
 export function FriendRow({ friend, onSelect }: Props) {
   const { t } = useTranslation()
-  const statusBg =
-    friend.status === 'online'
-      ? 'var(--ma-success)'
-      : friend.status === 'in-game'
-      ? 'var(--ma-warning)'
-      : 'var(--ma-fg-subtle)'
+  const statusBg = friendStatusColor(friend.status)
 
   const statusLabel =
     friend.status === 'online'
@@ -64,14 +59,7 @@ export function FriendRow({ friend, onSelect }: Props) {
       {/* Status label */}
       <span
         className="shrink-0 text-[11px] font-semibold"
-        style={{
-          color:
-            friend.status === 'online'
-              ? 'var(--ma-success)'
-              : friend.status === 'in-game'
-              ? 'var(--ma-warning)'
-              : 'var(--ma-fg-subtle)',
-        }}
+        style={{ color: statusBg }}
       >
         {statusLabel}
       </span>

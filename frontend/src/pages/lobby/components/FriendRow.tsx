@@ -1,7 +1,7 @@
 import { IconSwords } from '@/components/ui/icons'
 import { Avatar } from '@/components/ui/Avatar'
 import { Card } from '@/components/ui/card'
-import type { Friend } from '@/services/lobby/lobby.interface'
+import { friendStatusColor, type Friend } from '@/services/lobby/lobby.interface'
 import { useTranslation } from '@/i18n/useTranslation'
 
 // ─── Sub-components ───────────────────────────────────────────────
@@ -23,12 +23,7 @@ function PresenceDot({ status }: { status: Friend['status'] }) {
         height: '8px',
         width: '8px',
         borderRadius: '50%',
-        background:
-          status === 'in-game'
-            ? 'var(--ma-warning)'
-            : status === 'offline'
-            ? 'var(--ma-fg-subtle)'
-            : 'var(--ma-success)',
+        background: friendStatusColor(status),
       }}
     />
   )
@@ -60,12 +55,7 @@ export function FriendRow({ friend, onChallenge, onSelect }: FriendRowProps) {
             height: '10px',
             width: '10px',
             borderRadius: '50%',
-            background:
-              friend.status === 'in-game'
-                ? 'var(--ma-warning)'
-                : friend.status === 'offline'
-                ? 'var(--ma-fg-subtle)'
-                : 'var(--ma-success)',
+            background: friendStatusColor(friend.status),
             border: '2px solid var(--ma-bg)',
           }}
           aria-hidden="true"

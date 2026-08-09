@@ -22,3 +22,12 @@ export interface LobbyPlayer {
   name: string
   elo: number
 }
+
+/** Presence-indicator color for a friend's status — shared by every place that renders a status dot/label. */
+export function friendStatusColor(status: Friend['status']): string {
+  return status === 'in-game'
+    ? 'var(--ma-warning)'
+    : status === 'offline'
+    ? 'var(--ma-fg-subtle)'
+    : 'var(--ma-success)'
+}
