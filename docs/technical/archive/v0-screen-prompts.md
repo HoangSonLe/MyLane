@@ -1,12 +1,14 @@
-# v0 Screen Prompts
+# v0 Screen Prompts (archived)
 
-Content-only prompts for [v0.dev](https://v0.dev), one per screen in the [screen inventory](../ui/screen-inventory-and-flow.md).
+Archived after Version 1 shipped: these are the exact prompts used to generate the original 11 screens via v0.dev — historical reference, not an active workflow doc. For any *new* screen going forward, use these as a template alongside [Step 7 - Future Screens](../ai-workflow.md#step-7---future-screens) in [`ai-workflow.md`](../ai-workflow.md).
 
-These assume the base UI / design system already exists in the v0 project (Step 1 of [`ai-workflow.md`](ai-workflow.md) is done). Each prompt below intentionally **omits color, typography, spacing, and any other visual-style direction** — v0 should reuse what already exists. This is the per-screen version of [Step 7 - Future Screens](ai-prompts.md#step-7---future-screens).
+Content-only prompts for [v0.dev](https://v0.dev), one per screen in the [screen inventory](../../ui/screen-inventory-and-flow.md).
+
+These assume the base UI / design system already exists in the v0 project (Step 1 of [`ai-workflow.md`](../ai-workflow.md) is done). Each prompt below intentionally **omits color, typography, spacing, and any other visual-style direction** — v0 should reuse what already exists.
 
 Paste one block at a time into v0. Each block is self-contained.
 
-Facts come from [`docs/ui/screen-inventory-and-flow.md`](../ui/screen-inventory-and-flow.md), [`docs/gameplay/README.md`](../gameplay/README.md), and the per-game files in [`docs/gameplay/`](../gameplay/). Where source docs don't define something, it's marked `(not specified in source docs)` instead of invented — resolve those before/while using the prompt if they matter for this screen.
+Facts come from [`docs/ui/screen-inventory-and-flow.md`](../../ui/screen-inventory-and-flow.md), [`docs/gameplay/README.md`](../../gameplay/README.md), and the per-game files in [`docs/gameplay/`](../../gameplay/). Where source docs don't define something, it's marked `(not specified in source docs)` instead of invented — resolve those before/while using the prompt if they matter for this screen.
 
 ---
 

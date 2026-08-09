@@ -9,10 +9,12 @@ git log, không lặp lại ở đây).
 
 ## ⚠️ Cần làm thủ công trên Supabase/hạ tầng thật (code đã sẵn sàng, chưa tự áp dụng)
 
-- Chạy các migration sau trên Supabase project thật (SQL Editor):
-  - `database/migrations/20260804_add_solo_endless_match_history_mode.sql`
-  - `database/migrations/20260804_split_category_bests_by_mode.sql`
-  - `database/migrations/20260804_rematch_bypasses_friend_check.sql`
+- Áp lại `database/schema.sql` (SQL Editor) trên Supabase project thật — file
+  này giờ là nguồn schema duy nhất (đã gộp toàn bộ migration cũ, kể cả 3 thay
+  đổi còn thiếu trên production: `match_history` cho phép mode
+  `solo_endless`, `category_bests` tách `solo_ranked_*`/`versus_ranked_*`, và
+  `create_match_invite` nhận `p_rematch_room_code`). An toàn chạy lại nhiều
+  lần (idempotent).
 - Cấu hình Google/Discord OAuth provider trong Supabase Dashboard
   (Authentication → Providers, cần Client ID/Secret + đúng Callback URL) để
   đăng nhập OAuth chính và "Add login method" chạy thật.

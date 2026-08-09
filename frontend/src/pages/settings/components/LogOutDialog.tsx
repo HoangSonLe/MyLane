@@ -1,6 +1,7 @@
 import { useId } from 'react'
 import { useTranslation } from '@/i18n/useTranslation'
-import { IconLogOut, IconSpinner } from './icons'
+import { IconSpinner } from '@/components/ui/icons'
+import { IconLogOut } from './icons'
 
 interface LogOutDialogProps {
   visible: boolean
@@ -78,7 +79,7 @@ export function LogOutDialog({ visible, busy, onConfirm, onCancel }: LogOutDialo
               color: '#fff',
             }}
           >
-            {busy && <IconSpinner />}
+            {busy && <IconSpinner width={16} height={16} />}
             {busy ? t.settings.logOutBusy : t.settings.logOutConfirm}
           </button>
 

@@ -1,4 +1,5 @@
 import { Card } from '@/components/ui/card'
+import { OverlayBackdrop } from '@/components/ui/overlay'
 import { useTranslation } from '@/i18n/useTranslation'
 
 function IconX() {
@@ -33,13 +34,7 @@ function IconWifiOff() {
 export function OfflinePauseOverlay({ onQuit }: { onQuit: () => void }) {
   const { t } = useTranslation()
   return (
-    <div
-      className="fixed inset-0 z-40 flex items-end justify-center"
-      style={{ background: 'oklch(0 0 0 / 0.6)', backdropFilter: 'blur(6px)' }}
-      role="dialog"
-      aria-modal="true"
-      aria-label={t.offlinePauseOverlay.connectionLost}
-    >
+    <OverlayBackdrop ariaLabel={t.offlinePauseOverlay.connectionLost} dim={0.6} blur={6}>
       <Card className="w-full max-w-sm mb-6 mx-4 flex flex-col items-center gap-4 p-6 text-center" radius="3xl" shadow="lg">
         <div
           className="flex h-14 w-14 items-center justify-center rounded-2xl"
@@ -69,6 +64,6 @@ export function OfflinePauseOverlay({ onQuit }: { onQuit: () => void }) {
           {t.offlinePauseOverlay.quitGame}
         </button>
       </Card>
-    </div>
+    </OverlayBackdrop>
   )
 }

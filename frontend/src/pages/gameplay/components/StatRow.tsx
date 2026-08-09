@@ -1,4 +1,4 @@
-import { Card } from '@/components/ui/card'
+import { Card, StatCell } from '@/components/ui/card'
 import { useTranslation } from '@/i18n/useTranslation'
 
 export function StatRow({
@@ -26,14 +26,14 @@ export function StatRow({
   return (
     <Card className="flex items-center justify-around py-2.5" shadow="sm">
       {items.map((item) => (
-        <div key={item.label} className="flex flex-col items-center gap-0.5">
-          <span className="text-[10px] font-medium uppercase tracking-widest" style={{ color: 'var(--ma-fg-subtle)' }}>
-            {item.label}
-          </span>
-          <span className="text-[16px] font-bold tabular-nums" style={{ color: 'var(--ma-fg)' }}>
-            {item.value}
-          </span>
-        </div>
+        <StatCell
+          key={item.label}
+          className="flex flex-col items-center gap-0.5"
+          label={item.label}
+          labelClassName="text-[10px] font-medium uppercase tracking-widest"
+          value={item.value}
+          valueClassName="text-[16px] font-bold tabular-nums"
+        />
       ))}
     </Card>
   )

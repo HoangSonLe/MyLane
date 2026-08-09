@@ -52,7 +52,7 @@ export const matchInviteSupabaseService = {
     mode = 'versus_ranked',
     /** Room code of a just-finished match against this exact opponent — lets
      * a non-friend Rematch bypass the friend-check. See
-     * database/migrations/20260804_rematch_bypasses_friend_check.sql. */
+     * create_match_invite's p_rematch_room_code in database/schema.sql. */
     rematchRoomCode?: string
   ): Promise<{ inviteId: string; roomCode: string }> {
     const supabase = requireSupabase()

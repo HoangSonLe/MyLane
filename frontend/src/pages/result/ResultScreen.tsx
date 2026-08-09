@@ -62,7 +62,7 @@ export function ResultScreen({
 
   // Rematch: reopens ChallengeModal pre-filled with the same opponent/
   // category/difficulty/mode as the match that just finished — see
-  // database/migrations/20260804_rematch_bypasses_friend_check.sql for why
+  // create_match_invite's p_rematch_room_code in database/schema.sql for why
   // this works even when the opponent isn't a friend.
   const [rematchTarget, setRematchTarget] = useState<Friend | null>(null)
   const [isLoadingRematch, setIsLoadingRematch] = useState(false)

@@ -1,6 +1,6 @@
-import { IconUser, IconTrophy20 as IconTrophy } from '@/components/ui/icons'
+import { IconUser, IconTrophy20 as IconTrophy, IconSettings } from '@/components/ui/icons'
 import { ShortcutGrid } from '@/components/ui/grid'
-import { IconUsers, IconSettings } from './icons'
+import { IconUsers } from './icons'
 import { useTranslation } from '@/i18n/useTranslation'
 
 interface NavShortcut {
@@ -40,7 +40,7 @@ export function NavShortcuts({ skeleton, offline, onNavigate }: NavShortcutsProp
     {
       id: 'settings',
       label: t.home.navSettings,
-      icon: <IconSettings />,
+      icon: <IconSettings width={20} height={20} />,
     },
   ]
 

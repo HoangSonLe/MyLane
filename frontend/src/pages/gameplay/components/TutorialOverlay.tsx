@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Card } from '@/components/ui/card'
+import { OverlayBackdrop } from '@/components/ui/overlay'
 import { GameId } from '@/configs/enum'
 import { useTranslation } from '@/i18n/useTranslation'
 
@@ -19,13 +20,7 @@ export function TutorialOverlay({
     .replace('{total}', String(steps.length))
 
   return (
-    <div
-      className="fixed inset-0 z-40 flex items-end justify-center"
-      style={{ background: 'oklch(0 0 0 / 0.6)', backdropFilter: 'blur(6px)' }}
-      role="dialog"
-      aria-modal="true"
-      aria-label={t.tutorial.gameTutorial}
-    >
+    <OverlayBackdrop ariaLabel={t.tutorial.gameTutorial} dim={0.6} blur={6}>
       <Card className="w-full max-w-sm mb-6 mx-4 flex flex-col gap-5 p-6" radius="3xl" shadow="lg">
         {/* Progress dots */}
         <div className="flex items-center gap-1.5" aria-label={stepOfLabel}>
@@ -76,6 +71,6 @@ export function TutorialOverlay({
           </button>
         </div>
       </Card>
-    </div>
+    </OverlayBackdrop>
   )
 }

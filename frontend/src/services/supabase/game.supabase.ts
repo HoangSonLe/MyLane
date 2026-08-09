@@ -80,7 +80,7 @@ export const gameSupabaseService = {
 
         // category_bests tracks Solo Ranked and Versus Ranked bests separately
         // (docs/gameplay/README.md "best score ... per category + mode") — see
-        // database/migrations/20260804_split_category_bests_by_mode.sql.
+        // the category_bests table in database/schema.sql.
         if (prevBest) {
           previousBestScore = usesRankedScoring
             ? (isVersusRanked ? prevBest.versus_ranked_score : prevBest.solo_ranked_score)

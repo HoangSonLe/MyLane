@@ -1,4 +1,5 @@
-import { IconLink, IconGoogle, IconDiscord } from './icons'
+import { IconGoogle, IconDiscord } from '@/components/ui/icons'
+import { IconLink } from './icons'
 import { useTranslation } from '@/i18n/useTranslation'
 
 interface LinkedMethod {
@@ -8,8 +9,8 @@ interface LinkedMethod {
 }
 
 function LinkedMethodIcon({ id }: { id: string }) {
-  if (id === 'google') return <IconGoogle />
-  if (id === 'discord') return <IconDiscord />
+  if (id === 'google') return <IconGoogle width={16} height={16} />
+  if (id === 'discord') return <IconDiscord width={16} height={16} />
   return <IconLink />
 }
 

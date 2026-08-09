@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Card } from '@/components/ui/card'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { SettingsRow } from '@/components/ui/settings'
+import { OverlayBackdrop } from '@/components/ui/overlay'
 import { IconPlay, IconRefresh } from './icons'
 import { getGameLabels, getModeLabels } from '@/services/gameplay/gameplay-screen.types'
 import { GameId, ModeId } from '@/configs/enum'
@@ -69,13 +70,7 @@ export function PauseOverlay({
 
   if (showSettings) {
     return (
-      <div
-        className="fixed inset-0 z-40 flex items-end justify-center"
-        style={{ background: 'oklch(0 0 0 / 0.6)', backdropFilter: 'blur(6px)' }}
-        role="dialog"
-        aria-modal="true"
-        aria-label={t.settings.title}
-      >
+      <OverlayBackdrop ariaLabel={t.settings.title} dim={0.6} blur={6}>
         <Card className="w-full max-w-sm mb-6 mx-4 overflow-hidden p-0" radius="3xl" shadow="lg">
           <div className="flex items-center justify-between border-b border-[var(--ma-border)] px-5 py-4">
             <p className="text-[17px] font-bold" style={{ color: 'var(--ma-fg)' }}>{t.settings.title}</p>
@@ -105,19 +100,13 @@ export function PauseOverlay({
             onToggle={setHapticsEnabled}
           />
         </Card>
-      </div>
+      </OverlayBackdrop>
     )
   }
 
   return (
     <>
-      <div
-        className="fixed inset-0 z-40 flex items-end justify-center"
-        style={{ background: 'oklch(0 0 0 / 0.6)', backdropFilter: 'blur(6px)' }}
-        role="dialog"
-        aria-modal="true"
-        aria-label={t.pauseOverlay.gamePaused}
-      >
+      <OverlayBackdrop ariaLabel={t.pauseOverlay.gamePaused} dim={0.6} blur={6}>
         <Card className="w-full max-w-sm mb-6 mx-4 flex flex-col gap-3 p-5" radius="3xl" shadow="lg">
         {/* Header */}
         <div className="flex items-center justify-between pb-1">
@@ -203,7 +192,7 @@ export function PauseOverlay({
           </button>
         </div>
         </Card>
-      </div>
+      </OverlayBackdrop>
       <ConfirmDialog
         open={confirmation !== null}
         variant="danger"

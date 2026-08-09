@@ -1,4 +1,6 @@
-# Báo Cáo Audit & Danh Sách Lỗi Logic Flow / Quick Match Matchmaking
+# Báo Cáo Audit & Danh Sách Lỗi Logic Flow / Quick Match Matchmaking (đã lưu trữ)
+
+**Đã lưu trữ:** cả 13 lỗi bên dưới đều ở trạng thái "Đã fix" (xem bảng trạng thái triển khai cuối file) — giữ lại vì phần phân tích kỹ thuật (race condition, atomic guard...) còn giá trị tham khảo, không phải vì còn việc tồn đọng. Việc còn phải làm nằm ở [`known-gaps.md`](../known-gaps.md).
 
 Tài liệu này tổng hợp toàn bộ 13 lỗi logic flow, race condition và bất cập được phát hiện khi đối chiếu mã nguồn ứng dụng với tài liệu chuẩn (`docs/ui/screen-inventory-and-flow.md` và `docs/technical/`). Tài liệu này dành cho các AI Agent hoặc lập trình viên tiếp quản sửa lỗi và hoàn thiện.
 

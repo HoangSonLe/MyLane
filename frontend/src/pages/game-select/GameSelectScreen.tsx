@@ -4,9 +4,7 @@ import { BottomNavBar } from '@/components/ui/BottomNavBar'
 import { SectionLabel } from '@/components/ui/SectionLabel'
 import { ScreenShell, ScreenOfflineBanner, ScreenMain } from '@/components/ui/layout'
 import { BackRow } from './components/BackRow'
-import { GameCard } from './components/GameCard'
-import { ModeChip } from './components/ModeChip'
-import { DifficultyChip } from './components/DifficultyChip'
+import { GameCard, ModeChip, DifficultyChip } from '@/components/ui/game'
 import { StartButton } from './components/StartButton'
 import { GuestNudge } from './components/GuestNudge'
 import { GAMES, MODES, DIFFICULTIES } from '@/services/game-select/game-select.mock'
@@ -158,26 +156,28 @@ export function GameSelectScreen({
             <SectionLabel label={t.gameSelect.mode} />
           )}
           <div className="flex gap-2 px-4">
-            {localizedModes.map((mode) => {
-              const modeLocked = mode.id === ModeId.SOLO_ENDLESS && isEndlessLevelLocked
-              return (
-                <ModeChip
-                  key={mode.id}
-                  mode={mode}
-                  selected={!isLoadingStats && selectedMode === mode.id}
-                  isGuest={isGuest}
-                  customLocked={modeLocked ? true : undefined}
-                  currentLevel={selectedGameStats?.highestLevel ?? 1}
-                  skeleton={isLoadingStats}
-                  onLogIn={() => onNavigate?.('login')}
-                  onSelect={() => {
-                    if (!modeLocked && (!isGuest || !mode.requiresAccount)) {
-                      setSelectedMode(mode.id)
-                    }
-                  }}
-                />
-              )
-            })}
+            {localizedModes
+              .filter((mode) => !(mode.id === ModeId.SOLO_ENDLESS && isEndlessLevelLocked))
+              .map((mode) => {
+                const modeLocked = mode.id === ModeId.SOLO_ENDLESS && isEndlessLevelLocked
+                return (
+                  <ModeChip
+                    key={mode.id}
+                    mode={mode}
+                    selected={!isLoadingStats && selectedMode === mode.id}
+                    isGuest={isGuest}
+                    customLocked={modeLocked ? true : undefined}
+                    currentLevel={selectedGameStats?.highestLevel ?? 1}
+                    skeleton={isLoadingStats}
+                    onLogIn={() => onNavigate?.('login')}
+                    onSelect={() => {
+                      if (!modeLocked && (!isGuest || !mode.requiresAccount)) {
+                        setSelectedMode(mode.id)
+                      }
+                    }}
+                  />
+                )
+              })}
           </div>
         </div>
 

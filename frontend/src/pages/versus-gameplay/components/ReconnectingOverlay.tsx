@@ -1,4 +1,5 @@
 import { IconX } from './icons'
+import { OverlayBackdrop } from '@/components/ui/overlay'
 import { useTranslation } from '@/i18n/useTranslation'
 
 export function ReconnectingOverlay({
@@ -11,13 +12,7 @@ export function ReconnectingOverlay({
   const offset = circ * (1 - Math.max(0, countdown / maxSecs))
 
   return (
-    <div
-      className="fixed inset-0 z-40 flex items-end justify-center"
-      style={{ background: 'oklch(0 0 0 / 0.65)', backdropFilter: 'blur(6px)' }}
-      role="dialog"
-      aria-modal="true"
-      aria-label={t.versusGameplay.opponentDisconnectedAria}
-    >
+    <OverlayBackdrop ariaLabel={t.versusGameplay.opponentDisconnectedAria} dim={0.65} blur={6}>
       <div
         className="w-full max-w-sm mb-6 mx-4 flex flex-col items-center gap-5 rounded-3xl p-6 text-center"
         style={{ background: 'var(--ma-surface)', border: '1px solid var(--ma-border)', boxShadow: 'var(--ma-shadow-lg)' }}
@@ -67,6 +62,6 @@ export function ReconnectingOverlay({
           {t.versusGameplay.quitMatch}
         </button>
       </div>
-    </div>
+    </OverlayBackdrop>
   )
 }

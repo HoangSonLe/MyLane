@@ -2,7 +2,7 @@ import { useState, type ComponentType } from 'react'
 import { ModalBackdrop } from '@/components/ui/ModalBackdrop'
 import { authService } from '@/services/auth/auth.service'
 import { useTranslation } from '@/i18n/useTranslation'
-import { IconGoogle, IconDiscord } from './icons'
+import { IconGoogle, IconDiscord } from '@/components/ui/icons'
 
 interface Props {
   show: boolean
@@ -13,8 +13,8 @@ interface Props {
 }
 
 const PROVIDERS: { id: 'google' | 'discord'; label: string; Icon: ComponentType }[] = [
-  { id: 'google', label: 'Google', Icon: IconGoogle },
-  { id: 'discord', label: 'Discord', Icon: IconDiscord },
+  { id: 'google', label: 'Google', Icon: () => <IconGoogle width={16} height={16} /> },
+  { id: 'discord', label: 'Discord', Icon: () => <IconDiscord width={16} height={16} /> },
 ]
 
 export function AddLoginMethodModal({ show, onClose, linkedProviderIds }: Props) {

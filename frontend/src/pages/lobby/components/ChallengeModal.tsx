@@ -37,7 +37,7 @@ interface Props {
   initialMode?: string
   /** versus_rooms.code of a just-finished match against this exact `friend`
    * — lets the invite bypass the friend-only check for a non-friend
-   * opponent. See database/migrations/20260804_rematch_bypasses_friend_check.sql. */
+   * opponent. See create_match_invite's p_rematch_room_code in database/schema.sql. */
   rematchRoomCode?: string
 }
 

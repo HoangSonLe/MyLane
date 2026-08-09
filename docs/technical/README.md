@@ -18,13 +18,16 @@ Zero-cost start · mobile-first web game · fast to build · easy to scale later
 
 ## AI Workflow Docs
 
-- [AI Development Workflow](ai-workflow.md)
-- [AI Prompts](ai-prompts.md)
-- [AI Coding Rules](ai-coding-rules.md)
-- [v0 Screen Prompts](v0-screen-prompts.md) — per-screen, content-only prompts for v0
+- [AI Development Workflow](ai-workflow.md) — how AI tools are used to build screens, plus every reusable prompt (v0.dev generation, Claude audit/refactor, Design System extraction, review checklist)
+- [AI Coding Rules](ai-coding-rules.md) — evergreen component/service placement rules for AI-assisted refactors
 - [Screen Display Data Models](screen-display-data-models.md) — screen-level view models for rendering UI
 - [Mock Auth API](mock-auth-api.md) — how login is faked (MSW + standalone mock server) until the ASP.NET Core API exists
 - [Known Gaps](known-gaps.md) — logic that's still mock/local/prototype despite the UI looking real; track here before implementing
+
+Version 1 is complete; the following are kept for historical reference only, not active workflow:
+
+- [`archive/v0-screen-prompts.md`](archive/v0-screen-prompts.md) — the exact per-screen prompts used to generate Version 1's original 11 screens
+- [`archive/matchmaking-and-flow-bugs.md`](archive/matchmaking-and-flow-bugs.md) — Quick Match/Versus flow bug audit; all 13 findings are fixed
 
 ---
 
