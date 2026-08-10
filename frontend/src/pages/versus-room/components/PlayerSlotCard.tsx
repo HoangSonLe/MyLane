@@ -1,4 +1,5 @@
 import { Card } from '@/components/ui/card'
+import { Avatar } from '@/components/ui/Avatar'
 
 import type { PlayerSlot } from '@/services/versus-room/versus-room.interface'
 import { useTranslation } from '@/i18n/useTranslation'
@@ -50,13 +51,6 @@ export function PlayerSlotCard({
     )
   }
 
-  const initials = slot?.name
-    .split(' ')
-    .map((n) => n[0])
-    .join('')
-    .slice(0, 2)
-    .toUpperCase() ?? '?'
-
   return (
     <div
       style={{
@@ -69,24 +63,24 @@ export function PlayerSlotCard({
     >
       <div className="flex items-center gap-3">
         {/* Avatar */}
-        <div
-          className="shrink-0 flex items-center justify-center"
-          style={{
-            height: '2.5rem',
-            width: '2.5rem',
-            borderRadius: 'var(--radius-xl)',
-            background: isEmpty ? 'var(--ma-surface-raised)' : 'var(--ma-icon-bg)',
-            border: '1px solid var(--ma-border)',
-            color: 'var(--ma-fg-muted)',
-          }}
-          aria-hidden="true"
-        >
-          {isEmpty ? <IconUserDash /> : (
-            <span className="text-[13px] font-bold" style={{ color: 'var(--ma-fg-muted)' }}>
-              {initials}
-            </span>
-          )}
-        </div>
+        {isEmpty ? (
+          <div
+            className="shrink-0 flex items-center justify-center"
+            style={{
+              height: '2.5rem',
+              width: '2.5rem',
+              borderRadius: 'var(--radius-xl)',
+              background: 'var(--ma-surface-raised)',
+              border: '1px solid var(--ma-border)',
+              color: 'var(--ma-fg-muted)',
+            }}
+            aria-hidden="true"
+          >
+            <IconUserDash />
+          </div>
+        ) : (
+          <Avatar name={slot?.name ?? '?'} imageUrl={slot?.avatarUrl} size="2.5rem" fontSize="13px" />
+        )}
 
         {/* Name + handle */}
         <div className="flex flex-1 min-w-0 flex-col justify-center">

@@ -13,7 +13,7 @@ import { ContinueCard } from './components/ContinueCard'
 import { EmptyPrompt } from './components/EmptyPrompt'
 import { NavShortcuts } from './components/NavShortcuts'
 import { homeService } from '@/services/home/home.service'
-import { lobbyService } from '@/services/lobby/lobby.service'
+import { useIncomingFriendRequestsQuery, useInvalidateFriendsData } from '@/services/lobby/lobby.queries'
 import type { LastPlayed } from '@/services/home/home.interface'
 import { useNetworkStatus } from '@/lib/hooks/useNetworkStatus'
 import { useAuthStore } from '@/stores/auth.store'
@@ -39,11 +39,14 @@ export function HomeScreen({
   const [lastPlayed, setLastPlayed] = useState<LastPlayed | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
-  const [unreadRequestsCount, setUnreadRequestsCount] = useState(0)
 
   const [menuVisible, setMenuVisible] = useState(false)
   const [addFriendModalVisible, setAddFriendModalVisible] = useState(false)
   const [notificationsModalVisible, setNotificationsModalVisible] = useState(false)
+
+  const { data: incomingRequests } = useIncomingFriendRequestsQuery({ refetchInterval: 3 * 1000 })
+  const unreadRequestsCount = incomingRequests?.length ?? 0
+  const invalidateFriendsData = useInvalidateFriendsData()
 
   const loadHomeData = useCallback(async () => {
     setIsLoading(true)
@@ -51,44 +54,16 @@ export function HomeScreen({
     try {
       const { lastPlayed } = await homeService.getHomeData()
       setLastPlayed(lastPlayed)
-
-      if (!isGuest) {
-        const reqs = await lobbyService.getIncomingFriendRequests()
-        setUnreadRequestsCount(reqs.length)
-      }
     } catch {
       setErrorMessage(t.home.loadError)
     } finally {
       setIsLoading(false)
     }
-  }, [isGuest, t.home.loadError])
+  }, [t.home.loadError])
 
   useEffect(() => {
     loadHomeData()
-
-    // Realtime Supabase postgres_changes subscription for friend requests
-    const unsubscribeFriends = user?.id
-      ? lobbyService.subscribeToFriendRequests(user.id, () => {
-          lobbyService.getIncomingFriendRequests().then((reqs) => {
-            setUnreadRequestsCount(reqs.length)
-          }).catch(() => {})
-        })
-      : () => {}
-
-    // Fast background auto-refresh for notification counter every 3 seconds
-    const interval = setInterval(() => {
-      if (!isGuest) {
-        lobbyService.getIncomingFriendRequests().then((reqs) => {
-          setUnreadRequestsCount(reqs.length)
-        }).catch(() => {})
-      }
-    }, 3 * 1000)
-
-    return () => {
-      unsubscribeFriends()
-      clearInterval(interval)
-    }
-  }, [user?.id, loadHomeData, isGuest])
+  }, [loadHomeData])
 
   return (
     <ScreenShell>
@@ -184,7 +159,7 @@ export function HomeScreen({
       <FriendNotificationsModal
         visible={notificationsModalVisible}
         onClose={() => setNotificationsModalVisible(false)}
-        onUpdate={loadHomeData}
+        onUpdate={invalidateFriendsData}
       />
     </ScreenShell>
   )

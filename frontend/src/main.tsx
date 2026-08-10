@@ -1,6 +1,8 @@
 import { StrictMode, Suspense, lazy } from 'react'
 import { createRoot } from 'react-dom/client'
+import { QueryClientProvider } from '@tanstack/react-query'
 import App from './App'
+import { queryClient } from '@/lib/query-client'
 import './index.css'
 import '@/stores/theme.store'
 
@@ -14,13 +16,15 @@ const DemoApp = isDemo
 function render() {
   createRoot(document.getElementById('root')!).render(
     <StrictMode>
-      {DemoApp ? (
-        <Suspense fallback={null}>
-          <DemoApp />
-        </Suspense>
-      ) : (
-        <App />
-      )}
+      <QueryClientProvider client={queryClient}>
+        {DemoApp ? (
+          <Suspense fallback={null}>
+            <DemoApp />
+          </Suspense>
+        ) : (
+          <App />
+        )}
+      </QueryClientProvider>
     </StrictMode>,
   )
 }

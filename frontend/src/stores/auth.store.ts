@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import { authService, UserSession } from '@/services/auth/auth.service'
 import type { AuthCredentials } from '@/services/auth/auth.interface'
 import { clearToken, getToken, saveToken } from '@/services/http/api-client'
+import { queryClient } from '@/lib/query-client'
 
 interface AuthState {
   user: UserSession | null
@@ -115,6 +116,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       // Remote sign-out is best effort; local sign-out must always complete.
     } finally {
       clearToken()
+      queryClient.clear()
       set({ user: null, isLoading: false, errorMessage: null })
     }
   },

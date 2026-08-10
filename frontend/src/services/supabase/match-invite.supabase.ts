@@ -15,7 +15,7 @@ function throwInviteError(error: any): never {
 async function mapInviteRow(supabase: any, row: any): Promise<MatchInviteData> {
   const { data: inviterProfile, error } = await supabase
     .from('profiles')
-    .select('name, handle, overall_elo')
+    .select('name, handle, avatar_url, overall_elo')
     .eq('id', row.inviter_id)
     .maybeSingle()
   if (error) throwInviteError(error)
@@ -33,6 +33,7 @@ async function mapInviteRow(supabase: any, row: any): Promise<MatchInviteData> {
     inviterId: row.inviter_id,
     inviterName: inviterProfile?.name || 'Bạn bè',
     inviterHandle: inviterProfile?.handle || 'friend',
+    inviterAvatarUrl: inviterProfile?.avatar_url || undefined,
     inviterElo: categoryElo?.elo ?? inviterProfile?.overall_elo ?? 1000,
     inviteeId: row.invitee_id,
     category: row.category as GameId,

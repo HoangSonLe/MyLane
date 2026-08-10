@@ -8,6 +8,7 @@ export interface MatchInviteData {
   inviterId: string
   inviterName: string
   inviterHandle: string
+  inviterAvatarUrl?: string
   inviterElo: number
   inviteeId: string
   category: GameId

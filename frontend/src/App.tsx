@@ -15,6 +15,8 @@ import { supabaseService } from '@/services/supabase'
 import { accessLogService } from '@/services/access-log/access-log.service'
 import { IncomingInviteModal, type IncomingInviteData } from '@/pages/lobby/components/IncomingInviteModal'
 import { MuteInviteModal } from '@/pages/lobby/components/MuteInviteModal'
+import { Toast } from '@/components/ui/Toast'
+import { useTranslation } from '@/i18n/useTranslation'
 import { WelcomeOnboardingModal } from '@/components/ui/modal/WelcomeOnboardingModal'
 import { LogOutDialog } from '@/pages/settings/components/LogOutDialog'
 import { LandingScreen } from '@/pages/landing/LandingScreen'
@@ -105,7 +107,10 @@ export default function App() {
   const accountMutedMap = useInviteMuteStore((state) => state.accountMutedMap)
   const sessionMutedMap = useInviteMuteStore((state) => state.sessionMutedMap)
   const [globalIncomingInvite, setGlobalIncomingInvite] = useState<IncomingInviteData | null>(null)
+  const globalIncomingInviteRef = useRef<IncomingInviteData | null>(null)
   const [globalMuteTarget, setGlobalMuteTarget] = useState<(InviteMuteTarget & { name: string }) | null>(null)
+  const [globalInviteToast, setGlobalInviteToast] = useState<string | null>(null)
+  const { t } = useTranslation()
   const [sharedRoomCode, setSharedRoomCode] = useState(getSharedRoomCodeFromLocation)
   const [sharedFriendId, setSharedFriendId] = useState(getSharedFriendIdFromLocation)
   const [welcomeModalVisible, setWelcomeModalVisible] = useState(false)
@@ -171,6 +176,12 @@ export default function App() {
     }
   }, [clearInviteMutes, inviteAccountId, subscribeToInviteMutes, syncInviteMutes])
 
+  /** Keep a ref mirror so the polling effect below can read the latest shown
+   * invite without re-subscribing every time it changes. */
+  useEffect(() => {
+    globalIncomingInviteRef.current = globalIncomingInvite
+  }, [globalIncomingInvite])
+
   /** Global Realtime listener + 2s polling for incoming 1v1 challenges. */
   useEffect(() => {
     if (!inviteAccountId || !inviteMutesHydrated) return
@@ -184,6 +195,7 @@ export default function App() {
             inviterId: inviteData.inviterId,
             inviterName: inviteData.inviterName,
             inviterHandle: inviteData.inviterHandle,
+            inviterAvatarUrl: inviteData.inviterAvatarUrl,
             inviterElo: inviteData.inviterElo,
             gameCategory: inviteData.category,
             difficulty: inviteData.difficulty,
@@ -198,11 +210,23 @@ export default function App() {
     // 1. Realtime WebSocket listener
     const unsubscribe = matchInviteService.subscribeToIncomingInvites(inviteAccountId, handleNewInvite)
 
-    // 2. Active 2-second fast polling backup
+    // 2. Active 2-second fast polling backup — also doubles as the way we
+    // notice the inviter cancelled the invite we're currently showing (their
+    // cancel is only pushed to the challenger's own realtime channel, not
+    // ours), so the modal doesn't sit there promising a match that's gone.
     const pollInterval = setInterval(() => {
       void matchInviteService.checkPendingInvite(inviteAccountId)
         .then((invite) => {
-          if (invite) handleNewInvite(invite)
+          if (invite) {
+            handleNewInvite(invite)
+            return
+          }
+          const shown = globalIncomingInviteRef.current
+          if (shown) {
+            setGlobalIncomingInvite(null)
+            setGlobalInviteToast(t.challenge.inviteNoLongerAvailable)
+            setTimeout(() => setGlobalInviteToast(null), 4000)
+          }
         })
         .catch(() => {})
     }, 2000)
@@ -211,7 +235,7 @@ export default function App() {
       unsubscribe()
       clearInterval(pollInterval)
     }
-  }, [inviteAccountId, inviteMutesHydrated, isInviteMuted])
+  }, [inviteAccountId, inviteMutesHydrated, isInviteMuted, t])
 
   /** A mute arriving from another device also dismisses a visible invite. */
   useEffect(() => {
@@ -721,6 +745,14 @@ export default function App() {
     <>
       {renderActiveScreen()}
 
+      {/* Global toast for invite accept/decline outcomes (e.g. inviter cancelled first) */}
+      <Toast
+        show={!!globalInviteToast}
+        message={globalInviteToast ?? ''}
+        variant="warning"
+        onClose={() => setGlobalInviteToast(null)}
+      />
+
       {/* Global Realtime 1v1 Match Challenge Invitation Modal */}
       <IncomingInviteModal
         invite={globalIncomingInvite}
@@ -737,9 +769,16 @@ export default function App() {
               setMatchedVersusRoom(room)
               setRoomEntrySource(RoomEntrySource.CHALLENGE)
               goTo('versus-room')
+            } else {
+              // Invite was cancelled by the inviter (or expired) between the
+              // modal opening and Accept being tapped — say so instead of
+              // silently doing nothing.
+              setGlobalInviteToast(t.challenge.inviteNoLongerAvailable)
+              setTimeout(() => setGlobalInviteToast(null), 4000)
             }
           } catch {
-            // Stay on the current screen if the invite expired or room was occupied.
+            setGlobalInviteToast(t.versusRoom.errorConnection)
+            setTimeout(() => setGlobalInviteToast(null), 4000)
           }
         }}
         onDecline={async () => {

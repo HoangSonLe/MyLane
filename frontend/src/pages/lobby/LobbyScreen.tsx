@@ -24,7 +24,7 @@ import { RoomActions } from './components/RoomActions'
 import { FriendRow, FriendRowSkeleton } from './components/FriendRow'
 import { EmptyFriends, FriendsError, GuestWall } from './components/FriendStateCards'
 import { LobbyNavShortcuts } from './components/LobbyNavShortcuts'
-import { lobbyService } from '@/services/lobby/lobby.service'
+import { useFriendsQuery, useIncomingFriendRequestsQuery, useInvalidateFriendsData } from '@/services/lobby/lobby.queries'
 import { versusRoomService, RoomNotFoundError, NoAvailableRoomsError } from '@/services/versus-room/versus-room.service'
 import type { Friend } from '@/services/lobby/lobby.interface'
 import type { PublicRoomSummary, Room } from '@/services/versus-room/versus-room.interface'
@@ -57,76 +57,34 @@ export function LobbyScreen({
   const { t } = useTranslation()
   const muteUser = useInviteMuteStore((state) => state.muteUser)
 
-  const [friends, setFriends] = useState<Friend[]>([])
   const [availableRooms, setAvailableRooms] = useState<PublicRoomSummary[]>([])
   const [selectedRoomForDetail, setSelectedRoomForDetail] = useState<PublicRoomSummary | null>(null)
   const [selectedFriendForProfile, setSelectedFriendForProfile] = useState<Friend | null>(null)
   const [challengeTargetFriend, setChallengeTargetFriend] = useState<Friend | null>(null)
   const [addFriendModalVisible, setAddFriendModalVisible] = useState(false)
   const [notificationsModalVisible, setNotificationsModalVisible] = useState(false)
-  const [incomingRequestsCount, setIncomingRequestsCount] = useState(0)
   const [muteTarget, setMuteTarget] = useState<(InviteMuteTarget & { name: string }) | null>(null)
   const [toastMessage, setToastMessage] = useState<string | null>(null)
   const [headerMenuVisible, setHeaderMenuVisible] = useState(false)
 
-  const [isLoading, setIsLoading] = useState(true)
-  const [isError, setIsError] = useState(false)
   const [isQuickJoining, setIsQuickJoining] = useState(false)
   const [isLoadingRooms, setIsLoadingRooms] = useState(false)
-  const [isRefreshingFriends, setIsRefreshingFriends] = useState(false)
   const [friendsExpanded, setFriendsExpanded] = useState(false)
 
-  const loadFriends = useCallback(async () => {
-    if (isGuest) {
-      setIsLoading(false)
-      return
-    }
-    setIsLoading(true)
-    setIsError(false)
-    try {
-      const [friendList, reqs] = await Promise.all([
-        lobbyService.getFriends(),
-        lobbyService.getIncomingFriendRequests(),
-      ])
-      setFriends(friendList)
-      setIncomingRequestsCount(reqs.length)
-    } catch {
-      setIsError(true)
-    } finally {
-      setIsLoading(false)
-    }
-  }, [isGuest])
+  const friendsQuery = useFriendsQuery({ refetchInterval: 3 * 1000 })
+  const requestsQuery = useIncomingFriendRequestsQuery({ refetchInterval: 3 * 1000 })
+  const invalidateFriendsData = useInvalidateFriendsData()
 
-  const handleRefreshFriends = useCallback(async () => {
-    if (isGuest || isRefreshingFriends) return
-    setIsRefreshingFriends(true)
-    try {
-      const [friendList, reqs] = await Promise.all([
-        lobbyService.getFriends(),
-        lobbyService.getIncomingFriendRequests(),
-      ])
-      setFriends(friendList)
-      setIncomingRequestsCount(reqs.length)
-    } catch {
-      // keep existing state on error
-    } finally {
-      setIsRefreshingFriends(false)
-    }
-  }, [isGuest, isRefreshingFriends])
+  const friends = friendsQuery.data ?? []
+  const incomingRequestsCount = requestsQuery.data?.length ?? 0
+  const isLoading = friendsQuery.isLoading
+  const isError = friendsQuery.isError || requestsQuery.isError
+  const isRefreshingFriends = friendsQuery.isRefetching || requestsQuery.isRefetching
 
-  const loadFriendsSilent = useCallback(async () => {
+  const handleRefreshFriends = () => {
     if (isGuest) return
-    try {
-      const [friendList, reqs] = await Promise.all([
-        lobbyService.getFriends(),
-        lobbyService.getIncomingFriendRequests(),
-      ])
-      setFriends(friendList)
-      setIncomingRequestsCount(reqs.length)
-    } catch {
-      // keep existing state on network error
-    }
-  }, [isGuest])
+    void Promise.all([friendsQuery.refetch(), requestsQuery.refetch()])
+  }
 
   const loadAvailableRooms = useCallback(async () => {
     if (isGuest) return
@@ -141,7 +99,6 @@ export function LobbyScreen({
   }, [isGuest])
 
   useEffect(() => {
-    loadFriends()
     loadAvailableRooms()
 
     // Realtime Supabase postgres_changes subscription for available rooms
@@ -149,25 +106,16 @@ export function LobbyScreen({
       loadAvailableRooms()
     })
 
-    // Realtime Supabase postgres_changes subscription for friend requests
-    const unsubscribeFriends = user?.id
-      ? lobbyService.subscribeToFriendRequests(user.id, () => {
-          loadFriendsSilent()
-        })
-      : () => {}
-
-    // Fast background auto-refresh polling every 3 seconds for instant notifications & rooms sync
+    // Fast background auto-refresh polling every 3 seconds for rooms sync
     const interval = setInterval(() => {
-      loadFriendsSilent()
       loadAvailableRooms()
     }, 3 * 1000)
 
     return () => {
       unsubscribeRooms()
-      unsubscribeFriends()
       clearInterval(interval)
     }
-  }, [user?.id, loadFriends, loadFriendsSilent, loadAvailableRooms])
+  }, [loadAvailableRooms])
 
   const handleQuickJoin = async () => {
     if (isGuest) {
@@ -255,6 +203,17 @@ export function LobbyScreen({
         show={!!selectedRoomForDetail}
         onClose={() => setSelectedRoomForDetail(null)}
         onJoin={handleJoinSpecificRoom}
+        onViewHost={(room) => {
+          if (!room.hostId) return
+          setSelectedFriendForProfile({
+            id: room.hostId,
+            name: room.hostName,
+            handle: room.hostHandle || room.hostName,
+            avatarUrl: room.hostAvatarUrl,
+            elo: room.hostElo,
+            status: 'online',
+          })
+        }}
       />
 
       {/* Public Friend Profile Popup */}
@@ -399,7 +358,7 @@ export function LobbyScreen({
           ) : isGuest ? (
             <GuestWall onLogIn={() => onNavigate?.('login')} />
           ) : isError ? (
-            <FriendsError onRetry={loadFriends} />
+            <FriendsError onRetry={handleRefreshFriends} />
           ) : isEmpty ? (
             <EmptyFriends />
           ) : (
@@ -451,14 +410,14 @@ export function LobbyScreen({
       <AddFriendModal
         visible={addFriendModalVisible}
         onClose={() => setAddFriendModalVisible(false)}
-        onFriendAdded={loadFriends}
+        onFriendAdded={invalidateFriendsData}
       />
 
       {/* Notifications & Friend Requests Modal */}
       <FriendNotificationsModal
         visible={notificationsModalVisible}
         onClose={() => setNotificationsModalVisible(false)}
-        onUpdate={loadFriends}
+        onUpdate={invalidateFriendsData}
       />
     </ScreenShell>
   )

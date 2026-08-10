@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { IconSwords, IconChevronRight14, IconDiffEasy, IconDiffMedium, IconDiffHard, IconDiffSuperHard } from '@/components/ui/icons'
 import { ModalBackdrop } from '@/components/ui/ModalBackdrop'
+import { Avatar } from '@/components/ui/Avatar'
 import { FriendProfileModal } from '@/pages/lobby/components/FriendProfileModal'
 import { useTranslation } from '@/i18n/useTranslation'
 import type { GameId } from '@/configs/enum'
@@ -16,6 +17,7 @@ export interface IncomingInviteData {
   inviterId: string
   inviterName: string
   inviterHandle: string
+  inviterAvatarUrl?: string
   inviterElo: number
   gameCategory: GameId
   difficulty?: string
@@ -109,6 +111,7 @@ export function IncomingInviteModal({
     id: invite.inviterId,
     name: invite.inviterName,
     handle: invite.inviterHandle,
+    avatarUrl: invite.inviterAvatarUrl,
     elo: invite.inviterElo,
     status: 'online',
   }
@@ -217,12 +220,7 @@ export function IncomingInviteModal({
             title={t.challenge?.clickProfileHint || 'Bấm để xem thông tin người thách đấu'}
           >
             <div className="flex items-center gap-2.5 min-w-0 flex-1">
-              <div
-                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-sm font-bold text-white shadow-sm"
-                style={{ background: 'var(--ma-brand)' }}
-              >
-                {invite.inviterName[0]?.toUpperCase() || 'U'}
-              </div>
+              <Avatar name={invite.inviterName} imageUrl={invite.inviterAvatarUrl} size="2.25rem" fontSize="13px" />
               <div className="flex flex-col min-w-0">
                 <span className="text-[13px] font-bold truncate hover:underline" style={{ color: 'var(--ma-fg)' }}>
                   {invite.inviterName}

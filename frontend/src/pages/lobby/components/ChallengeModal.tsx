@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { ModalBackdrop } from '@/components/ui/ModalBackdrop'
+import { Avatar } from '@/components/ui/Avatar'
 import { matchInviteService } from '@/services/match-invite/match-invite.service'
+import { lobbyService } from '@/services/lobby/lobby.service'
 import { GameId } from '@/configs/enum'
 import type { Friend } from '@/services/lobby/lobby.interface'
 import {
@@ -67,11 +69,39 @@ export function ChallengeModal({
   const [inviteState, setInviteState] = useState<{ inviteId: string; roomCode: string } | null>(null)
   const [countdown, setCountdown] = useState(30)
   const [declineReason, setDeclineReason] = useState<string | null>(null)
+  const [loadedFriend, setLoadedFriend] = useState<{ id: string; friend: Friend } | null>(null)
   const onAcceptedRef = useRef(onAccepted)
   const onCloseRef = useRef(onClose)
 
   useEffect(() => { onAcceptedRef.current = onAccepted }, [onAccepted])
   useEffect(() => { onCloseRef.current = onClose }, [onClose])
+
+  /** The `friend` prop is often a lightweight snapshot (friend-row list, or a
+   * stale copy from before FriendProfileModal finished loading its own
+   * enriched data) missing per-category Elo — refetch the full profile so
+   * the Elo shown here actually matches the selected game category. */
+  useEffect(() => {
+    if (!show || !friend) {
+      setLoadedFriend(null)
+      return
+    }
+    if (friend.records) {
+      setLoadedFriend({ id: friend.id, friend })
+      return
+    }
+    let cancelled = false
+    lobbyService
+      .getFriendProfile(friend.id, friend.handle)
+      .then((profile) => {
+        if (!cancelled && profile) setLoadedFriend({ id: friend.id, friend: profile })
+      })
+      .catch(() => {
+        // Keep showing the friend prop's summary Elo if the detail fetch fails.
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [friend, show])
 
   const handleCancel = useCallback(async () => {
     if (inviteState) {
@@ -186,6 +216,8 @@ export function ChallengeModal({
   }
 
   const activeCategoryLabel = getLocalizedGameLabel(t, selectedCategory)
+  const displayedFriend = loadedFriend?.id === friend.id ? loadedFriend.friend : friend
+  const displayedElo = displayedFriend.records?.[selectedCategory]?.elo ?? displayedFriend.elo
 
   return (
     <ModalBackdrop show={show} onClose={inviteState ? undefined : handleCancel}>
@@ -221,15 +253,10 @@ export function ChallengeModal({
           className="mt-3 flex items-center gap-3 p-2.5 rounded-xl shrink-0"
           style={{ background: 'var(--ma-surface)', border: '1px solid var(--ma-border-subtle)' }}
         >
-          <div
-            className="flex h-9 w-9 items-center justify-center rounded-xl font-bold text-white shadow-sm"
-            style={{ background: 'var(--ma-brand)' }}
-          >
-            {friend.name[0]?.toUpperCase() || 'F'}
-          </div>
+          <Avatar name={displayedFriend.name} imageUrl={displayedFriend.avatarUrl} size="2.25rem" fontSize="13px" />
           <div className="min-w-0 flex-1">
-            <p className="text-[13px] font-bold text-[var(--ma-fg)] truncate">{friend.name}</p>
-            <p className="text-[11px] text-[var(--ma-fg-subtle)]">@{friend.handle} • {friend.elo} Elo</p>
+            <p className="text-[13px] font-bold text-[var(--ma-fg)] truncate">{displayedFriend.name}</p>
+            <p className="text-[11px] text-[var(--ma-fg-subtle)]">@{displayedFriend.handle} • {displayedElo} Elo</p>
           </div>
         </div>
 

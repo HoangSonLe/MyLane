@@ -23,8 +23,8 @@ import { MatchDetailDialog } from './components/MatchDetailDialog'
 import { FriendProfileModal } from '@/pages/lobby/components/FriendProfileModal'
 import { ChallengeModal } from '@/pages/lobby/components/ChallengeModal'
 import { profileService } from '@/services/profile/profile.service'
-import { lobbyService } from '@/services/lobby/lobby.service'
-import type { ProfileData, MatchEntry } from '@/services/profile/profile.interface'
+import { useFriendsQuery, useInvalidateFriendsData } from '@/services/lobby/lobby.queries'
+import type { ProfileData, ProfileStats, MatchEntry } from '@/services/profile/profile.interface'
 import type { Friend } from '@/services/lobby/lobby.interface'
 import { useNetworkStatus } from '@/lib/hooks/useNetworkStatus'
 import { useAuthStore } from '@/stores/auth.store'
@@ -58,9 +58,9 @@ export function ProfileScreen({
   const isGuest = user?.isGuest ?? true
   const { t } = useTranslation()
 
-  const [data, setData] = useState<ProfileData | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [isError, setIsError] = useState(false)
+  const [stats, setStats] = useState<ProfileStats | null>(null)
+  const [isLoadingStats, setIsLoadingStats] = useState(true)
+  const [isStatsError, setIsStatsError] = useState(false)
   const [selectedMatch, setSelectedMatch] = useState<MatchEntry | null>(null)
   const [selectedFriendForProfile, setSelectedFriendForProfile] = useState<Friend | null>(null)
   const [challengeTargetFriend, setChallengeTargetFriend] = useState<Friend | null>(null)
@@ -75,49 +75,60 @@ export function ProfileScreen({
     setScoringRulesModalState({ open: true, section: section ?? null })
   }, [])
 
-  const load = useCallback(async () => {
+  const friendsQuery = useFriendsQuery({ refetchInterval: 10 * 1000 })
+  const invalidateFriendsData = useInvalidateFriendsData()
+
+  const loadStats = useCallback(async () => {
     if (isGuest) {
-      setIsLoading(false)
+      setIsLoadingStats(false)
       return
     }
-    setIsLoading(true)
-    setIsError(false)
+    setIsLoadingStats(true)
+    setIsStatsError(false)
     try {
-      const [profile, friends] = await Promise.all([
-        profileService.getProfile(),
-        lobbyService.getFriends(),
-      ])
-      setData({ ...profile, friends })
+      setStats(await profileService.getProfile())
     } catch {
-      setIsError(true)
+      setIsStatsError(true)
     } finally {
-      setIsLoading(false)
+      setIsLoadingStats(false)
     }
   }, [isGuest])
 
-  const loadSilent = useCallback(async () => {
+  const loadStatsSilent = useCallback(async () => {
     if (isGuest) return
     try {
-      const [profile, friends] = await Promise.all([
-        profileService.getProfile(),
-        lobbyService.getFriends(),
-      ])
-      setData({ ...profile, friends })
+      setStats(await profileService.getProfile())
     } catch {
       // Keep existing state on silent refresh
     }
   }, [isGuest])
 
   useEffect(() => {
-    load()
+    loadStats()
 
     // Silent background auto-refresh every 10 seconds
     const interval = setInterval(() => {
-      loadSilent()
+      loadStatsSilent()
     }, 10 * 1000)
 
     return () => clearInterval(interval)
-  }, [load, loadSilent])
+  }, [loadStats, loadStatsSilent])
+
+  // Combines the profile-stats fetch above with the shared friends query —
+  // stays null until both have resolved at least once, so the page paints
+  // atomically (no flash of an empty friends list) just like before this
+  // used a single combined Promise.all fetch.
+  const isLoading = isLoadingStats || friendsQuery.isLoading
+  const isError = isStatsError || friendsQuery.isError
+  const data: ProfileData | null =
+    stats && !friendsQuery.isLoading && !friendsQuery.isError
+      ? { ...stats, friends: friendsQuery.data ?? [] }
+      : null
+
+  const retryLoad = () => {
+    loadStats()
+    void friendsQuery.refetch()
+  }
 
   useEffect(() => {
     if (initialFriendCode) setFriendQrVisible(true)
@@ -190,7 +201,7 @@ export function ProfileScreen({
 
         {/* ── Error ── */}
         {!isGuest && isError && data === null && (
-          <ErrorState onRetry={load} />
+          <ErrorState onRetry={retryLoad} />
         )}
 
         {/* ── Profile Content ── */}
@@ -289,7 +300,7 @@ export function ProfileScreen({
       <AddFriendModal
         visible={addFriendModalVisible}
         onClose={() => setAddFriendModalVisible(false)}
-        onFriendAdded={load}
+        onFriendAdded={invalidateFriendsData}
       />
 
       <FriendQrModal
@@ -300,7 +311,7 @@ export function ProfileScreen({
           setFriendQrVisible(false)
           if (initialFriendCode) onFriendCodeConsumed?.()
         }}
-        onFriendAdded={load}
+        onFriendAdded={invalidateFriendsData}
       />
 
       <ScoringRulesModal

@@ -8,6 +8,7 @@ export interface PlayerSlot {
   id?: string
   name: string
   handle: string
+  avatarUrl?: string
   elo: number
   ready: boolean
 }
@@ -65,6 +66,9 @@ export interface PublicRoomSummary {
   category: GameCategoryId
   mode: RoundMode
   difficulty?: DifficultyId
+  hostId?: string
+  hostHandle?: string
+  hostAvatarUrl?: string
   hostName: string
   hostElo: number
   playerCount: number

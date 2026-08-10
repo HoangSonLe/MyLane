@@ -103,7 +103,7 @@ export const versusSupabaseService = {
 
     const [profilesRes, categoryElosRes] = await Promise.all([
       hostIds.length > 0
-        ? supabase.from('profiles').select('id, name, overall_elo').in('id', hostIds)
+        ? supabase.from('profiles').select('id, name, handle, avatar_url, overall_elo').in('id', hostIds)
         : Promise.resolve({ data: [], error: null }),
       hostIds.length > 0
         ? supabase.from('category_elo').select('user_id, category, elo').in('user_id', hostIds)
@@ -121,6 +121,9 @@ export const versusSupabaseService = {
       return {
         code: row.code,
         roomName: row.room_name || row.code,
+        hostId: row.host_id || undefined,
+        hostHandle: hostP?.handle || undefined,
+        hostAvatarUrl: hostP?.avatar_url || undefined,
         hostName: hostP?.name || 'Host',
         hostElo: eloMap.get(`${row.host_id}:${row.category}`) ?? hostP?.overall_elo ?? 1000,
         category: row.category as GameCategoryId,
@@ -281,7 +284,7 @@ export const versusSupabaseService = {
     const normalizedCode = code.trim().split('/').filter(Boolean).at(-1) || code.trim()
     const { data: roomRow, error } = await supabase
       .from('versus_rooms')
-      .select('*, host:profiles!host_id(name, handle, overall_elo), guest:profiles!guest_id(name, handle, overall_elo)')
+      .select('*, host:profiles!host_id(name, handle, avatar_url, overall_elo), guest:profiles!guest_id(name, handle, avatar_url, overall_elo)')
       .eq('code', normalizedCode.toUpperCase())
       .maybeSingle()
 
@@ -311,6 +314,7 @@ export const versusSupabaseService = {
         id: roomRow.host_id,
         name: roomRow.host?.name || 'Host Player',
         handle: roomRow.host?.handle || 'host',
+        avatarUrl: roomRow.host?.avatar_url || undefined,
         elo: eloByUser.get(roomRow.host_id) ?? roomRow.host?.overall_elo ?? 1000,
         ready: !!roomRow.host_ready,
       },
@@ -319,6 +323,7 @@ export const versusSupabaseService = {
             id: roomRow.guest_id,
             name: roomRow.guest?.name || 'Guest Player',
             handle: roomRow.guest?.handle || 'guest',
+            avatarUrl: roomRow.guest?.avatar_url || undefined,
             elo: eloByUser.get(roomRow.guest_id) ?? roomRow.guest?.overall_elo ?? 1000,
             ready: !!roomRow.guest_ready,
           }

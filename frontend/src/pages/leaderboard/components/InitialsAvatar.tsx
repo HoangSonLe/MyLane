@@ -33,6 +33,8 @@ export function InitialsAvatar({
         <img
           src={imageUrl}
           alt=""
+          loading="lazy"
+          decoding="async"
           className="absolute inset-0 h-full w-full object-cover"
           style={{ borderRadius: 'inherit' }}
           onError={() => setImgError(true)}

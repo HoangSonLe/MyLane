@@ -1,4 +1,5 @@
-import { IconSwords, IconUser } from '@/components/ui/icons'
+import { IconSwords } from '@/components/ui/icons'
+import { Avatar } from '@/components/ui/Avatar'
 import { ModalBackdrop } from '@/components/ui/ModalBackdrop'
 import type { PublicRoomSummary } from '@/services/versus-room/versus-room.interface'
 import { GAME_CATEGORIES } from '@/services/versus-room/versus-room.mock'
@@ -11,6 +12,15 @@ interface PublicRoomDetailModalProps {
   show: boolean
   onClose: () => void
   onJoin: (code: string) => void
+  onViewHost?: (room: PublicRoomSummary) => void
+}
+
+function IconChevronRight() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M9 18l6-6-6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
 }
 
 function IconGlobe() {
@@ -27,6 +37,7 @@ export function PublicRoomDetailModal({
   show,
   onClose,
   onJoin,
+  onViewHost,
 }: PublicRoomDetailModalProps) {
   const { t } = useTranslation()
 
@@ -91,30 +102,52 @@ export function PublicRoomDetailModal({
           <span className="text-[11px] font-semibold uppercase tracking-wider" style={{ color: 'var(--ma-fg-subtle)' }}>
             {t.lobby.hostInfo}
           </span>
-          <div className="flex items-center justify-between rounded-2xl p-3" style={{ border: '1px solid var(--ma-border-subtle)' }}>
-            <div className="flex items-center gap-2.5">
-              <div
-                className="flex h-9 w-9 items-center justify-center rounded-xl text-sm"
-                style={{
-                  background: 'var(--ma-icon-bg)',
-                  color: 'var(--ma-icon-fg)',
-                }}
+          {(() => {
+            const isClickable = !!(onViewHost && room.hostId)
+            const hostContent = (
+              <>
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <Avatar name={room.hostName} imageUrl={room.hostAvatarUrl} size="2.25rem" fontSize="13px" />
+                  <div className="flex flex-col min-w-0">
+                    <span className="text-[13px] font-bold truncate" style={{ color: 'var(--ma-fg)' }}>
+                      {room.hostName}
+                    </span>
+                    <span className="text-[11px]" style={{ color: 'var(--ma-fg-muted)' }}>
+                      Rating: <strong className="font-semibold" style={{ color: 'var(--ma-fg)' }}>{room.hostElo} Elo</strong>
+                    </span>
+                  </div>
+                </div>
+                <div className="flex shrink-0 items-center gap-1.5">
+                  <span className="rounded-xl px-2.5 py-1 text-[11px] font-bold" style={{ background: 'var(--ma-active-soft)', color: 'var(--ma-active)' }}>
+                    Host
+                  </span>
+                  {isClickable && (
+                    <span style={{ color: 'var(--ma-fg-subtle)' }}>
+                      <IconChevronRight />
+                    </span>
+                  )}
+                </div>
+              </>
+            )
+
+            return isClickable ? (
+              <button
+                type="button"
+                onClick={() => onViewHost!(room)}
+                className="flex w-full items-center justify-between rounded-2xl p-3 text-left transition-opacity hover:opacity-80 active:opacity-60"
+                style={{ border: '1px solid var(--ma-border-subtle)' }}
               >
-                <IconUser />
+                {hostContent}
+              </button>
+            ) : (
+              <div
+                className="flex w-full items-center justify-between rounded-2xl p-3"
+                style={{ border: '1px solid var(--ma-border-subtle)' }}
+              >
+                {hostContent}
               </div>
-              <div className="flex flex-col">
-                <span className="text-[13px] font-bold" style={{ color: 'var(--ma-fg)' }}>
-                  {room.hostName}
-                </span>
-                <span className="text-[11px]" style={{ color: 'var(--ma-fg-muted)' }}>
-                  Rating: <strong className="font-semibold" style={{ color: 'var(--ma-fg)' }}>{room.hostElo} Elo</strong>
-                </span>
-              </div>
-            </div>
-            <span className="rounded-xl px-2.5 py-1 text-[11px] font-bold" style={{ background: 'var(--ma-active-soft)', color: 'var(--ma-active)' }}>
-              Host
-            </span>
-          </div>
+            )
+          })()}
         </div>
 
         {/* Slot Info */}
