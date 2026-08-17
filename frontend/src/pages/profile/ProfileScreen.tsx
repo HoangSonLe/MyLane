@@ -55,6 +55,7 @@ export function ProfileScreen({
 }: Props) {
   const { isOffline } = useNetworkStatus()
   const user = useAuthStore((s) => s.user)
+  const isAuthInitialized = useAuthStore((s) => s.isInitialized)
   const isGuest = user?.isGuest ?? true
   const { t } = useTranslation()
 
@@ -157,8 +158,24 @@ export function ProfileScreen({
           aria-hidden="true"
         />
 
+        {/* ── Session still resolving (e.g. reopening after a long time away) ──
+            Without this, a momentarily-null `user` while checkSession() is
+            still in flight falls through the `?? true` default below and
+            flashes the Guest wall even for an already-logged-in account. */}
+        {!isAuthInitialized && (
+          <>
+            <LoadingIndicator />
+            <AvatarHero skeleton data={PLACEHOLDER} />
+            <EloCard skeleton data={PLACEHOLDER} />
+            <BestScoresCard skeleton data={PLACEHOLDER} />
+            <RecordStatsCard skeleton data={PLACEHOLDER} />
+            <FriendsCard skeleton data={PLACEHOLDER} />
+            <MatchHistoryCard skeleton data={PLACEHOLDER} onOpenMatch={() => {}} />
+          </>
+        )}
+
         {/* ── Guest ── */}
-        {isGuest && (
+        {isAuthInitialized && isGuest && (
           <>
             <div className="flex flex-col items-center gap-3 px-4 py-4">
               <div
