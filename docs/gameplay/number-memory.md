@@ -32,22 +32,22 @@ Digits 1–9, sampled with replacement (can repeat within one sequence).
 ## Level System
 
 - 10 levels.
-- Level 1 starts at 6 characters; each level adds 1 character (up to 15 at level 10).
-- Each level requires `times` consecutive round wins (default **5**) to advance.
+- Level 1 starts at 8 characters; each level adds 1 character (up to 17 at level 10).
+- Each level requires `times` consecutive round wins (default **3**) to advance.
 - Losing `times` rounds within the same level → **Game Over**.
 
 | Level | Characters to remember | Rounds to win |
 |---|---|---|
-| 1 | 6 | 5 |
-| 2 | 7 | 5 |
-| 3 | 8 | 5 |
-| 4 | 9 | 5 |
-| 5 | 10 | 5 |
-| 6 | 11 | 5 |
-| 7 | 12 | 5 |
-| 8 | 13 | 5 |
-| 9 | 14 | 5 |
-| 10 | 15 | 5 |
+| 1 | 8 | 3 |
+| 2 | 9 | 3 |
+| 3 | 10 | 3 |
+| 4 | 11 | 3 |
+| 5 | 12 | 3 |
+| 6 | 13 | 3 |
+| 7 | 14 | 3 |
+| 8 | 15 | 3 |
+| 9 | 16 | 3 |
+| 10 | 17 | 3 |
 
 ## Difficulty Modes
 
@@ -83,4 +83,4 @@ Player can **Pause** mid-round and **Resume** at the exact same state, or **Rese
 
 ## Endless Mode
 
-Unlocks after Level 10. Starting length 16, +1 character every 3 consecutive wins. Separate Endless leaderboard (ranked by highest length reached). See [`README.md`](README.md#endless-mode).
+Unlocks after Level 10. Starting length 18, +1 character every 3 consecutive wins. Separate Endless leaderboard (ranked by highest length reached). See [`README.md`](README.md#endless-mode).

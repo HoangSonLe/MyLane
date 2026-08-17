@@ -29,21 +29,21 @@ export interface LinearLevel {
   roundsToWin: number
 }
 
-/** docs/gameplay/number-memory.md — level 1 = 6 chars ... level 10 = 15 chars, 5 wins/level. */
+/** docs/gameplay/number-memory.md — level 1 = 8 chars ... level 10 = 17 chars, 3 wins/level. */
 export const NUMBER_LEVELS: LinearLevel[] = Array.from({ length: 10 }, (_, i) => ({
   level: i + 1,
-  length: i + 6,
-  roundsToWin: 5,
+  length: i + 8,
+  roundsToWin: 3,
 }))
 
 /** docs/gameplay/alphabet-memory.md — "identical to Number Memory" level table. */
 export const ALPHABET_LEVELS: LinearLevel[] = NUMBER_LEVELS
 
-/** docs/gameplay/sequence-memory.md — level 1 = 4 tiles ... level 10 = 13 tiles, 5 wins/level. */
+/** docs/gameplay/sequence-memory.md — level 1 = 6 tiles ... level 10 = 15 tiles, 3 wins/level. */
 export const SEQUENCE_LEVELS: LinearLevel[] = Array.from({ length: 10 }, (_, i) => ({
   level: i + 1,
-  length: i + 4,
-  roundsToWin: 5,
+  length: i + 6,
+  roundsToWin: 3,
 }))
 
 export interface GridLevel {
@@ -63,16 +63,16 @@ export interface GridLevel {
  * games) rather than inventing an unstated intra-level growth formula.
  */
 export const GRID_LEVELS: GridLevel[] = [
-  { level: 1, xAxis: 5, yAxis: 5, beginCount: 8, roundsToWin: 3 },
-  { level: 2, xAxis: 6, yAxis: 5, beginCount: 10, roundsToWin: 3 },
-  { level: 3, xAxis: 6, yAxis: 6, beginCount: 12, roundsToWin: 3 },
-  { level: 4, xAxis: 7, yAxis: 6, beginCount: 14, roundsToWin: 3 },
-  { level: 5, xAxis: 7, yAxis: 7, beginCount: 16, roundsToWin: 3 },
-  { level: 6, xAxis: 8, yAxis: 8, beginCount: 18, roundsToWin: 3 },
-  { level: 7, xAxis: 9, yAxis: 8, beginCount: 20, roundsToWin: 3 },
-  { level: 8, xAxis: 9, yAxis: 9, beginCount: 22, roundsToWin: 3 },
-  { level: 9, xAxis: 10, yAxis: 9, beginCount: 24, roundsToWin: 3 },
-  { level: 10, xAxis: 10, yAxis: 10, beginCount: 26, roundsToWin: 3 },
+  { level: 1, xAxis: 5, yAxis: 5, beginCount: 10, roundsToWin: 3 },
+  { level: 2, xAxis: 6, yAxis: 5, beginCount: 12, roundsToWin: 3 },
+  { level: 3, xAxis: 6, yAxis: 6, beginCount: 14, roundsToWin: 3 },
+  { level: 4, xAxis: 7, yAxis: 6, beginCount: 16, roundsToWin: 3 },
+  { level: 5, xAxis: 7, yAxis: 7, beginCount: 18, roundsToWin: 3 },
+  { level: 6, xAxis: 8, yAxis: 8, beginCount: 20, roundsToWin: 3 },
+  { level: 7, xAxis: 9, yAxis: 8, beginCount: 22, roundsToWin: 3 },
+  { level: 8, xAxis: 9, yAxis: 9, beginCount: 24, roundsToWin: 3 },
+  { level: 9, xAxis: 10, yAxis: 9, beginCount: 26, roundsToWin: 3 },
+  { level: 10, xAxis: 10, yAxis: 10, beginCount: 28, roundsToWin: 3 },
 ]
 
 /** docs/gameplay/grid-memory.md "Default Timing". */
@@ -99,16 +99,16 @@ export interface ColorLevel {
  * the number of distinct colors increase across the 10 levels.
  */
 export const COLOR_LEVELS: ColorLevel[] = [
-  { level: 1, colorCount: 4, length: 5, roundsToWin: 5 },
-  { level: 2, colorCount: 4, length: 6, roundsToWin: 5 },
-  { level: 3, colorCount: 4, length: 7, roundsToWin: 5 },
-  { level: 4, colorCount: 5, length: 7, roundsToWin: 5 },
-  { level: 5, colorCount: 5, length: 8, roundsToWin: 5 },
-  { level: 6, colorCount: 5, length: 9, roundsToWin: 5 },
-  { level: 7, colorCount: 6, length: 9, roundsToWin: 5 },
-  { level: 8, colorCount: 6, length: 10, roundsToWin: 5 },
-  { level: 9, colorCount: 6, length: 11, roundsToWin: 5 },
-  { level: 10, colorCount: 6, length: 12, roundsToWin: 5 },
+  { level: 1, colorCount: 4, length: 7, roundsToWin: 3 },
+  { level: 2, colorCount: 4, length: 8, roundsToWin: 3 },
+  { level: 3, colorCount: 4, length: 9, roundsToWin: 3 },
+  { level: 4, colorCount: 5, length: 9, roundsToWin: 3 },
+  { level: 5, colorCount: 5, length: 10, roundsToWin: 3 },
+  { level: 6, colorCount: 5, length: 11, roundsToWin: 3 },
+  { level: 7, colorCount: 6, length: 11, roundsToWin: 3 },
+  { level: 8, colorCount: 6, length: 12, roundsToWin: 3 },
+  { level: 9, colorCount: 6, length: 13, roundsToWin: 3 },
+  { level: 10, colorCount: 6, length: 14, roundsToWin: 3 },
 ]
 
 /** docs/gameplay/color-memory.md "Round Flow" — same flash/gap pace as Sequence Memory. */
@@ -245,12 +245,12 @@ export function getEndlessConfig(gameType: GameId, endlessWins: number): Endless
   switch (gameType) {
     case GameId.NUMBER:
     case GameId.ALPHABET:
-      return { length: 16 + steps }
+      return { length: 18 + steps }
     case GameId.SEQUENCE:
-      return { length: 14 + steps }
+      return { length: 16 + steps }
     case GameId.GRID:
-      return { xAxis: 10, yAxis: 10, beginCount: 26 + steps * 2, length: 26 + steps * 2 }
+      return { xAxis: 10, yAxis: 10, beginCount: 28 + steps * 2, length: 28 + steps * 2 }
     case GameId.COLOR:
-      return { colorCount: 6, length: 13 + steps }
+      return { colorCount: 6, length: 15 + steps }
   }
 }

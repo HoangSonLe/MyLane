@@ -57,22 +57,22 @@ are defined: amber, teal, rose, violet, lime, sky; only the first
 - 10 levels, **two independent axes** grow together (same spirit as [Grid
   Memory](grid-memory.md)'s 2-axis progression): sequence length, and the
   number of distinct colors on the board.
-- Each level requires **5** consecutive round wins to advance (same
+- Each level requires **3** consecutive round wins to advance (same
   convention as Number/Alphabet/Sequence Memory).
-- Losing 5 rounds within the same level → **Game Over**.
+- Losing 3 rounds within the same level → **Game Over**.
 
 | Level | Colors | Sequence length | Rounds to win |
 |---|---|---|---|
-| 1 | 4 | 5 | 5 |
-| 2 | 4 | 6 | 5 |
-| 3 | 4 | 7 | 5 |
-| 4 | 5 | 7 | 5 |
-| 5 | 5 | 8 | 5 |
-| 6 | 5 | 9 | 5 |
-| 7 | 6 | 9 | 5 |
-| 8 | 6 | 10 | 5 |
-| 9 | 6 | 11 | 5 |
-| 10 | 6 | 12 | 5 |
+| 1 | 4 | 7 | 3 |
+| 2 | 4 | 8 | 3 |
+| 3 | 4 | 9 | 3 |
+| 4 | 5 | 9 | 3 |
+| 5 | 5 | 10 | 3 |
+| 6 | 5 | 11 | 3 |
+| 7 | 6 | 11 | 3 |
+| 8 | 6 | 12 | 3 |
+| 9 | 6 | 13 | 3 |
+| 10 | 6 | 14 | 3 |
 
 ## Difficulty Modes
 
@@ -113,6 +113,6 @@ scoring pipeline, see [`docs/technical/known-gaps.md`](../technical/known-gaps.m
 
 Unlocks after Level 10. `colorCount` stays fixed at 6 (the board doesn't
 grow further); sequence length continues from Level 10's ending value of
-12, starting at **13** and +1 every 3 consecutive wins — same +1-per-3-wins
+14, starting at **15** and +1 every 3 consecutive wins — same +1-per-3-wins
 convention as Number/Alphabet/Sequence Memory. Separate Endless
 leaderboard, same convention as [`README.md`](README.md#endless-mode).

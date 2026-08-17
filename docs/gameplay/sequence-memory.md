@@ -32,22 +32,22 @@ This differs from [Grid Memory](grid-memory.md) (which shows numbered labels sim
 ## Level System
 
 - 10 levels.
-- Level 1 starts at a 4-tile sequence; each level adds 1 tile (up to 13 at level 10).
-- Each level requires **5** consecutive round wins to advance (same convention as Number/Alphabet Memory).
-- Losing 5 rounds within the same level → **Game Over**.
+- Level 1 starts at a 6-tile sequence; each level adds 1 tile (up to 15 at level 10).
+- Each level requires **3** consecutive round wins to advance (same convention as Number/Alphabet Memory).
+- Losing 3 rounds within the same level → **Game Over**.
 
 | Level | Sequence length | Rounds to win |
 |---|---|---|
-| 1 | 4 | 5 |
-| 2 | 5 | 5 |
-| 3 | 6 | 5 |
-| 4 | 7 | 5 |
-| 5 | 8 | 5 |
-| 6 | 9 | 5 |
-| 7 | 10 | 5 |
-| 8 | 11 | 5 |
-| 9 | 12 | 5 |
-| 10 | 13 | 5 |
+| 1 | 6 | 3 |
+| 2 | 7 | 3 |
+| 3 | 8 | 3 |
+| 4 | 9 | 3 |
+| 5 | 10 | 3 |
+| 6 | 11 | 3 |
+| 7 | 12 | 3 |
+| 8 | 13 | 3 |
+| 9 | 14 | 3 |
+| 10 | 15 | 3 |
 
 ## Difficulty Modes
 
@@ -82,4 +82,4 @@ Uses the shared [scoring formula](README.md#scoring-formula-ranked-games-only). 
 
 ## Endless Mode
 
-Unlocks after Level 10. Starting length 14, +1 tile every 3 consecutive wins. Separate Endless leaderboard, same convention as [`README.md`](README.md#endless-mode).
+Unlocks after Level 10. Starting length 16, +1 tile every 3 consecutive wins. Separate Endless leaderboard, same convention as [`README.md`](README.md#endless-mode).

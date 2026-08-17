@@ -153,7 +153,7 @@ R_A_new = R_A + K × (S_A - E_A)
 
 Unlocks after a player completes **Level 10** in any category.
 
-- Number/Alphabet Memory: sequence length starts at 16, +1 every 3 consecutive wins.
+- Number/Alphabet Memory: sequence length starts at 18, +1 every 3 consecutive wins.
 - Grid Memory: after the 10×10 grid, `beginCount` +2 every 3 wins; larger grids (11×11+) deferred to a later version.
 - Has its own leaderboard (ranked by highest item count / `beginCount` reached).
 - Solo only (Practice + Ranked) — no Versus Endless in Version 1.

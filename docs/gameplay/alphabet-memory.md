@@ -27,7 +27,7 @@ ZXCVBNM
 
 ## Everything else
 
-Identical to [Number Memory](number-memory.md): Viewing → Answering flow (including the **Skip** control to end Viewing early), 10-level table (6→15 characters, 5 wins/level), difficulty mode time bonuses, Pause/Resume/Reset, Endless Mode (starts at 16, +1 per 3 wins).
+Identical to [Number Memory](number-memory.md): Viewing → Answering flow (including the **Skip** control to end Viewing early), 10-level table (8→17 characters, 3 wins/level), difficulty mode time bonuses, Pause/Resume/Reset, Endless Mode (starts at 18, +1 per 3 wins).
 
 Speed Bonus coefficient differs — see [scoring formula](README.md#scoring-formula-ranked-games-only): Alphabet Memory uses **10 points/second** (vs. 8 for Number Memory).
 
