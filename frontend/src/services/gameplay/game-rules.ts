@@ -248,8 +248,14 @@ export function getEndlessConfig(gameType: GameId, endlessWins: number): Endless
       return { length: 18 + steps }
     case GameId.SEQUENCE:
       return { length: 16 + steps }
-    case GameId.GRID:
-      return { xAxis: 10, yAxis: 10, beginCount: 28 + steps * 2, length: 28 + steps * 2 }
+    case GameId.GRID: {
+      // docs/gameplay/README.md: "larger grids (11×11+) deferred to a later
+      // version" — the board stays 10×10, so beginCount can never exceed
+      // its 100 cells (buildGridLit would otherwise loop forever looking
+      // for a free cell).
+      const beginCount = Math.min(10 * 10, 28 + steps * 2)
+      return { xAxis: 10, yAxis: 10, beginCount, length: beginCount }
+    }
     case GameId.COLOR:
       return { colorCount: 6, length: 15 + steps }
   }

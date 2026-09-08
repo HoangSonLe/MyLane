@@ -6,7 +6,7 @@ import {
   RoomFullError,
   RoomNotFoundError,
 } from '../versus-room/versus-room.service'
-import { getSupabaseClient } from './supabase.client'
+import { getSupabaseClient, openRealtimeChannel } from './supabase.client'
 
 const WAITING_ROOM_CLEANUP_INTERVAL_MS = 60_000
 let lastWaitingRoomCleanupAt = 0
@@ -346,11 +346,11 @@ export const versusSupabaseService = {
   subscribeToAvailableRooms(onChange: () => void): () => void {
     const supabase = getSupabaseClient()
     if (!supabase) return () => {}
-    const channel = supabase
-      .channel('public_versus_rooms_changes')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'versus_rooms' }, onChange)
-      .subscribe()
-    return () => { void supabase.removeChannel(channel) }
+    return openRealtimeChannel(supabase, 'public_versus_rooms_changes', (channel) => {
+      channel
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'versus_rooms' }, onChange)
+        .subscribe()
+    })
   },
 
   /**
@@ -364,15 +364,15 @@ export const versusSupabaseService = {
   subscribeToRoomUpdates(code: string, onChange: () => void): () => void {
     const supabase = getSupabaseClient()
     if (!supabase) return () => {}
-    const channel = supabase
-      .channel(`versus_room_updates:${code}`)
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'versus_rooms', filter: `code=eq.${code}` },
-        onChange,
-      )
-      .subscribe()
-    return () => { void supabase.removeChannel(channel) }
+    return openRealtimeChannel(supabase, `versus_room_updates:${code}`, (channel) => {
+      channel
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'versus_rooms', filter: `code=eq.${code}` },
+          onChange,
+        )
+        .subscribe()
+    })
   },
 
   /**
@@ -388,18 +388,21 @@ export const versusSupabaseService = {
   subscribeToRoomPresence(code: string, userId: string, onSync: (onlineUserIds: string[]) => void): () => void {
     const supabase = getSupabaseClient()
     if (!supabase) return () => {}
-    const channel = supabase.channel(`versus_room_presence:${code}`, {
-      config: { presence: { key: userId } },
-    })
-    channel
-      .on('presence', { event: 'sync' }, () => {
-        onSync(Object.keys(channel.presenceState()))
-      })
-      .subscribe((status) => {
-        if (status === 'SUBSCRIBED') {
-          void channel.track({ online_at: new Date().toISOString() })
-        }
-      })
-    return () => { void supabase.removeChannel(channel) }
+    return openRealtimeChannel(
+      supabase,
+      `versus_room_presence:${code}`,
+      (channel) => {
+        channel
+          .on('presence', { event: 'sync' }, () => {
+            onSync(Object.keys(channel.presenceState()))
+          })
+          .subscribe((status) => {
+            if (status === 'SUBSCRIBED') {
+              void channel.track({ online_at: new Date().toISOString() })
+            }
+          })
+      },
+      { config: { presence: { key: userId } } },
+    )
   },
 }

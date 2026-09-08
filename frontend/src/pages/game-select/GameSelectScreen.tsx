@@ -50,8 +50,9 @@ export function GameSelectScreen({
   // are blocked separately via `requiresAccount`, not this check. Recomputed
   // from `selectedGame`'s own data, so switching game cards while Endless is
   // selected re-evaluates it (a mode picked for one game can be locked for
-  // another).
-  const isEndlessLevelLocked = !isGuest && (selectedGameStats?.highestLevel ?? 1) < 10
+  // another). docs/gameplay/README.md: "Unlocks after a player *completes*
+  // Level 10" — reaching Level 10 and then losing out does not count.
+  const isEndlessLevelLocked = !isGuest && !(selectedGameStats?.completedLevel10 ?? false)
   const isSelectedModeLocked = selectedMode === ModeId.SOLO_ENDLESS && isEndlessLevelLocked
 
   const loadStats = useCallback(async () => {
@@ -97,7 +98,15 @@ export function GameSelectScreen({
 
   function handleStart() {
     if (!canStart) return
-    const meta = { game: selectedGame, mode: selectedMode, difficulty: selectedDiff, startLevel: selectedStartLevel }
+    // Endless has no Starting Level (the picker is hidden for it below) —
+    // don't forward a level picked earlier for Practice/Ranked, GameplayScreen
+    // always plays Endless on the Level-10 board.
+    const meta = {
+      game: selectedGame,
+      mode: selectedMode,
+      difficulty: selectedDiff,
+      startLevel: selectedMode === ModeId.SOLO_ENDLESS ? undefined : selectedStartLevel,
+    }
     if (currentMode.versusFlow) {
       onNavigate?.('matchmaking', meta)
     } else {

@@ -58,7 +58,9 @@ export const resultHandlers = [
     // above) stays exclusively Ranked. See game.supabase.ts's shouldPersist
     // for the real-backend equivalent.
     const shouldPersist = !isGuest && (isRanked || input.mode === ModeId.SOLO_PRACTICE || input.mode === ModeId.SOLO_ENDLESS)
-    const outcome = input.outcome ?? (input.perfect || input.roundsCleared >= 5 ? 'win' : 'loss')
+    // Solo outcome (docs/gameplay/README.md § Accounts): a run counts as a
+    // win only when it completed Level 10; every other ending is a loss.
+    const outcome = input.outcome ?? (input.completedAllLevels ? 'win' : 'loss')
     const previousElo = isVersusRanked && shouldPersist ? (user?.elo ?? 1000) : undefined
     const eloChange = previousElo === undefined
       ? undefined
@@ -73,6 +75,7 @@ export const resultHandlers = [
     if (shouldPersist && statsEntry) {
       statsEntry.bestScore = Math.max(statsEntry.bestScore ?? 0, breakdown.score)
       statsEntry.highestLevel = Math.max(statsEntry.highestLevel ?? 0, input.levelReached)
+      statsEntry.completedLevel10 = statsEntry.completedLevel10 || input.completedAllLevels
       MOCK_LAST_PLAYED.game = GAME_LABELS[input.game]
       MOCK_LAST_PLAYED.mode = MODE_LABELS[input.mode]
       MOCK_LAST_PLAYED.score = input.levelReached

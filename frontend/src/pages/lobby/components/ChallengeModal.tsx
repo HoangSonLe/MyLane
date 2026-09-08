@@ -72,6 +72,11 @@ export function ChallengeModal({
   const [loadedFriend, setLoadedFriend] = useState<{ id: string; friend: Friend } | null>(null)
   const onAcceptedRef = useRef(onAccepted)
   const onCloseRef = useRef(onClose)
+  // An 'accepted' response can arrive twice (Realtime push + the 2s poll,
+  // or a poll tick while joinRoom is still in flight) — only the first one
+  // may navigate, otherwise the parent joins the room twice and pushes a
+  // duplicate versus-room entry onto its history.
+  const acceptedHandledRef = useRef(false)
 
   useEffect(() => { onAcceptedRef.current = onAccepted }, [onAccepted])
   useEffect(() => { onCloseRef.current = onClose }, [onClose])
@@ -104,8 +109,15 @@ export function ChallengeModal({
   }, [friend, show])
 
   const handleCancel = useCallback(async () => {
+    // Closing must always succeed and must not carry a previous friend's
+    // "declined" banner over to the next friend this modal opens for.
+    setDeclineReason(null)
     if (inviteState) {
-      await matchInviteService.cancelChallengeInvite(inviteState.inviteId, inviteState.roomCode)
+      try {
+        await matchInviteService.cancelChallengeInvite(inviteState.inviteId, inviteState.roomCode)
+      } catch {
+        // The 30s server expiry cleans up an invite we failed to cancel.
+      }
       setInviteState(null)
     }
     onCloseRef.current()
@@ -157,6 +169,9 @@ export function ChallengeModal({
 
     const handleResponse = (status: string, roomCode: string) => {
       if (status === 'accepted') {
+        if (acceptedHandledRef.current) return
+        acceptedHandledRef.current = true
+        setInviteState(null)
         onAcceptedRef.current(roomCode)
         onCloseRef.current()
       } else if (status === 'declined') {
@@ -199,6 +214,7 @@ export function ChallengeModal({
   const handleSendInvite = async () => {
     setIsSending(true)
     setDeclineReason(null)
+    acceptedHandledRef.current = false
     try {
       const result = await matchInviteService.sendChallengeInvite(
         friend.id,

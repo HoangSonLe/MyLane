@@ -1,4 +1,4 @@
-import { getSupabaseClient } from './supabase.client'
+import { getSupabaseClient, openRealtimeChannel } from './supabase.client'
 
 export interface AccountInviteMuteRecord {
   mutedUserId: string
@@ -75,25 +75,22 @@ export const inviteMuteSupabaseService = {
     const supabase = getSupabaseClient()
     if (!supabase || !userId) return () => {}
 
-    const channel = supabase
-      .channel(`invite-mutes:${userId}`)
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'invite_mutes',
-          filter: `user_id=eq.${userId}`,
-        },
-        (payload) => {
-          const record = mapMuteRow(payload.new)
-          if (record) onChange(record)
-        }
-      )
-      .subscribe()
-
-    return () => {
-      void supabase.removeChannel(channel)
-    }
+    return openRealtimeChannel(supabase, `invite-mutes:${userId}`, (channel) => {
+      channel
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'invite_mutes',
+            filter: `user_id=eq.${userId}`,
+          },
+          (payload) => {
+            const record = mapMuteRow(payload.new)
+            if (record) onChange(record)
+          }
+        )
+        .subscribe()
+    })
   },
 }

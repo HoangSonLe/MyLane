@@ -11,14 +11,16 @@ import {
   IconSwords,
 } from '@/components/ui/icons'
 import { ScreenShell } from '@/components/ui/layout'
+import { DifficultyChip } from '@/components/ui/game'
 import { DifficultyId, GameId, RoomEntrySource, RoundMode } from '@/configs/enum'
+import { DIFFICULTIES } from '@/services/game-select/game-select.mock'
 import { isSupabaseConfigured } from '@/services/backend-config'
 import { matchmakingSupabaseService } from '@/services/supabase/matchmaking.supabase'
 import type { GameCategoryId, Room } from '@/services/versus-room/versus-room.interface'
 import { versusRoomService } from '@/services/versus-room/versus-room.service'
 import { useAuthStore } from '@/stores/auth.store'
 import { useTranslation } from '@/i18n/useTranslation'
-import { getLocalizedGameLabel } from '@/services/gameplay/gameplay-screen.types'
+import { getDifficultyLabels, getLocalizedGameLabel } from '@/services/gameplay/gameplay-screen.types'
 
 const CATEGORY_ITEMS: { id: GameCategoryId; label: string; icon: ComponentType<{ width?: number; height?: number }> }[] = [
   { id: GameId.COLOR, label: 'Color', icon: IconCategoryColor },
@@ -41,7 +43,13 @@ export function MatchmakingScreen({
 }) {
   const { t } = useTranslation()
   const user = useAuthStore((state) => state.user)
+  const difficultyLabels = getDifficultyLabels(t)
   const [selectedCategory, setSelectedCategory] = useState<GameCategoryId>(initialCategory)
+  // The server only pairs queue rows with equal difficulty
+  // (`poll_matchmaking` in database/schema.sql), so the player must be able
+  // to see and change it here — previously it was inherited invisibly from
+  // the last Solo pick, and two players on Easy vs Hard never matched.
+  const [selectedDifficulty, setSelectedDifficulty] = useState<DifficultyId>(initialDifficulty)
   const [userElo, setUserElo] = useState<number | null>(null)
   const [seconds, setSeconds] = useState(0)
   const [isSearching, setIsSearching] = useState(true)
@@ -146,7 +154,7 @@ export function MatchmakingScreen({
 
     void matchmakingSupabaseService.enterQueue({
       category: selectedCategory,
-      difficulty: initialDifficulty,
+      difficulty: selectedDifficulty,
       userElo,
       eloDelta: 100,
       attemptId,
@@ -173,7 +181,7 @@ export function MatchmakingScreen({
       if (pollInterval) clearInterval(pollInterval)
       void matchmakingSupabaseService.leaveQueue(attemptId).catch(() => {})
     }
-  }, [attemptId, handleFoundMatch, initialDifficulty, isSearching, selectedCategory, user?.id, userElo])
+  }, [attemptId, handleFoundMatch, selectedDifficulty, isSearching, selectedCategory, user?.id, userElo])
 
   useEffect(() => {
     if (!isSearching || !queueId || eloDelta === 100 || userElo === null) return
@@ -204,6 +212,22 @@ export function MatchmakingScreen({
     setIsSearching(true)
   }
 
+  // Same restart dance as a category change: the queue row carries the
+  // difficulty, so changing it means a fresh attempt.
+  const handleDifficultyChange = async (difficulty: DifficultyId) => {
+    if (difficulty === selectedDifficulty) return
+    setIsSearching(false)
+    await matchmakingSupabaseService.leaveQueue(attemptId).catch(() => {})
+    if (!mountedRef.current) return
+    handledRoomCodeRef.current = null
+    setQueueId(null)
+    setSelectedDifficulty(difficulty)
+    setSeconds(0)
+    setIsTimeout(false)
+    setAttemptId(crypto.randomUUID())
+    setIsSearching(true)
+  }
+
   const handleCancelAndBack = () => {
     void matchmakingSupabaseService.leaveQueue(attemptId).catch(() => {})
     onBack()
@@ -216,7 +240,7 @@ export function MatchmakingScreen({
       const created = await versusRoomService.createRoom({
         category: selectedCategory,
         mode: RoundMode.VERSUS_RANKED,
-        difficulty: initialDifficulty,
+        difficulty: selectedDifficulty,
         roomName: `${user?.name || 'Player'}'s Ranked Arena`,
         isPrivate: false,
       })
@@ -269,6 +293,23 @@ export function MatchmakingScreen({
                 </button>
               )
             })}
+          </div>
+        </div>
+
+        {/* Difficulty — pairing requires an exact match, so it must be visible and changeable here. */}
+        <div className="mt-2 flex flex-col gap-1.5 w-full">
+          <label className="text-[11px] sm:text-[12px] font-semibold text-[var(--ma-fg-subtle)] text-center">
+            {t.gameSelect.difficulty}
+          </label>
+          <div className="flex gap-2 px-1">
+            {DIFFICULTIES.map((difficulty) => (
+              <DifficultyChip
+                key={difficulty.id}
+                difficulty={{ ...difficulty, label: difficultyLabels[difficulty.id] }}
+                selected={selectedDifficulty === difficulty.id}
+                onSelect={() => { void handleDifficultyChange(difficulty.id) }}
+              />
+            ))}
           </div>
         </div>
 

@@ -17,6 +17,10 @@ export interface GameStats {
   elo: number
   bestScore: number | null
   highestLevel: number | null
+  /** docs/gameplay/README.md § Endless Mode: "Unlocks after a player completes
+   *  Level 10" — set once a run wins the required rounds at Level 10, which
+   *  `highestLevel` alone can't tell apart from merely reaching Level 10. */
+  completedLevel10: boolean
 }
 
 export interface ModeMeta {

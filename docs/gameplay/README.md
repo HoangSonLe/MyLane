@@ -38,10 +38,12 @@ These rules apply across all 5 games and must stay consistent between them.
 
 | Mode | Description | Affects Elo? | Saved to records/leaderboard? |
 |---|---|---|---|
-| Solo Practice | Free practice, no pressure. Can reveal the answer after each round. | No | No |
+| Solo Practice | Free practice, no pressure. Can reveal the answer after each round. | No | Personal bests only (practice score/level, highest level, own match history) — never the leaderboard |
 | Solo Ranked | Solo play for rank/records. | No | Yes |
-| Versus Ranked | 1v1, same category + mode, shared seed. Faster correct player wins. | Yes | Yes |
+| Versus Ranked | 1v1, same category + mode, shared seed. Faster correct player wins: more correct rounds wins; equal counts go to whoever submitted round 5 first (server clock, `versus_round_results.submitted_at`); 0-0 stays a draw. | Yes | Yes |
 | Versus Unranked | 1v1 for fun. | No | No |
+
+Solo outcome for records: a Solo run is recorded as a **win** only when it completes Level 10 (`completedAllLevels`); any other ending is a **loss**. Versus outcomes are the server-owned match result.
 
 Versus match creation: invite a friend directly, create a room (Public/Private), browse available public rooms, Quick Join, or Quick Match (Elo-based).
 
@@ -109,7 +111,7 @@ When a participant forfeits an active Versus match, the server immediately final
 ### Matchmaking (Quick Match)
 
 1. **Simultaneous Queue Pairing**: Both players MUST be actively searching in the Matchmaking Queue (`MatchmakingScreen`, `matchmaking_queue` table) at the same time.
-2. Matches online players in the same game category with overlapping Elo search windows.
+2. Matches online players in the same game category **and difficulty** (both chosen on `MatchmakingScreen`; the room is created with that difficulty) with overlapping Elo search windows.
 3. Initial Elo window: **±100** (e.g. `1287 — 1487 Elo`).
 4. If no match after **10s**, widen by **±50**; repeat every 10s up to **±300** max.
 5. Max wait: **60s**, then "no opponent found," giving options to "Create Host Room" or "Retry Queue".
@@ -140,7 +142,7 @@ R_A_new = R_A + K × (S_A - E_A)
 
 `S_A` = 1 win / 0.5 draw / 0 loss. K-factor by current Elo: <1200 → K=40, 1200–1599 → K=32, 1600–1999 → K=24, ≥2000 → K=16.
 
-- Each game category has its own Elo, plus a weighted-average overall Elo.
+- Each game category has its own Elo, plus a weighted-average overall Elo. Weights are not defined anywhere, so `profiles.overall_elo` is the plain average of the categories the player has an Elo row for (same formula as the client's `calculateOverallElo`), written by `finalize_versus_room`.
 - Starting Elo: **1000**. Floor: **100** (never goes lower).
 
 ### Leaderboard & Records
@@ -151,7 +153,7 @@ R_A_new = R_A + K × (S_A - E_A)
 
 ### Endless Mode
 
-Unlocks after a player completes **Level 10** in any category.
+Unlocks after a player completes **Level 10** in any category — i.e. wins the required rounds *at* Level 10 (`category_bests.completed_level_10`); merely reaching Level 10 and then losing out does not unlock it. Endless always plays on the Level-10 board; the Starting Level picker does not apply.
 
 - Number/Alphabet Memory: sequence length starts at 18, +1 every 3 consecutive wins.
 - Grid Memory: after the 10×10 grid, `beginCount` +2 every 3 wins; larger grids (11×11+) deferred to a later version.
@@ -194,7 +196,7 @@ Ideas to enhance the impact and meaningfulness of Difficulty Mode selection in f
 - Viewing/Answering countdowns must be server-controlled (or use a tamper-resistant timer) — never trust client-side timing alone.
 - Basic anti-cheat: rate-limit input speed, flag abnormal/bot-like input patterns.
 - Guest config/progress lives in `localStorage`; synced to the server on login.
-- Reconnect window during Versus: **60 seconds** (GDD §11 says 45–60s, §17 sets it at 60s) — treat 60s as the value unless a decision changes it. Timeout while disconnected counts as a loss.
+- Reconnect window during Versus: **60 seconds** (GDD §11 says 45–60s, §17 sets it at 60s) — treat 60s as the value unless a decision changes it. Timeout while disconnected counts as a loss. The connected player keeps playing meanwhile (rounds are submitted independently; a banner shows the countdown, the board is never blocked). If the opponent has not returned when the window ends, the remaining player may leave **without a forfeit** (no Elo change); the room stays `in_progress` and the match is not counted — the server-side disconnect finalize is still backlog, see [`docs/technical/known-gaps.md`](../technical/known-gaps.md) §5.
 - All tunable numbers (timers, win-streak counts, score coefficients, K-factor, etc.) must be configurable (server-side config), never hard-coded into core logic.
 
 Source: [`MY_LANE_GAME_DESIGN.md`](../../MY_LANE_GAME_DESIGN.md) §§3–11, §17.

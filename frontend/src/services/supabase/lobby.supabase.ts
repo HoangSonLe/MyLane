@@ -1,4 +1,4 @@
-import { getSupabaseClient } from './supabase.client'
+import { getSupabaseClient, openRealtimeChannel } from './supabase.client'
 import type { Friend, FriendCategoryRecord } from '../lobby/lobby.interface'
 import { calculateOverallElo } from '@/lib/utils'
 
@@ -415,42 +415,39 @@ export const lobbySupabaseService = {
     const supabase = getSupabaseClient()
     if (!supabase || !userId) return () => {}
 
-    const channel = supabase
-      .channel(`friendships:${userId}`)
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'friendships',
-          filter: `addressee_id=eq.${userId}`,
-        },
-        () => callback()
-      )
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'friendships',
-          filter: `requester_id=eq.${userId}`,
-        },
-        () => callback()
-      )
-      .on(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'profiles',
-        },
-        () => callback()
-      )
-      .subscribe()
-
-    return () => {
-      supabase.removeChannel(channel)
-    }
+    return openRealtimeChannel(supabase, `friendships:${userId}`, (channel) => {
+      channel
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'friendships',
+            filter: `addressee_id=eq.${userId}`,
+          },
+          () => callback()
+        )
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'friendships',
+            filter: `requester_id=eq.${userId}`,
+          },
+          () => callback()
+        )
+        .on(
+          'postgres_changes',
+          {
+            event: 'UPDATE',
+            schema: 'public',
+            table: 'profiles',
+          },
+          () => callback()
+        )
+        .subscribe()
+    })
   },
 
   /**

@@ -1,6 +1,6 @@
 import { DifficultyId } from '@/configs/enum'
 import type { GameCategoryId } from '../versus-room/versus-room.interface'
-import { getSupabaseClient } from './supabase.client'
+import { getSupabaseClient, openRealtimeChannel } from './supabase.client'
 
 export type MatchmakingQueueStatus = 'searching' | 'matched' | 'expired' | 'missing'
 
@@ -118,33 +118,30 @@ export const matchmakingSupabaseService = {
     const supabase = getSupabaseClient()
     if (!supabase || !userId) return () => {}
 
-    const channel = supabase
-      .channel(`matchmaking:${userId}:${attemptId}`)
-      .on(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'matchmaking_queue',
-          filter: `user_id=eq.${userId}`,
-        },
-        (payload: any) => {
-          const row = payload.new
-          if (
-            row?.attempt_id === attemptId &&
-            row.status === 'matched' &&
-            row.room_code &&
-            row.room_code !== 'PENDING'
-          ) {
-            onMatched(row.room_code)
+    return openRealtimeChannel(supabase, `matchmaking:${userId}:${attemptId}`, (channel) => {
+      channel
+        .on(
+          'postgres_changes',
+          {
+            event: 'UPDATE',
+            schema: 'public',
+            table: 'matchmaking_queue',
+            filter: `user_id=eq.${userId}`,
+          },
+          (payload: any) => {
+            const row = payload.new
+            if (
+              row?.attempt_id === attemptId &&
+              row.status === 'matched' &&
+              row.room_code &&
+              row.room_code !== 'PENDING'
+            ) {
+              onMatched(row.room_code)
+            }
           }
-        }
-      )
-      .subscribe()
-
-    return () => {
-      void supabase.removeChannel(channel)
-    }
+        )
+        .subscribe()
+    })
   },
 
   async leaveQueue(attemptId?: string): Promise<void> {

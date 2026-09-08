@@ -7,7 +7,9 @@ import { RoundBanner } from './components/RoundBanner'
 import { SeedBadge } from './components/SeedBadge'
 import { WaitingState } from './components/WaitingState'
 import { ReconnectingOverlay } from './components/ReconnectingOverlay'
+import { OpponentLeftOverlay } from './components/OpponentLeftOverlay'
 import { ErrorOverlay } from './components/ErrorOverlay'
+import { StatusBanner } from '@/components/ui/StatusBanner'
 import { PromptBar } from './components/PromptBar'
 import { IconChevronLeft } from './components/icons'
 import { MOCK_PLAYER, MOCK_OPPONENT } from '@/services/versus-gameplay/versus-gameplay.mock'
@@ -60,6 +62,7 @@ export function VersusGameplayScreen({
   seed: requestedSeed,
   onQuit,
   onMatchEnd,
+  onAbandon,
 }: Props) {
   const { t } = useTranslation()
   const gameLabels = getGameLabels(t)
@@ -83,25 +86,38 @@ export function VersusGameplayScreen({
     }
   }, [])
 
-  const [screenState,     setScreenState]     = useState<ScreenState>(ScreenState.NORMAL)
+  const totalRounds = 5
+  // Resume-on-reload (docs/technical/known-gaps.md "Resume-on-reload"): the
+  // server already knows how many rounds this player submitted. Start from
+  // the next one instead of round 1 — replaying rounds the server silently
+  // ignores (`submit_versus_round` returns the current state for an
+  // already-submitted round) let the player re-run known puzzles and pile
+  // extra bonus seconds into the formula score.
+  const initialOwnRounds = currentPlayerIsHost ? room?.hostRoundsCompleted || 0 : room?.guestRoundsCompleted || 0
+  const initialRound = Math.min(totalRounds, initialOwnRounds + 1)
+  const alreadyDoneRounds = Array.from({ length: initialOwnRounds }, (_, i) => i + 1)
+
+  const [screenState,     setScreenState]     = useState<ScreenState>(
+    initialOwnRounds >= totalRounds ? ScreenState.WAITING : ScreenState.NORMAL,
+  )
   const [phase,           setPhase]            = useState<Phase>(Phase.IDLE)
   const [opponentStatus,  setOpponentStatus]   = useState<OpponentStatus>(OpponentStatus.CONNECTED)
   const [showQuitConfirm, setShowQuitConfirm]  = useState(false)
   const [forcedOutcome, setForcedOutcome] = useState<'win' | 'loss' | 'draw' | null>(null)
   const [finishReason, setFinishReason] = useState<MatchFinishReason | undefined>(room?.finishReason ?? undefined)
+  // Opponent stayed away for the whole 60s reconnect window — see the
+  // reconnect-countdown effect below and OpponentLeftOverlay.
+  const [opponentGone, setOpponentGone] = useState(false)
 
   // Match/round state
-  const [round,         setRound]         = useState(1)
-  const totalRounds                        = 5
+  const [round,         setRound]         = useState(initialRound)
   const [playerScore,   setPlayerScore]   = useState(currentPlayerIsHost ? room?.hostScore || 0 : room?.guestScore || 0)
   const [opponentScore, setOpponentScore] = useState(currentPlayerIsHost ? room?.guestScore || 0 : room?.hostScore || 0)
-  const [playerRoundsCompleted, setPlayerRoundsCompleted] = useState(
-    currentPlayerIsHost ? room?.hostRoundsCompleted || 0 : room?.guestRoundsCompleted || 0,
-  )
+  const [playerRoundsCompleted, setPlayerRoundsCompleted] = useState(initialOwnRounds)
   const [opponentRoundsCompleted, setOpponentRoundsCompleted] = useState(
     currentPlayerIsHost ? room?.guestRoundsCompleted || 0 : room?.hostRoundsCompleted || 0,
   )
-  const [level,         setLevel]         = useState(1)
+  const [level,         setLevel]         = useState(initialRound)
   const [timer,         setTimer]         = useState(30)
   const [reconnectCd,   setReconnectCd]   = useState(60)
   const timerRef     = useRef<ReturnType<typeof setInterval> | null>(null)
@@ -128,10 +144,10 @@ export function VersusGameplayScreen({
   const maxConsecutiveItemsRef = useRef(0)
   const bonusSecondsRef = useRef(0)
   const perfectRef = useRef(true)
-  const settledRoundsRef = useRef(new Set<number>())
-  const submittedRoundsRef = useRef(new Set<number>())
+  const settledRoundsRef = useRef(new Set<number>(alreadyDoneRounds))
+  const submittedRoundsRef = useRef(new Set<number>(alreadyDoneRounds))
   const submittingRoundsRef = useRef(new Set<number>())
-  const autoStartedRoundsRef = useRef(new Set<number>())
+  const autoStartedRoundsRef = useRef(new Set<number>(alreadyDoneRounds))
   const matchEndSentRef = useRef(false)
   const serverEloChangeRef = useRef(0)
   // Presence-driven: true unless a sustained Realtime-presence absence says
@@ -284,30 +300,45 @@ export function VersusGameplayScreen({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase, round, screenState, timer])
 
-  // Reconnect countdown — runs when opponentStatus is 'reconnecting' or 'disconnected' (60s grace period)
+  // Reconnect countdown — runs while the opponent is 'reconnecting' /
+  // 'disconnected' (60s grace period, docs/gameplay/README.md "Technical
+  // Rules"). Also runs in WAITING, so a player who already finished all 5
+  // rounds isn't left staring at a spinner forever when the opponent quits.
+  // The player's own round is NOT blocked or paused meanwhile: each side
+  // submits rounds independently, so the connected player just keeps going
+  // (a non-blocking banner shows the countdown).
+  const opponentAway = opponentStatus === OpponentStatus.RECONNECTING || opponentStatus === OpponentStatus.DISCONNECTED
   useEffect(() => {
-    if (
-      (opponentStatus === OpponentStatus.RECONNECTING || opponentStatus === OpponentStatus.DISCONNECTED) &&
-      screenState === ScreenState.NORMAL
-    ) {
+    if (opponentAway && !opponentGone && (screenState === ScreenState.NORMAL || screenState === ScreenState.WAITING)) {
       setReconnectCd(60)
       reconnectRef.current = setInterval(() => {
-        setReconnectCd((c) => {
-          if (c <= 1) {
-            clearInterval(reconnectRef.current!)
-            // A client cannot award itself a win. The dedicated presence/game
-            // server required by technical docs must confirm disconnect expiry.
-            setScreenState(ScreenState.ERROR)
-            return 0
-          }
-          return c - 1
-        })
+        setReconnectCd((c) => Math.max(0, c - 1))
       }, 1000)
     } else {
       if (reconnectRef.current) clearInterval(reconnectRef.current)
     }
     return () => { if (reconnectRef.current) clearInterval(reconnectRef.current) }
-  }, [opponentStatus, screenState])
+  }, [opponentAway, opponentGone, screenState])
+
+  // Window expired: a client cannot award itself the win (no server RPC
+  // confirms a disconnect — known-gaps.md §5), so the only exit offered is
+  // leaving *without* a forfeit (OpponentLeftOverlay → onAbandon). Kept out
+  // of the interval updater so StrictMode can't fire it twice.
+  useEffect(() => {
+    if (!opponentAway || opponentGone || reconnectCd > 0) return
+    if (reconnectRef.current) clearInterval(reconnectRef.current)
+    setOpponentGone(true)
+  }, [opponentAway, opponentGone, reconnectCd])
+
+  // Opponent came back (before or after the window closed) — drop the "gone"
+  // overlay and re-arm the countdown, otherwise a second disconnect would
+  // still read the leftover 0 and expire instantly.
+  useEffect(() => {
+    if (!opponentAway) {
+      setOpponentGone(false)
+      setReconnectCd(60)
+    }
+  }, [opponentAway])
 
   // ── Number logic ──
   function startNumberRound(len: number, random: () => number) {
@@ -473,7 +504,19 @@ export function VersusGameplayScreen({
       setOpponentRoundsCompleted(currentPlayerIsHost ? result.guestRoundsCompleted : result.hostRoundsCompleted)
       if (result.outcome) setForcedOutcome(result.outcome)
       serverEloChangeRef.current = result.eloChange
-      if (result.matchStatus === 'finished') setScreenState(ScreenState.RESULT)
+      if (result.matchStatus === 'finished') {
+        // The round RPC doesn't carry finish_reason. If the opponent forfeited
+        // a moment before this submission the match is already 'finished'
+        // here, and buildResult() would otherwise report it as 'completed'
+        // (no forfeit notice on Result) — read the reason from the room once.
+        try {
+          const latest = await versusRoomService.getRoom(room.code)
+          setFinishReason(latest.finishReason ?? 'completed')
+        } catch {
+          // Fall back to 'completed'; match_history already holds the truth.
+        }
+        setScreenState(ScreenState.RESULT)
+      }
     } catch {
       setScreenState(ScreenState.ERROR)
       throw new Error('Round submission failed')
@@ -656,6 +699,17 @@ export function VersusGameplayScreen({
         {/* Normal gameplay */}
         {showGameUI && (
           <>
+            {/* Opponent reconnect window — informational only, the board
+                stays fully playable (rounds are submitted independently). */}
+            {opponentAway && !opponentGone && (
+              <div className="pt-1">
+                <StatusBanner
+                  variant="offline"
+                  message={t.versusGameplay.opponentReconnectingBanner(reconnectCd)}
+                />
+              </div>
+            )}
+
             {/* Matchup header */}
             <MatchupHeader
               playerName={playerName}   playerScore={playerScore}
@@ -724,16 +778,20 @@ export function VersusGameplayScreen({
         )}
       </main>
 
-      {/* ── RECONNECTING OVERLAY ──
-          Covers both cases:
-          1. screenState === RECONNECTING (screen-level state)
-          2. opponentStatus === RECONNECTING while game is NORMAL (opponent-driven)
-      */}
-      {(isReconnecting || (opponentStatus === OpponentStatus.RECONNECTING && isNormal)) && (
+      {/* ── RECONNECTING OVERLAY ── own connection only (screenState). The
+          opponent's disconnect no longer covers the board: it's the
+          non-blocking banner above, then OpponentLeftOverlay once the 60s
+          window expires. */}
+      {isReconnecting && (
         <ReconnectingOverlay
           countdown={reconnectCd}
           onQuit={() => { onQuit?.() }}
         />
+      )}
+
+      {/* ── OPPONENT DID NOT RETURN ── leave without forfeit (not onQuit). */}
+      {opponentGone && !isError && screenState !== ScreenState.RESULT && (
+        <OpponentLeftOverlay onLeave={() => { (onAbandon ?? onQuit)?.() }} />
       )}
 
       {/* ── ERROR OVERLAY ── */}

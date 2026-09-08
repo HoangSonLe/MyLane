@@ -53,11 +53,17 @@ export const profileSupabaseService = {
     const [
       { data: profileRow },
       { data: matches },
+      { data: outcomeRows },
       { data: eloRows },
       { data: bestRows },
     ] = await Promise.all([
       supabase.from('profiles').select('name, handle, avatar_url, overall_elo, joined_label').eq('id', userId).maybeSingle(),
       supabase.from('match_history').select('*').eq('user_id', userId).order('played_at', { ascending: false }).limit(30),
+      // Totals / win-rate must cover the whole record (docs/gameplay/README.md
+      // § Accounts "total games/wins/losses/draws"), not just the 30-row
+      // history page above — that capped "Games" at 30 and made the win
+      // rate a rolling figure that disagreed with the friend-profile view.
+      supabase.from('match_history').select('outcome').eq('user_id', userId),
       supabase.from('category_elo').select('*').eq('user_id', userId),
       supabase.from('category_bests').select('*').eq('user_id', userId),
     ])
@@ -76,9 +82,10 @@ export const profileSupabaseService = {
       playedAt: m.played_at,
     }))
 
-    const wins = (matches || []).filter((m: any) => m.outcome === 'win').length
-    const losses = (matches || []).filter((m: any) => m.outcome === 'loss').length
-    const draws = (matches || []).filter((m: any) => m.outcome === 'draw').length
+    const allOutcomes = outcomeRows || []
+    const wins = allOutcomes.filter((m: any) => m.outcome === 'win').length
+    const losses = allOutcomes.filter((m: any) => m.outcome === 'loss').length
+    const draws = allOutcomes.filter((m: any) => m.outcome === 'draw').length
 
     const ALL_CATEGORIES: { id: GameId; label: string }[] = [
       { id: GameId.NUMBER, label: 'Number' },
@@ -123,7 +130,7 @@ export const profileSupabaseService = {
       avatarUrl: profileRow?.avatar_url || userData?.user?.user_metadata?.avatar_url || undefined,
       joinedLabel: profileRow?.joined_label || 'Member',
       overallElo: computedOverallElo,
-      totalGames: (matches || []).length,
+      totalGames: allOutcomes.length,
       wins,
       losses,
       draws,

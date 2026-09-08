@@ -91,11 +91,11 @@ export const GAMES: GameMeta[] = [
  * in plain JS at mock-server/game-stats.mjs for the standalone server.
  */
 export const GAME_STATS_SEED: GameStats[] = [
-  { id: GameId.NUMBER, elo: 1240, bestScore: 14, highestLevel: 10 },
-  { id: GameId.ALPHABET, elo: 1185, bestScore: 12, highestLevel: 10 },
-  { id: GameId.GRID, elo: 1310, bestScore: 9, highestLevel: 9 },
-  { id: GameId.SEQUENCE, elo: 1420, bestScore: 18, highestLevel: 10 },
-  { id: GameId.COLOR, elo: 1150, bestScore: 6, highestLevel: 6 },
+  { id: GameId.NUMBER, elo: 1240, bestScore: 14, highestLevel: 10, completedLevel10: true },
+  { id: GameId.ALPHABET, elo: 1185, bestScore: 12, highestLevel: 10, completedLevel10: false },
+  { id: GameId.GRID, elo: 1310, bestScore: 9, highestLevel: 9, completedLevel10: false },
+  { id: GameId.SEQUENCE, elo: 1420, bestScore: 18, highestLevel: 10, completedLevel10: true },
+  { id: GameId.COLOR, elo: 1150, bestScore: 6, highestLevel: 6, completedLevel10: false },
 ]
 
 export const MODES: ModeMeta[] = [

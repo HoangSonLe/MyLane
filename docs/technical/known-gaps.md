@@ -80,12 +80,15 @@ hoàn toàn — xem mục 6 về phần vẫn cần dedicated Game API).
 Timing out while disconnected counts as a loss."
 
 Presence thật đã phát hiện đúng lúc đối thủ mất kết nối và đếm ngược 60s
-chạy đúng, nhưng khi hết giờ, client chỉ chuyển `ScreenState.ERROR` — không
-tự tuyên bố mình thắng, ván coi như huỷ/không tính. Đây là chủ đích: không
-có RPC nào cho phép 1 client "khai hộ" đối thủ thua
-(`forfeit_versus_match` hiện chỉ cho tự khai bản thân thua), nên cho phép
-tự xử thắng ở đây sẽ mở lỗ hổng gian lận. **Xác nhận (2026-08-05): giữ
-nguyên hành vi này tạm thời** — chưa cần làm RPC bên dưới ngay.
+chạy đúng. Hành vi hiện tại (đã sửa 2026-09-08): trong 60s đó bàn chơi
+**không bị chặn** — chỉ có banner đếm ngược, người còn kết nối vẫn nộp
+round bình thường; hết 60s hiện `OpponentLeftOverlay` với đúng 1 lối ra là
+**về Lobby không forfeit** (`onAbandon`, không gọi RPC nào) — phòng giữ
+`in_progress`, ván không tính, không đổi Elo. Client không tự tuyên bố mình
+thắng: không có RPC nào cho phép 1 client "khai hộ" đối thủ thua
+(`forfeit_versus_match` chỉ cho tự khai bản thân thua), nên cho phép tự xử
+thắng ở đây sẽ mở lỗ hổng gian lận. **Xác nhận (2026-08-05, giữ nguyên
+2026-09-08):** chưa làm RPC bên dưới ngay.
 
 **Thiết kế đề xuất (backlog, chưa làm, cần duyệt kỹ trước khi viết migration):**
 1. Heartbeat ghi xuống DB (không chỉ Presence trong bộ nhớ Realtime) — thêm
@@ -161,3 +164,48 @@ Ghi nhận, chưa triển khai:
   không đều, nhập ngược chuỗi (Reverse Recall).
 - Difficulty cộng thêm độ dài chuỗi gốc trong Versus (Easy = chuẩn, Super
   Hard = +3–4 ký tự từ Round 1).
+
+---
+
+## 11. Còn treo sau đợt rà lỗi logic 2026-09-08 (chưa quyết định)
+
+Đợt 2026-09-08 đã sửa: checkpoint rò rỉ qua nút Back, timeout Solo đếm 2
+lần trong StrictMode, Endless dùng level rò rỉ, Profile chỉ đếm 30 trận,
+Versus resume sai round / overlay chặn bàn / thoát bị forfeit, đua Accept
+lời mời, ChallengeModal xử lý `accepted` nhiều lần, kênh Realtime chết khi
+subscribe lại cùng topic (`openRealtimeChannel`), tie-break Versus, Quick
+Match chọn difficulty, Endless mở khi hoàn thành level 10
+(`completed_level_10`), Reset chỉ chơi lại round, Solo win chỉ khi hoàn
+thành level 10. Lịch sử chi tiết nằm ở git log; phần dưới là việc **còn
+lại**, mỗi mục cần chọn hướng trước khi làm:
+
+- **Back trong 3s đếm ngược ở phòng chờ** (`VersusRoomScreen` →
+  `handleHeaderBack`): trận đã `in_progress` nhưng thoát không forfeit
+  (`leave_versus_room` ném `MATCH_IN_PROGRESS`, client nuốt lỗi rồi rời).
+  Hướng 1: hiện confirm rồi gọi `forfeitMatch`. Hướng 2: coi 3s đó chưa
+  phải trận thật, cho phép rời — cần ghi rõ vào docs/gameplay.
+- **`match_history.score` lệch đơn vị giữa 2 người cùng trận Versus**:
+  server ghi số round đúng (0..5), client ghi đè bằng điểm công thức chỉ
+  khi bên đó vào màn Result. Bảng tuần/tháng đang xếp lẫn 2 loại. Hướng 1:
+  `finalize_versus_room` tự tính điểm công thức cho cả 2 (cần chuyển
+  `computeScore` sang SQL). Hướng 2: leaderboard Versus chỉ dùng số round.
+- **Guest vẫn mở kênh Realtime `friendships:`** (`lobby.queries.ts` key
+  theo `userId`, không theo `enabled`) — chỉ tốn tài nguyên.
+- **Lời mời còn treo khi người gửi reload**: `ChallengeModal` không cancel
+  khi unmount, đối thủ có thể accept vào phòng host đã đi. Bị chặn bởi hạn
+  30s của invite + TTL 10 phút của phòng.
+- **RPC xử thắng khi đối thủ mất kết nối**: vẫn là mục 5 ở trên.
+
+**Chưa test tay** (mới có type-check + lint), cần chạy app thật trước khi
+commit đợt này:
+1. Solo: hết giờ chỉ tính 1 lần thua trong dev; Reset trong Pause chơi lại
+   round nhưng giữ level/streak.
+2. Endless Color và Grid: bàn 6 màu và 10×10 dù trước đó đã chọn level
+   thấp ở Practice.
+3. Versus: reload giữa trận vào đúng round kế tiếp; đối thủ tắt app → banner
+   đếm ngược, bàn vẫn chơi được, hết 60s về Lobby không mất Elo; đối thủ
+   quay lại rồi rớt lần 2 → đếm lại từ 60.
+4. Lobby: gửi/nhận lời mời, modal không hiện lại sau khi Accept.
+5. Supabase: đã apply `database/schema.sql` (hoặc `database/delta-2026-09-08.sql`)
+   chưa — kiểm tra bằng `completed_level_10` tồn tại và
+   `finalize_versus_room` có chứa `submitted_at`.

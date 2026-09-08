@@ -144,7 +144,7 @@ Nguồn gốc quyết định:
 **Versus room flow UI**:
 - Quick Join: nút tham gia ngay phòng Public mở mà không cần tạo phòng.
 - Available Rooms List: danh sách phòng Public có sẵn để chọn tham gia.
-- Quick Match: card chính, mô tả ngắn về Elo-based matchmaking.
+- Quick Match: card chính, mô tả ngắn về Elo-based matchmaking. Màn Matchmaking cho chọn category **và difficulty** (chip tái dùng `DifficultyChip`), vì server chỉ ghép hai người cùng category + difficulty.
 - Create Room: form gồm game category, mode, privacy setting (Public/Private), room name optional, và nút tạo room.
 - Join Room: input room code (6 ký tự) hoặc link, nút join rõ ràng, feedback lỗi nếu code sai hoặc room đầy.
 - Nếu đã có phòng, room state nên hiển thị host badge, player slot, game category, mode, privacy status, và trạng thái ready.

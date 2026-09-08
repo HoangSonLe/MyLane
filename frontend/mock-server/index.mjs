@@ -175,7 +175,9 @@ app.post('/api/game/result', (req, res) => {
 
   const isGuest = !user || user.isGuest
   const shouldPersist = !isGuest && (isRanked || input.mode === 'solo-practice' || input.mode === 'solo-endless')
-  const outcome = input.outcome ?? (input.perfect || input.roundsCleared >= 5 ? 'win' : 'loss')
+  // Solo outcome (docs/gameplay/README.md § Accounts): win only when the run
+  // completed Level 10; every other ending is a loss.
+  const outcome = input.outcome ?? (input.completedAllLevels ? 'win' : 'loss')
   const previousElo = isVersusRanked && shouldPersist ? (user?.elo ?? 1000) : undefined
   const eloChange = previousElo === undefined
     ? undefined
@@ -190,6 +192,7 @@ app.post('/api/game/result', (req, res) => {
   if (shouldPersist && statsEntry) {
     statsEntry.bestScore = Math.max(statsEntry.bestScore, breakdown.score)
     statsEntry.highestLevel = Math.max(statsEntry.highestLevel, input.levelReached)
+    statsEntry.completedLevel10 = statsEntry.completedLevel10 || Boolean(input.completedAllLevels)
     MOCK_LAST_PLAYED.game = GAME_LABELS[input.game]
     MOCK_LAST_PLAYED.mode = MODE_LABELS[input.mode]
     MOCK_LAST_PLAYED.score = input.levelReached

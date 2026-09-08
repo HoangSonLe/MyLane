@@ -1,6 +1,6 @@
 import { GameId } from '@/configs/enum'
 import type { InviteStatus, MatchInviteData } from '../match-invite/match-invite.interface'
-import { getSupabaseClient } from './supabase.client'
+import { getSupabaseClient, openRealtimeChannel } from './supabase.client'
 
 function requireSupabase() {
   const supabase = getSupabaseClient()
@@ -90,28 +90,31 @@ export const matchInviteSupabaseService = {
   subscribeToIncomingInvites(userId: string, onInvite: (invite: MatchInviteData) => void): () => void {
     const supabase = getSupabaseClient()
     if (!supabase || !userId) return () => {}
-    const channel = supabase
-      .channel(`match-invites:${userId}`)
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'match_invites',
-          filter: `invitee_id=eq.${userId}`,
-        },
-        async (payload) => {
-          const row = payload.new as any
-          if (row?.status !== 'pending' || new Date(row.expires_at).getTime() <= Date.now()) return
-          try {
-            onInvite(await mapInviteRow(supabase, row))
-          } catch {
-            // Polling remains as the recovery path.
+    return openRealtimeChannel(supabase, `match-invites:${userId}`, (channel) => {
+      channel
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'match_invites',
+            filter: `invitee_id=eq.${userId}`,
+          },
+          async (payload) => {
+            const row = payload.new as any
+            // Expiry is decided by the database clock (expire_stale_match_invites,
+            // docs/gameplay/README.md "Versus Lifecycle Timeouts") — never by
+            // comparing expires_at against this device's clock.
+            if (row?.status !== 'pending') return
+            try {
+              onInvite(await mapInviteRow(supabase, row))
+            } catch {
+              // Polling remains as the recovery path.
+            }
           }
-        }
-      )
-      .subscribe()
-    return () => { void supabase.removeChannel(channel) }
+        )
+        .subscribe()
+    })
   },
 
   subscribeToInviteResponse(
@@ -120,24 +123,26 @@ export const matchInviteSupabaseService = {
   ): () => void {
     const supabase = getSupabaseClient()
     if (!supabase || !inviteId) return () => {}
-    const channel = supabase
-      .channel(`invite-response:${inviteId}`)
-      .on(
-        'postgres_changes',
-        { event: 'UPDATE', schema: 'public', table: 'match_invites', filter: `id=eq.${inviteId}` },
-        (payload) => {
-          const row = payload.new as any
-          if (row && ['accepted', 'declined', 'expired'].includes(row.status)) {
-            onResponse(row.status as InviteStatus, row.room_code)
+    return openRealtimeChannel(supabase, `invite-response:${inviteId}`, (channel) => {
+      channel
+        .on(
+          'postgres_changes',
+          { event: 'UPDATE', schema: 'public', table: 'match_invites', filter: `id=eq.${inviteId}` },
+          (payload) => {
+            const row = payload.new as any
+            if (row && ['accepted', 'declined', 'expired'].includes(row.status)) {
+              onResponse(row.status as InviteStatus, row.room_code)
+            }
           }
-        }
-      )
-      .subscribe()
-    return () => { void supabase.removeChannel(channel) }
+        )
+        .subscribe()
+    })
   },
 
   async checkPendingInvite(userId: string): Promise<MatchInviteData | null> {
     const supabase = requireSupabase()
+    // Server-clock expiry: the RPC flips stale rows to 'expired' before we
+    // read, so filtering on status alone is enough (no client-clock compare).
     const { error: expireError } = await supabase.rpc('expire_stale_match_invites')
     if (expireError) throwInviteError(expireError)
     const { data: row, error } = await supabase
@@ -145,7 +150,6 @@ export const matchInviteSupabaseService = {
       .select('*')
       .eq('invitee_id', userId)
       .eq('status', 'pending')
-      .gt('expires_at', new Date().toISOString())
       .order('created_at', { ascending: false })
       .limit(1)
       .maybeSingle()

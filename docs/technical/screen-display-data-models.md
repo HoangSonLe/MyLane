@@ -420,6 +420,8 @@ interface PlayerIdentity {
 interface GameStatsSummary {
   bestScore?: number
   highestLevel?: number
+  /** Endless unlock: won the required rounds at Level 10 (highestLevel alone can't tell). */
+  completedLevel10?: boolean
   currentElo?: number
   peakElo?: number
 }

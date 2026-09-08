@@ -31,6 +31,7 @@ export function VersusRoomScreen({
   initialEntrySource = RoomEntrySource.CUSTOM,
   initialJoinCode = '',
   onRoomLinkConsumed,
+  onRoomChanged,
 }: {
   onBack?: () => void
   onNavigate?: (screen: string, room?: Room) => void
@@ -39,6 +40,14 @@ export function VersusRoomScreen({
   initialEntrySource?: RoomEntrySource
   initialJoinCode?: string
   onRoomLinkConsumed?: () => void
+  /**
+   * Fires when the room this screen owns changes identity or status
+   * (created, joined, left, started). App uses it so a room created/joined
+   * *here* — not only one handed in via `initialRoom` from Matchmaking /
+   * Quick Join / Challenge — is known for logout cleanup and
+   * resume-on-reload (docs/technical/known-gaps.md "Resume-on-reload").
+   */
+  onRoomChanged?: (room: Room | null) => void
 }) {
   const { isOffline } = useNetworkStatus()
   const { t } = useTranslation()
@@ -173,6 +182,15 @@ export function VersusRoomScreen({
   const roomRef = useRef(room)
   roomRef.current = room
   const navigatedToGameRef = useRef(false)
+
+  // Report room identity/status changes upward (not every 800ms poll tick —
+  // only when code or status actually changes, so App isn't re-rendered
+  // and its resume snapshot isn't rewritten on every refresh).
+  const onRoomChangedRef = useRef(onRoomChanged)
+  onRoomChangedRef.current = onRoomChanged
+  useEffect(() => {
+    onRoomChangedRef.current?.(roomRef.current)
+  }, [room?.code, room?.status])
 
   // Poll room membership/readiness. Navigation is handled separately so both
   // clients honor the same server-issued start_at timestamp.

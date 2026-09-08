@@ -14,6 +14,14 @@ export interface Props {
   roundMode?: RoundMode
   difficulty?: DifficultyId
   seed?: string
+  /** Player chose to leave mid-match — counts as a forfeit (server-side). */
   onQuit?: () => void
   onMatchEnd?: (result: GameResultInput) => void
+  /**
+   * The opponent stayed disconnected past the 60s reconnect window and the
+   * player leaves. NOT a forfeit: no RPC is called, the room stays
+   * `in_progress` and the match is simply not counted — see
+   * docs/technical/known-gaps.md §5 for the server-side finalize backlog.
+   */
+  onAbandon?: () => void
 }

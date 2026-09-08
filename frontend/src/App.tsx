@@ -108,6 +108,11 @@ export default function App() {
   const sessionMutedMap = useInviteMuteStore((state) => state.sessionMutedMap)
   const [globalIncomingInvite, setGlobalIncomingInvite] = useState<IncomingInviteData | null>(null)
   const globalIncomingInviteRef = useRef<IncomingInviteData | null>(null)
+  // Invite ids this client already accepted / declined / muted. The 2s poll
+  // can read the row while respond_to_match_invite is still committing and
+  // would otherwise re-show the very invite being accepted (on top of the
+  // Versus Room), then flash "no longer available" a tick later.
+  const handledInviteIdsRef = useRef(new Set<string>())
   const [globalMuteTarget, setGlobalMuteTarget] = useState<(InviteMuteTarget & { name: string }) | null>(null)
   const [globalInviteToast, setGlobalInviteToast] = useState<string | null>(null)
   const { t } = useTranslation()
@@ -186,8 +191,10 @@ export default function App() {
   useEffect(() => {
     if (!inviteAccountId || !inviteMutesHydrated) return
 
-    const handleNewInvite = (inviteData: MatchInviteData) => {
-      if (isInviteMuted({ userId: inviteData.inviterId, handle: inviteData.inviterHandle })) return
+    /** Returns whether this invite is one we're willing to show. */
+    const handleNewInvite = (inviteData: MatchInviteData): boolean => {
+      if (handledInviteIdsRef.current.has(inviteData.id)) return false
+      if (isInviteMuted({ userId: inviteData.inviterId, handle: inviteData.inviterHandle })) return false
       setGlobalIncomingInvite((current) => {
         if (!current || current.id !== inviteData.id) {
           return {
@@ -205,10 +212,13 @@ export default function App() {
         }
         return current
       })
+      return true
     }
 
     // 1. Realtime WebSocket listener
-    const unsubscribe = matchInviteService.subscribeToIncomingInvites(inviteAccountId, handleNewInvite)
+    const unsubscribe = matchInviteService.subscribeToIncomingInvites(inviteAccountId, (invite) => {
+      handleNewInvite(invite)
+    })
 
     // 2. Active 2-second fast polling backup — also doubles as the way we
     // notice the inviter cancelled the invite we're currently showing (their
@@ -218,9 +228,15 @@ export default function App() {
       void matchInviteService.checkPendingInvite(inviteAccountId)
         .then((invite) => {
           if (invite) {
+            // Shown / refreshed, or ignored (muted sender, already handled).
+            // The poll only returns the *newest* pending invite, so when it's
+            // ignored we can't tell whether the one on screen is still
+            // pending — keep it; the 30s server expiry bounds the wait.
             handleNewInvite(invite)
             return
           }
+          // Server says nothing is pending: whatever the modal still shows
+          // was cancelled by the inviter or expired — dismiss it.
           const shown = globalIncomingInviteRef.current
           if (shown) {
             setGlobalIncomingInvite(null)
@@ -549,6 +565,11 @@ export default function App() {
               setSharedRoomCode('')
               window.history.replaceState({}, '', '/')
             }}
+            // A room created/joined inside the screen must be tracked here
+            // too, otherwise leaveActiveWaitingRoom() (logout) and the
+            // resume-on-reload snapshot only know rooms that arrived via
+            // Matchmaking / Quick Join / Challenge.
+            onRoomChanged={(activeRoom) => setMatchedVersusRoom(activeRoom)}
             onBack={() => {
               setMatchedVersusRoom(null)
               setRoomEntrySource(RoomEntrySource.CUSTOM)
@@ -600,6 +621,15 @@ export default function App() {
               // Natural end → ResultScreen to show ELO change (doc Section 6)
               setMatchedVersusRoom(null)
               push('result')
+            }}
+            onAbandon={() => {
+              // Opponent never returned within the 60s window. Deliberately
+              // NOT forfeitMatch: the player who stayed must not lose Elo.
+              // The room stays in_progress and the match is not counted
+              // (docs/technical/known-gaps.md §5).
+              setMatchedVersusRoom(null)
+              setRoomEntrySource(RoomEntrySource.CUSTOM)
+              resetTo('lobby')
             }}
           />
         )
@@ -759,6 +789,7 @@ export default function App() {
         show={!!globalIncomingInvite}
         onAccept={async () => {
           const invite = globalIncomingInvite
+          if (invite?.id) handledInviteIdsRef.current.add(invite.id)
           setGlobalIncomingInvite(null)
           try {
             const response = invite?.id
@@ -782,10 +813,14 @@ export default function App() {
           }
         }}
         onDecline={async () => {
-          if (globalIncomingInvite?.id) {
-            await matchInviteService.respondToInvite(globalIncomingInvite.id, false)
-          }
+          const inviteId = globalIncomingInvite?.id
+          if (inviteId) handledInviteIdsRef.current.add(inviteId)
+          // Close first: a failed decline must never leave the modal stuck.
+          // The 30s server expiry cleans up an invite we couldn't decline.
           setGlobalIncomingInvite(null)
+          if (inviteId) {
+            await matchInviteService.respondToInvite(inviteId, false).catch(() => {})
+          }
         }}
         onOpenMute={(userId, handle, name) => {
           setGlobalMuteTarget({ userId, handle, name })
@@ -799,6 +834,7 @@ export default function App() {
         onClose={() => setGlobalMuteTarget(null)}
         onConfirmMute={(_handle: string, option: MuteDurationOption) => {
           if (globalMuteTarget) void muteInviter(globalMuteTarget, option)
+          if (globalIncomingInvite?.id) handledInviteIdsRef.current.add(globalIncomingInvite.id)
           setGlobalIncomingInvite(null)
           setGlobalMuteTarget(null)
         }}

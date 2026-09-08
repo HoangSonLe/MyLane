@@ -141,7 +141,13 @@ export function GameplayScreen({
   const checkpoint = initialLevel !== undefined && rawCheckpoint?.level !== initialLevel ? undefined : rawCheckpoint
 
   // Shared game state
-  const [level, setLevel]         = useState(initialLevel ?? checkpoint?.level ?? 1)
+  // Endless always plays on the Level-10 board (docs/gameplay/README.md:
+  // "Unlocks after ... Level 10"; getEndlessConfig grows from Level 10's
+  // values). A Starting Level picked for Practice/Ranked must never leak in
+  // here: ColorBoard/GridBoard size themselves from `level` while the
+  // sequence comes from the Endless config, so a lower level would leave
+  // tiles the sequence needs but the board never renders.
+  const [level, setLevel]         = useState(isEndless ? 10 : (initialLevel ?? checkpoint?.level ?? 1))
   // Consecutive wins at the current level (docs: needs `roundsToWin` in a row to advance).
   const [winStreak, setWinStreak] = useState(checkpoint?.winStreak ?? 0)
   // Losses accumulated at the current level, not necessarily consecutive
@@ -305,22 +311,26 @@ export function GameplayScreen({
   // timer vẫn client-side") — this only reacts to the real navigator
   // online/offline signal.
   useEffect(() => {
-    if (phase === 'answering' && !isOffline && !paused) {
+    if (phase === Phase.ANSWERING && !isOffline && !paused) {
       timerRef.current = setInterval(() => {
-        setTimer((t) => {
-          if (t <= 1) {
-            clearInterval(timerRef.current!)
-            handleWrong('timeout')
-            return 0
-          }
-          return t - 1
-        })
+        setTimer((t) => Math.max(0, t - 1))
       }, 1000)
     } else {
       if (timerRef.current) clearInterval(timerRef.current)
     }
     return () => { if (timerRef.current) clearInterval(timerRef.current) }
   }, [phase, isOffline, paused])
+
+  // Timeout side effect lives outside the setTimer updater: React (Strict
+  // Mode, and any render-phase replay) may invoke an updater more than once,
+  // which used to fire handleWrong twice and count one timeout as two losses.
+  // startRound() resets the timer to full before VIEWING, so a leftover 0
+  // from the previous round can never be read here as an instant timeout.
+  useEffect(() => {
+    if (phase !== Phase.ANSWERING || isOffline || paused || timer > 0) return
+    if (timerRef.current) clearInterval(timerRef.current)
+    handleWrong('timeout')
+  }, [phase, isOffline, paused, timer])
 
   // ── Number Memory logic ──
   // docs/gameplay/number-memory.md: digits 1-9 (not 0), sampled with replacement.
@@ -483,7 +493,11 @@ export function GameplayScreen({
     const next = [...seqInput, id]
     const pos = next.length - 1
     setSeqPressed(id)
-    scheduleTimeout(() => setSeqPressed(null), 180)
+    // Plain setTimeout, same reason as handleColorTap below: the shared
+    // scheduleTimeout slot is taken over by handleCorrect() on the final tap,
+    // which cancelled this un-press and left the last tile lit until the
+    // next round started.
+    setTimeout(() => setSeqPressed(null), 180)
 
     if (next[pos] !== seqSequence[pos]) {
       handleWrong(); return
@@ -556,6 +570,10 @@ export function GameplayScreen({
     // last flash to visually settle before the next one starts.
     const nextRoundDelayMs = gameType === GameId.COLOR ? 2500 : 1200
     if (isEndless) {
+      // No level-advance in Endless (docs: +1 item every 3 consecutive wins,
+      // driven by roundsClearedRef via getEndlessConfig) — the streak is
+      // still tracked so the HUD "Streak" cell means the same thing here.
+      setWinStreak(winStreak + 1)
       scheduleTimeout(() => {
         startRound(level)
       }, nextRoundDelayMs)
@@ -615,6 +633,9 @@ export function GameplayScreen({
   function startRound(lvl = level) {
     clearScheduledTimeout()
     setIsRevealed(false)
+    // Reset the countdown before VIEWING so the timeout effect can't read a
+    // previous round's leftover 0 as an instant timeout once ANSWERING begins.
+    setTimer(getAnswerTimeSeconds(gameType, lvl, difficulty, isEndless, roundsClearedRef.current))
     if (gameType === GameId.NUMBER)   startNumberRound(lvl)
     if (gameType === GameId.ALPHABET) startAlphaRound(lvl)
     if (gameType === GameId.GRID)     startGridRound(lvl)
@@ -674,7 +695,26 @@ export function GameplayScreen({
     setShowTutorial(false)
   }
 
-  function resetRound() {
+  // docs/gameplay/*.md "Controls": "Reset the round at any time" — restarts
+  // the *current* round with a fresh pattern, keeping level / streak / loss
+  // count and every score tally. (Previously this wiped the whole session
+  // back to Level 1, which is what Quit/Back below still do.) A reset while
+  // the 1.2s "correct" transition is pending would double-count the win, so
+  // that case just resumes and lets the scheduled continuation run.
+  function restartRound() {
+    pausedRef.current = false
+    setPaused(false)
+    if (phase === Phase.CORRECT) {
+      armScheduledTimeout()
+      return
+    }
+    if (timerRef.current) clearInterval(timerRef.current)
+    startRound(level)
+  }
+
+  // Full session reset — used when leaving the screen (Back / Quit) so no
+  // checkpoint or tally survives into the next run.
+  function resetSession() {
     clearGameplayCheckpoint()
     clearScheduledTimeout()
     if (timerRef.current) clearInterval(timerRef.current)
@@ -682,7 +722,7 @@ export function GameplayScreen({
     setPaused(false)
     setIsRevealed(false)
     setPhase(Phase.IDLE)
-    setLevel(1)
+    setLevel(isEndless ? 10 : 1)
     setWinStreak(0)
     setLossCount(0)
     setNumAnswer('')
@@ -702,7 +742,7 @@ export function GameplayScreen({
     reachedMaxLevelRef.current = false
   }
 
-  const maxTimer = getAnswerTimeSeconds(gameType, level, difficulty)
+  const maxTimer = getAnswerTimeSeconds(gameType, level, difficulty, isEndless, roundsClearedRef.current)
   const gridCfg = gameType === GameId.GRID ? getGridLevel(level) : null
 
   return (
@@ -713,7 +753,11 @@ export function GameplayScreen({
         title={gameLabels[gameType]}
         subtitle={modeLabels[mode]}
         pauseDisabled={phase === Phase.IDLE}
-        onBack={onBack}
+        // Same as WrongToast's Back below: leaving the run must also drop the
+        // sessionStorage checkpoint, otherwise the next run of this game/mode/
+        // difficulty at the same level silently inherits this run's losses,
+        // bonus seconds and perfect=false.
+        onBack={() => { resetSession(); onBack?.() }}
         onPause={() => { if (phase !== Phase.IDLE) pauseGame() }}
       />
 
@@ -729,7 +773,7 @@ export function GameplayScreen({
         isPractice={mode === ModeId.SOLO_PRACTICE}
         onTryAgain={() => { isGameOver ? finishGame() : startRound(level) }}
         onRevealAnswer={revealAnswer}
-        onBack={() => { resetRound(); onBack?.() }}
+        onBack={() => { resetSession(); onBack?.() }}
       />
 
       {/* ── OFFLINE BANNER ──
@@ -876,8 +920,8 @@ export function GameplayScreen({
           gameType={gameType}
           mode={mode}
           onResume={resumeGame}
-          onReset={resetRound}
-          onQuit={() => { resetRound(); onQuit?.() }}
+          onReset={restartRound}
+          onQuit={() => { resetSession(); onQuit?.() }}
         />
       )}
 
@@ -886,7 +930,7 @@ export function GameplayScreen({
           top banner above already covers being offline in every other
           phase, so this doesn't duplicate it there. */}
       {isOffline && phase === 'answering' && !paused && (
-        <OfflinePauseOverlay onQuit={() => { resetRound(); onQuit?.() }} />
+        <OfflinePauseOverlay onQuit={() => { resetSession(); onQuit?.() }} />
       )}
 
       {/* ── TUTORIAL OVERLAY ── */}

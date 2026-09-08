@@ -42,25 +42,25 @@ Mọi dữ liệu quan trọng (kỷ lục, elo, lịch sử trận đấu, bạ
 
 **Hệ thống level:**
 - Có 10 level.
-- Level 1 bắt đầu với 6 ký tự.
-- Mỗi level tăng thêm 1 ký tự (lên đến 15 ký tự ở level 10).
-- Mỗi level yêu cầu thắng liên tiếp `times` lượt (mặc định **5 lượt**) mới được lên level tiếp theo.
+- Level 1 bắt đầu với 8 ký tự.
+- Mỗi level tăng thêm 1 ký tự (lên đến 17 ký tự ở level 10).
+- Mỗi level yêu cầu thắng liên tiếp `times` lượt (mặc định **3 lượt**) mới được lên level tiếp theo.
 - Nếu thua đủ `times` lượt trong cùng một level → **Game Over**.
 
 **Bảng level mặc định:**
 
 | Level | Số ký tự cần nhớ | Số lượt cần thắng |
 |-------|------------------|-------------------|
-| 1     | 6                | 5                 |
-| 2     | 7                | 5                 |
-| 3     | 8                | 5                 |
-| 4     | 9                | 5                 |
-| 5     | 10               | 5                 |
-| 6     | 11               | 5                 |
-| 7     | 12               | 5                 |
-| 8     | 13               | 5                 |
-| 9     | 14               | 5                 |
-| 10    | 15               | 5                 |
+| 1     | 8                | 3                 |
+| 2     | 9                | 3                 |
+| 3     | 10               | 3                 |
+| 4     | 11               | 3                 |
+| 5     | 12               | 3                 |
+| 6     | 13               | 3                 |
+| 7     | 14               | 3                 |
+| 8     | 15               | 3                 |
+| 9     | 16               | 3                 |
+| 10    | 17               | 3                 |
 
 **Mode độ khó thời gian** (cộng thêm vào `viewTime` và `answerTime`):
 
@@ -122,16 +122,16 @@ Toàn bộ logic còn lại (Viewing → Answering → thắng/thua lượt → 
 
 | Level | Kích thước lưới | Số lượt cần thắng | beginCount khởi đầu gợi ý |
 |-------|-----------------|-------------------|---------------------------|
-| 1     | 5 × 5           | 3                 | 8                         |
-| 2     | 6 × 5           | 3                 | 10                        |
-| 3     | 6 × 6           | 3                 | 12                        |
-| 4     | 7 × 6           | 3                 | 14                        |
-| 5     | 7 × 7           | 3                 | 16                        |
-| 6     | 8 × 8           | 3                 | 18                        |
-| 7     | 9 × 8           | 3                 | 20                        |
-| 8     | 9 × 9           | 3                 | 22                        |
-| 9     | 10 × 9          | 3                 | 24                        |
-| 10    | 10 × 10         | 3                 | 26                        |
+| 1     | 5 × 5           | 3                 | 10                        |
+| 2     | 6 × 5           | 3                 | 12                        |
+| 3     | 6 × 6           | 3                 | 14                        |
+| 4     | 7 × 6           | 3                 | 16                        |
+| 5     | 7 × 7           | 3                 | 18                        |
+| 6     | 8 × 8           | 3                 | 20                        |
+| 7     | 9 × 8           | 3                 | 22                        |
+| 8     | 9 × 9           | 3                 | 24                        |
+| 9     | 10 × 9          | 3                 | 26                        |
+| 10    | 10 × 10         | 3                 | 28                        |
 
 **Thông số thời gian mặc định:**
 - Viewing: 18 giây
@@ -462,7 +462,7 @@ Giữ nguyên bảng level như mục 2 của tài liệu gốc.
 Sau khi người chơi hoàn thành **Level 10** của bất kỳ thể loại nào:
 
 - Mở khóa **Endless Mode**.
-- **Numbers / Alphabet**: Số ký tự bắt đầu từ 16 và tăng thêm +1 sau mỗi 3 lượt thắng liên tiếp.
+- **Numbers / Alphabet**: Số ký tự bắt đầu từ 18 và tăng thêm +1 sau mỗi 3 lượt thắng liên tiếp.
 - **Grid**: Sau lưới 10×10, `beginCount` tiếp tục tăng thêm 2 mỗi lần thắng đủ 3 lượt. Có thể mở rộng lên lưới 11×11, 12×12… ở các phiên bản sau.
 - Có bảng xếp hạng Endless riêng (xếp theo số item / beginCount cao nhất đạt được).
 - Endless Mode chỉ áp dụng cho Solo Ranked và Solo Practice (chưa hỗ trợ Versus ở Version 1).

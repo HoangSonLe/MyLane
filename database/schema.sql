@@ -74,9 +74,31 @@ CREATE TABLE IF NOT EXISTS public.category_bests (
   ranked_score INTEGER GENERATED ALWAYS AS (GREATEST(solo_ranked_score, versus_ranked_score)) STORED,
   ranked_level INTEGER GENERATED ALWAYS AS (GREATEST(solo_ranked_level, versus_ranked_level)) STORED,
   highest_level INTEGER DEFAULT 1,
+  -- docs/gameplay/README.md § Endless Mode: "Unlocks after a player completes
+  -- Level 10". highest_level alone can't distinguish "reached Level 10 then
+  -- lost out" from "won the required rounds at Level 10", so the unlock is
+  -- its own sticky flag, set by submitResult when completedAllLevels is true.
+  completed_level_10 BOOLEAN DEFAULT false NOT NULL,
   updated_at TIMESTAMPTZ DEFAULT NOW(),
   UNIQUE(user_id, category)
 );
+
+-- Reconcile deployments created before the Endless unlock flag existed
+-- (CREATE TABLE IF NOT EXISTS never adds columns to an existing table).
+ALTER TABLE public.category_bests
+  ADD COLUMN IF NOT EXISTS completed_level_10 BOOLEAN DEFAULT false NOT NULL;
+
+-- Backfill from history so players who already completed Level 10 don't
+-- lose their Endless unlock when this flag is introduced (idempotent).
+UPDATE public.category_bests cb
+SET completed_level_10 = true
+WHERE cb.completed_level_10 = false
+  AND EXISTS (
+    SELECT 1 FROM public.match_history h
+    WHERE h.user_id = cb.user_id
+      AND h.category = cb.category
+      AND h.completed_all_levels = true
+  );
 
 -- Reconcile a deployment created before the solo/versus ranked-best split:
 -- CREATE TABLE IF NOT EXISTS above does not touch an already-existing
@@ -1103,6 +1125,18 @@ BEGIN
       v_winner_id := v_room.host_id;
     ELSIF v_room.guest_score > v_room.host_score THEN
       v_winner_id := v_room.guest_id;
+    ELSIF v_room.host_score > 0 THEN
+      -- docs/gameplay/README.md "Versus Ranked ... Faster correct player
+      -- wins": equal correct-round counts are decided by who finished round
+      -- 5 first, on the server clock (versus_round_results.submitted_at).
+      -- 0-0 (nobody answered anything correctly) stays a draw.
+      SELECT rr.user_id INTO v_winner_id
+      FROM public.versus_round_results rr
+      WHERE rr.match_id = v_room.match_id
+        AND rr.round_number = 5
+        AND rr.user_id IN (v_room.host_id, v_room.guest_id)
+      ORDER BY rr.submitted_at ASC, rr.user_id ASC
+      LIMIT 1;
     ELSE
       v_winner_id := NULL;
     END IF;
@@ -1161,6 +1195,21 @@ BEGIN
     UPDATE public.category_elo
     SET elo = GREATEST(100, v_guest_rating + v_guest_delta), last_delta = v_guest_delta, updated_at = NOW()
     WHERE user_id = v_room.guest_id AND category = v_room.category;
+
+    -- docs/gameplay/README.md § Elo System: "per-category Elo ... plus a
+    -- weighted-average overall Elo". The doc never defines the weights, so
+    -- this mirrors the frontend's calculateOverallElo(): a plain average of
+    -- the categories the player has an Elo row for. Previously nothing ever
+    -- wrote profiles.overall_elo, leaving it frozen at 1000.
+    UPDATE public.profiles p
+    SET overall_elo = agg.avg_elo, updated_at = NOW()
+    FROM (
+      SELECT ce.user_id, ROUND(AVG(ce.elo))::INTEGER AS avg_elo
+      FROM public.category_elo ce
+      WHERE ce.user_id IN (v_room.host_id, v_room.guest_id)
+      GROUP BY ce.user_id
+    ) agg
+    WHERE p.id = agg.user_id;
   END IF;
 
   UPDATE public.versus_rooms

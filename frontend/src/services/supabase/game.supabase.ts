@@ -64,7 +64,10 @@ export const gameSupabaseService = {
       const userId = userData?.user?.id
 
       if (userId && shouldPersist) {
-        let outcome = input.outcome ?? (input.perfect || input.roundsCleared >= 5 ? 'win' : 'loss')
+        // Solo outcome (docs/gameplay/README.md § Accounts): a run counts as
+        // a win only when it completed Level 10; every other ending is a
+        // loss. Versus passes its server-owned outcome explicitly.
+        let outcome = input.outcome ?? (input.completedAllLevels ? 'win' : 'loss')
         const catLabelShort = (GAME_LABELS[input.game] || input.game).replace(' Memory', '')
         const dbMode = (input.mode as string).replace(/-/g, '_')
         const dbDifficulty = (input.difficulty as string).replace(/-/g, '_')
@@ -209,6 +212,8 @@ export const gameSupabaseService = {
             versus_ranked_score: newVersusRankedScore,
             versus_ranked_level: Math.max(prevBest?.versus_ranked_level || 0, isVersusRanked ? input.levelReached : 1),
             highest_level: newHighestLevel,
+            // Endless unlock flag (docs: "completes Level 10") — sticky once earned.
+            completed_level_10: Boolean(prevBest?.completed_level_10) || input.completedAllLevels,
             updated_at: new Date().toISOString(),
           },
           { onConflict: 'user_id,category' }
@@ -271,6 +276,7 @@ export const gameSupabaseService = {
         elo: elo?.elo || 1000,
         bestScore: best?.ranked_score ?? null,
         highestLevel: best?.highest_level ?? null,
+        completedLevel10: Boolean(best?.completed_level_10),
       }
     })
   },
